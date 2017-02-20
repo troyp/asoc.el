@@ -55,7 +55,7 @@ to `equal'. Possible values include `eq', `eql', `equal', `equalp'."
 ;; TODO: implement to use asoc-compare-fn
 (defalias 'asoc-get 'alist-get)
 
-(defmacro asoc-put (key value alist &optional replace)
+(defmacro asoc-put! (key value alist &optional replace)
   "Associate KEY with VALUE in ALIST.
 
 When KEY already exists, if REPLACE is non-nil, previous entries with that key
