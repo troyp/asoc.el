@@ -58,6 +58,12 @@
        (asoc-put 3 10 a :replace)
        )
      :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
+    ;; test with replace=non-nil, deletion at head of list
+    (should-equal
+     (let ((a '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25))))
+       (asoc-put 3 10 a :replace)
+       )
+     :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
     )
 
   )
