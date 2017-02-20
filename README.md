@@ -7,7 +7,7 @@ Associative list (alist) library for Emacs Lisp.
 
 ### variables
 
-asoc-compare-fn
+* asoc-compare-fn
 
 ### functions & macros
 
@@ -16,3 +16,6 @@ asoc-compare-fn
 * asoc-find-key `(asoc-find-key key list)`
 * asoc-contains-key? `(alist key)`
 * asoc-contains-pair? `(alist key value)`
+* asoc-do `(spec &rest body)`
+* asoc-fold `(alist init function)`
+ 
