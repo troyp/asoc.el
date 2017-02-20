@@ -33,38 +33,59 @@
                     (concat acc (format "%S\t%S\n" k v)))))
      :result "1\t1\n2\t4\n3\t9\n4\t16\n5\t25\n"))
 
-  (ert-deftest test-asoc-unit-tests-asoc-put ()
-    ;; test with replace=nil
+  (ert-deftest test-asoc-unit-tests-asoc--compare ()
+    "Unit tests for asoc--compare"
     (should-equal
-     (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
-       (asoc-put 3 10 a)
-       )
-     :result '((3 . 10) (1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
-    ;; test with replace=non-nil
-    (should-equal
-     (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
-       (asoc-put 3 10 a :replace)
-       )
-     :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
-    ;; test with replace=non-nil, multiple deletions
-    (should-equal
-     (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (3 . 1) (5 . 25))))
-       (asoc-put 3 10 a :replace)
-       )
-     :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
-    ;; test with replace=non-nil, no deletions
-    (should-equal
-     (let ((a '((1 . 1) (2 . 4) (4 . 16) (5 . 25))))
-       (asoc-put 3 10 a :replace)
-       )
-     :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
-    ;; test with replace=non-nil, deletion at head of list
-    (should-equal
-     (let ((a '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25))))
-       (asoc-put 3 10 a :replace)
-       )
-     :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
+     (let (table)
+       (dolist (fn '(#'equalp
+                     #'equal
+                     #'eql
+                     #'eq)     table)
+         (let* ( result
+                 (fnresult (dolist (xy
+                                    '((3 . 3)
+                                      (3 . 3.0)
+                                      ((1 2) . (1 2))
+                                      ("a" . "a")
+                                      ("a" . "A")
+                                      (x . x))
+                                    result)
+                             (setq result (cons (asoc--compare (car xy) (cdr xy))
+                                                result)))))
+           (setq table (cons fnresult table)))))
+     :result '((t nil t t nil t)    ;; equalp
+               (t nil t t nil t)    ;; equal
+               (t nil t t nil t)    ;; eql
+               (t nil t t nil t)))  ;; eq
     )
+
+  (ert-deftest test-asoc-unit-tests-asoc-put ()
+      ;; test with replace=nil
+      (should-equal
+       (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
+         (asoc-put 3 10 a))
+       :result '((3 . 10) (1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
+      ;; test with replace=non-nil
+      (should-equal
+       (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
+         (asoc-put 3 10 a :replace))
+       :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
+      ;; test with replace=non-nil, multiple deletions
+      (should-equal
+       (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (3 . 1) (5 . 25))))
+         (asoc-put 3 10 a :replace))
+       :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
+      ;; test with replace=non-nil, no deletions
+      (should-equal
+       (let ((a '((1 . 1) (2 . 4) (4 . 16) (5 . 25))))
+         (asoc-put 3 10 a :replace))
+       :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
+      ;; test with replace=non-nil, deletion at head of list
+      (should-equal
+       (let ((a '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25))))
+         (asoc-put 3 10 a :replace))
+       :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
+      )
 
   )
 
