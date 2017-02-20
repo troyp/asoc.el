@@ -5,9 +5,9 @@
 
 (cl-macrolet ((should-equal
                (expr keyword result)
-               (progn
-                 (unless (eq keyword :result) (error "expected :result"))
-                 `(should (equal ,expr ,result)))))
+               (if (eq keyword :result)
+                   `(should (equal ,expr ,result))
+                 (error "expected :result"))))
 
   (ert-deftest test-asoc-docstring-examples-asoc-do ()
     "Docstring examples for asoc functions and macros."
