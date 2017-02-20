@@ -61,12 +61,9 @@ to `equal'. Possible values include `eq', `eql', `equal', `equalp'."
 When KEY already exists, if REPLACE is non-nil, previous entries with that key
 are removed. Otherwise, the pair is simply consed on the front of the alist."
   `(progn
-     (when (and (asoc-contains-key? ,alist ,key)
-              ,replace)
-       (mapc (lambda (pr)
-               (when (asoc--compare (car pr) ,key)
-                 (delete pr ,alist)))
-             ,alist))
+     (when ,replace
+       (setq ,alist (map-filter (lambda (k _) (not (asoc--compare k ,key)))
+                                ,alist)))
      (setq ,alist (cons (cons ,key ,value) ,alist))))
 
 ;; TODO: implement to use asoc-compare-fn
