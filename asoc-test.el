@@ -37,18 +37,17 @@
     "Unit tests for asoc--compare"
     (should-equal
      (let (table)
-       (dolist (fn '(#'equalp
-                     #'equal
-                     #'eql
-                     #'eq)     table)
+       (dolist (fn
+                '(#'equalp #'equal #'eql #'eq)
+                table)
          (let* ( result
                  (fnresult (dolist (xy
-                                    '((3 . 3)
-                                      (3 . 3.0)
-                                      ((1 2) . (1 2))
-                                      ("a" . "a")
-                                      ("a" . "A")
-                                      (x . x))
+                                    '((3 . 3)           ;; 1. int
+                                      (3 . 3.0)         ;; 2. int vs float
+                                      ((1 2) . (1 2))   ;; 3. lists
+                                      ("a" . "a")       ;; 4. strings
+                                      ("a" . "A")       ;; 5. strings, diff case
+                                      (x . x))          ;; 6. symbols
                                     result)
                              (setq result (cons (asoc--compare (car xy) (cdr xy))
                                                 result)))))
