@@ -48,7 +48,7 @@
     )
 
   (ert-deftest test-asoc-unit-tests-asoc--compare ()
-    "Unit tests for asoc--compare"
+    "Unit tests for asoc--compare."
     (should-equal
      (let (table)
        (dolist (fn
@@ -72,7 +72,20 @@
                (t nil t t nil t)))  ;; eq
     )
 
+  (ert-deftest test-asoc-unit-tests-asoc-make ()
+    "Unit tests for asoc-make."
+    (should-equal (asoc-make) :result nil)
+    (should-equal (asoc-make '(a b c d))
+                  :result '((a) (b) (c) (d)))
+    (should-equal (asoc-make '(a b c d) nil)
+                  :result '((a) (b) (c) (d)))
+    (should-equal
+     (asoc-make '(a b c d) 'undefined)
+     :result '((a . undefined) (b . undefined) (c . undefined) (d . undefined)))
+      )
+
   (ert-deftest test-asoc-unit-tests-asoc-put ()
+    "Unit tests for asoc-put."
       ;; test with replace=nil
       (should-equal
        (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
