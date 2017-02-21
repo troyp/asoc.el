@@ -17,5 +17,7 @@ Associative list (alist) library for Emacs Lisp.
 * asoc-contains-key? `(alist key)`
 * asoc-contains-pair? `(alist key value)`
 * asoc-do `(spec &rest body)`
+* asoc-map-values `(func alist)`
+* asoc-zip `(keys values)`
 * asoc-fold `(alist init function)`
  
