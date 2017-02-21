@@ -52,6 +52,10 @@ to `equal'. Possible values include `eq', `eql', `equal', `equalp'."
            (setf alist (cdr alist)))
          (car alist)))))
 
+(defun asoc-make (&optional keys)
+  "Return an alist with KEYS each initialized to value nil."
+  (asoc-zip keys nil))
+
 ;; TODO: implement to use asoc-compare-fn
 (defalias 'asoc-get 'alist-get)
 
