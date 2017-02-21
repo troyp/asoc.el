@@ -121,18 +121,20 @@ Example:
                    ,@body))
                ,alist))))
 
-(defun asoc-fold (alist init function)
-  "Reduce ALIST using FUNCTION on the values, starting with value INIT.
+(defun asoc-map-values ())
+
+(defun asoc-fold (func alist init)
+  "Reduce ALIST using FUNC on the values, starting with value INIT.
 
-FUNCTION should take a key, a value and the accumulated result and return
+FUNC should take a key, a value and the accumulated result and return
 an updated result.
 
 Example:
    (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
          (s \"\"))
-     (asoc-fold a \"\"
-                (lambda (k v acc)
-                  (concat acc (format \"%S\t%S\\n\" k v)))))
+     (asoc-fold (lambda (k v acc)
+                  (concat acc (format \"%S\t%S\\n\" k v)))
+                a \"\"))
    \"1	1
    2	4
    3	9
@@ -143,7 +145,7 @@ Example:
   (let ((result init))
     (asoc-do
      ((key value) alist)
-     (setq result (funcall function key value result)))
+     (setq result (funcall func key value result)))
     result))
 
 
