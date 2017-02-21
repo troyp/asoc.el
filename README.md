@@ -5,7 +5,7 @@ Associative list (alist) library for Emacs Lisp.
 
 ##API
 
-### variables
+### Variables
 * asoc-compare-fn
 
 ### Constructor Functions
