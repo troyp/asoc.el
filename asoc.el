@@ -64,9 +64,9 @@ to `equal'. Possible values include `eq', `eql', `equal', `equalp'."
 ;; | Constructor Functions |
 ;; '-----------------------'
 
-(defun asoc-make (&optional keys)
+(defun asoc-make (&optional keys default)
   "Return an alist with KEYS each initialized to value nil."
-  (asoc-zip keys nil))
+  (asoc-zip keys (make-list (length keys) default)))
 
 ;; ,------------,
 ;; | Predicates |
