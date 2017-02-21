@@ -26,6 +26,10 @@
 ;;; Code:
 
 
+;; ,-----------,
+;; | Variables |
+;; '-----------'
+
 (defvar asoc-compare-fn nil
   "Special variable holding the equality predicate used in asoc functions.
 
@@ -33,6 +37,10 @@ May take the values `equalp', `equal', `eql', `eq'. When unset, or set to any
 other value, functions default to using `equal'.
 
 This variable may be passed to asoc functions dynamically in a let binding.")
+
+;; ,-------------------,
+;; | Private Functions |
+;; '-------------------'
 
 (defun asoc--compare (x y)
   "Compare X and Y using `asoc-compare-fn'."
@@ -52,10 +60,33 @@ to `equal'. Possible values include `eq', `eql', `equal', `equalp'."
            (setf alist (cdr alist)))
          (car alist)))))
 
+;; ,-----------------------,
+;; | Constructor Functions |
+;; '-----------------------'
+
 (defun asoc-make (&optional keys)
   "Return an alist with KEYS each initialized to value nil."
   (asoc-zip keys nil))
 
+;; ,------------,
+;; | Predicates |
+;; '------------'
+
+(defun asoc-contains-key? (alist key)
+  "Return t if ALIST contains an item with key KEY, nil otherwise."
+  (case asoc-compare-fn
+    ('equalp (and (asoc--assoc key alist #'equalp) t))
+    ('eql    (and (asoc--assoc key alist #'eql) t))
+    ('eq     (and (assq  key alist) t))
+    (t       (and (assoc key alist) t))))
+
+(defun asoc-contains-pair? (alist key value)
+  (and (member (cons key value) alist) t))
+
+;; ,------------------,
+;; | Access Functions |
+;; '------------------'
+
 ;; TODO: implement to use asoc-compare-fn
 (defalias 'asoc-get 'alist-get)
 
@@ -72,18 +103,11 @@ are removed. Otherwise, the pair is simply consed on the front of the alist."
 
 ;; TODO: implement to use asoc-compare-fn
 (defalias 'asoc-find-key 'assoc)
-
-(defun asoc-contains-key? (alist key)
-  "Return t if ALIST contains an item with key KEY, nil otherwise."
-  (case asoc-compare-fn
-    ('equalp (and (asoc--assoc key alist #'equalp) t))
-    ('eql    (and (asoc--assoc key alist #'eql) t))
-    ('eq     (and (assq  key alist) t))
-    (t       (and (assoc key alist) t))))
-
-(defun asoc-contains-pair? (alist key value)
-  (and (member (cons key value) alist) t))
 
+;; ,--------------------,
+;; | Looping Constructs |
+;; '--------------------'
+
 (defmacro asoc-do (spec &rest body)
   "Iterate through ALIST, executing BODY for each key-value pair.
 
@@ -125,6 +149,10 @@ Example:
                    ,@body))
                ,alist))))
 
+;; ,-------------------,
+;; | Mapping Functions |
+;; '-------------------'
+
 (defun asoc-map-values (func alist)
   "Return a modified copy of alist with values transformed by FUNC."
   (mapcar (lambda (k.v)
@@ -143,6 +171,10 @@ If KEYS is longer than VALUES, the excess keys have value nil."
          (values (append values (make-list n nil))))
     (mapcar* #'cons keys values)))
 
+;; ,-------,
+;; | Folds |
+;; '-------'
+
 (defun asoc-fold (func alist init)
   "Reduce ALIST using FUNC on the values, starting with value INIT.
 
