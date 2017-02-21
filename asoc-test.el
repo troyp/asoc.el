@@ -36,6 +36,18 @@
        :result "1\t1\n2\t4\n3\t9\n4\t16\n5\t25\n"))
     )
 
+  (ert-deftest test-asoc-unit-tests-asoc-do ()
+    "Docstring examples for asoc functions and macros."
+    ;; error if the variable RESULT is not defined
+    (should-error
+     (let ((a '((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36))))
+       (let (sum)
+         (makunbound 'sum)
+         (asoc-do ((key value) a sum)
+           (when (symbolp key)
+             (setf sum (+ sum value)))))))
+    )
+
   (ert-deftest test-asoc-unit-tests-asoc--compare ()
     "Unit tests for asoc--compare"
     (should-equal
