@@ -121,7 +121,23 @@ Example:
                    ,@body))
                ,alist))))
 
-(defun asoc-map-values ())
+(defun asoc-map-values (func alist)
+  "Return a modified copy of alist with values transformed by FUNC."
+  (mapcar (lambda (k.v)
+            (let ((k (car k.v))
+                  (v (cdr k.v)))
+              (cons k (funcall func v))))
+          alist))
+
+(defun asoc-zip (keys values)
+  "Return an alist associating KEYS with corresponding VALUES.
+If KEYS is longer than VALUES, the excess keys have value nil."
+  (when (> (length values) (length keys))
+    (error "More keys than values."))
+  (let* ((n (- (length keys)
+               (length values)))
+         (values (append values (make-list n nil))))
+    (mapcar* #'cons keys values)))
 
 (defun asoc-fold (func alist init)
   "Reduce ALIST using FUNC on the values, starting with value INIT.

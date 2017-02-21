@@ -100,6 +100,47 @@
        :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
       )
 
+  (ert-deftest test-asoc-unit-tests-asoc-map-values ()
+    "Unit tests for asoc-map-values."
+    (should-equal
+     (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
+       (asoc-map-values (lambda (x) (* x x)) a))
+     :result '((1 . 1) (2 . 16) (3 . 81) (4 . 256) (5 . 625)))
+    ;; empty alist
+    (should-equal
+     (let ((a nil))
+       (asoc-map-values (lambda (x) (* x x)) a))
+    :result nil)
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-zip ()
+    "Unit tests for asoc-zip."
+    ;; #keys == #values
+    (should-equal
+     (asoc-zip '(1 2 3 4 5) '(1 4 9 16 25))
+     :result '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
+    ;; #keys > #values
+    (should-equal
+     (asoc-zip '(1 2 3 4 5 6 7) '(1 4 9 16 25))
+     :result '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25) (6) (7)))
+    ;; #keys < #values
+    (should-error
+     (asoc-zip '(1 2 3 4 5) '(1 4 9 16 25 36)))
+    ;; empty list
+    (should-equal
+     (asoc-zip nil nil)
+     :result nil)
+    ;; empty values
+    (should-equal
+     (asoc-zip '(1 2 3 4 5) nil)
+     :result '((1) (2) (3) (4) (5)))
+    ;; values sequence is a string
+    (should-equal
+     (asoc-zip '(1 2 3 4 5 6) "qwerty")
+     :result '((1 . ?q) (2 . ?w) (3 . ?e) (4 . ?r) (5 . ?t) (6 . ?y)))
+    )
+
+
   )
 
 (defun asoc---test-all ()
