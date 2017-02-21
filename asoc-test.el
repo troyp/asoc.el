@@ -12,26 +12,29 @@
   (ert-deftest test-asoc-docstring-examples-asoc-do ()
     "Docstring examples for asoc functions and macros."
     (should-equal
-     (let ((a '((1 . 1) (2 . 4) (three . 9) (4 . 16) (five . 25))))
-       (asoc-do ((key value) a sum)
-         (when (symbolp key)
-           (setf sum (+ (or sum 0) value)))))
-     :result 34)
+     (with-temp-buffer
+       (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
+         (asoc-do ((k v) a)
+           (insert (format "%S\t%S\n" k v))))
+       (buffer-string))
+     :result "1	1\n2	4\n3	9\n4	16\n5	25\n")
     ;; with RESULT
     (should-equal
-     (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
-           (s ""))
-       (asoc-do ((k v) (reverse a) s)
-         (setq s (cons (format "%S\t%S" k v) s))))
-     :result '("1	1" "2	4" "3	9" "4	16" "5	25")))
-  (ert-deftest test-asoc-docstring-examples-asoc-fold ()
-    (should-equal
-     (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
-           (s ""))
-       (asoc-fold a ""
-                  (lambda (k v acc)
-                    (concat acc (format "%S\t%S\n" k v)))))
-     :result "1\t1\n2\t4\n3\t9\n4\t16\n5\t25\n"))
+     (let ((a '((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36))))
+       (let ((sum 0))
+         (asoc-do ((key value) a sum)
+           (when (symbolp key)
+             (setf sum (+ sum value))))))
+     :result 30)
+    (ert-deftest test-asoc-docstring-examples-asoc-fold ()
+      (should-equal
+       (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
+             (s ""))
+         (asoc-fold a ""
+                    (lambda (k v acc)
+                      (concat acc (format "%S\t%S\n" k v)))))
+       :result "1\t1\n2\t4\n3\t9\n4\t16\n5\t25\n"))
+    )
 
   (ert-deftest test-asoc-unit-tests-asoc--compare ()
     "Unit tests for asoc--compare"

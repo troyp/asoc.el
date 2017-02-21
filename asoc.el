@@ -85,17 +85,18 @@ are removed. Otherwise, the pair is simply consed on the front of the alist."
 
 For each iteration, KEYVAR is bound to the key and VALUEVAR is bound to the value.
 
-The return value is obtained by evaluating RESULT (nil by default).
+The return value is obtained by evaluating RESULT.
 
 Example:
-  (asoc-do ((key value) a sum)
-    (when (symbolp key)
-      (setf sum (+ (or sum 0) value))))
-  ;; add values associated with all keys that are symbols.
-
-(asoc-do ((k v) a)
-  (insert (format \"%S\t%S\n\" k v)))
+  (asoc-do ((k v) a)
+    (insert (format \"%S\t%S\n\" k v)))
   ;; print keys and values
+
+  (let ((sum 0))
+    (asoc-do ((key value) a sum)
+      (when (symbolp key)
+        (setf sum (+ sum value))))))
+  ;; add values associated with all keys that are symbols.
 
 \(fn ((KEYVAR VALUEVAR) ALIST [RESULT]) BODY...)"
   (declare (debug (((sexp sexp) form) body))
@@ -107,7 +108,7 @@ Example:
          (result  (caddr spec))
          (pairsym (make-symbol "pair")))
     (if result
-        `(let (,result)
+        `(progn
            (mapcar (lambda (pair)
                      (let ((,kvar (car pair))
                            (,vvar (cdr pair)))
