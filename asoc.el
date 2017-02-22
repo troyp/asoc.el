@@ -87,8 +87,8 @@ to `equal'. Possible values include `eq', `eql', `equal', `equalp'."
 ;; | Access Functions |
 ;; '------------------'
 
-;; TODO: implement to use asoc-compare-fn
-(defalias 'asoc-get 'alist-get)
+(defun asoc-get (key alist &optional default)
+  (or (cdr (asoc--assoc key alist)) default))
 
 (defmacro asoc-put! (key value alist &optional replace)
   "Associate KEY with VALUE in ALIST.
@@ -101,8 +101,7 @@ are removed. Otherwise, the pair is simply consed on the front of the alist."
                                 ,alist)))
      (setq ,alist (cons (cons ,key ,value) ,alist))))
 
-;; TODO: implement to use asoc-compare-fn
-(defalias 'asoc-find-key 'assoc)
+(defalias 'asoc-find-key 'asoc--assoc)
 
 ;; ,--------------------,
 ;; | Looping Constructs |
