@@ -88,7 +88,46 @@
     (should-equal
      (asoc-make '(a b c d) 'undefined)
      :result '((a . undefined) (b . undefined) (c . undefined) (d . undefined)))
-      )
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-contains-key? ()
+    "Unit tests for asoc--contains-key?."
+    (should-equal
+     (let* (table
+            (p     '(1 2))
+            (a     (list '(    1   . t)
+                         '(    2.0 . t)
+                         '(    "a" . t)
+                         (cons p     t)
+                         '(    nil . t)))
+            (test-items ;; test-item       alist-elem
+             (list         1         ;;    1           | 1  int
+                           1.0       ;;    1           | 2  float matches int
+                           2.0       ;;    2.0         | 3  float
+                           2         ;;    2.0         | 4  int matches float
+                           "a"       ;;    "a"         | 5  string
+                           "A"       ;;    "a"         | 6  string, other case
+                           '(1 2)    ;;    p = (1 2)   | 7  list, same structure
+                           p         ;;    p           | 8  list, same object
+                           nil       ;;    nil         | 9  nil
+             )))
+       (dolist (fn (list #'equalp #'equal #'eql #'eq) table)
+         (let* (result
+                (asoc-compare-fn fn)
+                (fnresult
+                 (dolist (test test-items result)
+                   (setq result (cons (asoc-contains-key? a test)
+                                      result)))))
+           (setq table (cons (reverse fnresult) table)))))
+     :result
+     ;; 1/1  1.0/1  2.0/2.0  2/2.0 "a"/"a" "A"/"a" (1 2)/(1 2) (1 2),same nil
+     '(( t     nil    nil    nil     nil     nil       nil          t      t)  ;; equalp
+       ( t     nil      t    nil     nil     nil       nil          t      t)  ;; equal
+       ( t     nil      t    nil       t     nil         t          t      t)  ;; eql
+       ( t       t      t      t       t       t         t          t      t)) ;; eq
+     )
+    )
+
 
   (ert-deftest test-asoc-unit-tests-asoc-put! ()
     "Unit tests for asoc-put!."
