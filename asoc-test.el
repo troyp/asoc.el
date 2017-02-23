@@ -52,24 +52,30 @@
     (should-equal
      (let (table)
        (dolist (fn
-                '(#'equalp #'equal #'eql #'eq)
+                (list #'equalp #'equal #'eql #'eq)
                 table)
          (let* ( result
+                 (p  '(1 2))
+                 (asoc-compare-fn fn)
                  (fnresult (dolist (xy
-                                    '((3 . 3)           ;; 1. int
-                                      (3 . 3.0)         ;; 2. int vs float
-                                      ((1 2) . (1 2))   ;; 3. lists
-                                      ("a" . "a")       ;; 4. strings
-                                      ("a" . "A")       ;; 5. strings, diff case
-                                      (x . x))          ;; 6. symbols
+                                    (list '(    3     . 3    )   ;; 1. int
+                                          '(    3     . 3.0  )   ;; 2. int vs float
+                                          '(    "a"   . "a"  )   ;; 4. strings
+                                          '(    "a"   . "A"  )   ;; 5. strings, diff case
+                                          '(    x     . x    )   ;; 6. symbols
+                                          '(    (1 2) . (1 2))   ;; 3. lists
+                                          (list p       p)   )   ;; 7. same object
                                     result)
                              (setq result (cons (asoc--compare (car xy) (cdr xy))
                                                 result)))))
-           (setq table (cons fnresult table)))))
-     :result '((t nil t t nil t)    ;; equalp
-               (t nil t t nil t)    ;; equal
-               (t nil t t nil t)    ;; eql
-               (t nil t t nil t)))  ;; eq
+           (setq table (cons (reverse fnresult) table)))))
+     :result
+     '( ; 3~3  3~3.0  (1 2)~(1 2) "a"~"a"  "a"~"A"  x~x
+       (   t    nil       nil nil    t       nil nil)    ;; equalp
+       (   t    nil       nil nil    t       nil nil)    ;; equal
+       (   t    nil       t   nil    t       t   nil)    ;; eql
+       (   t    t         t   t      t       t   nil))   ;; eq
+     )
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-make ()
