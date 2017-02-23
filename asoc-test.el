@@ -84,32 +84,32 @@
      :result '((a . undefined) (b . undefined) (c . undefined) (d . undefined)))
       )
 
-  (ert-deftest test-asoc-unit-tests-asoc-put ()
-    "Unit tests for asoc-put."
+  (ert-deftest test-asoc-unit-tests-asoc-put! ()
+    "Unit tests for asoc-put!."
       ;; test with replace=nil
       (should-equal
        (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
-         (asoc-put 3 10 a))
+         (asoc-put! 3 10 a))
        :result '((3 . 10) (1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
       ;; test with replace=non-nil
       (should-equal
        (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
-         (asoc-put 3 10 a :replace))
+         (asoc-put! 3 10 a :replace))
        :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
       ;; test with replace=non-nil, multiple deletions
       (should-equal
        (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (3 . 1) (5 . 25))))
-         (asoc-put 3 10 a :replace))
+         (asoc-put! 3 10 a :replace))
        :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
       ;; test with replace=non-nil, no deletions
       (should-equal
        (let ((a '((1 . 1) (2 . 4) (4 . 16) (5 . 25))))
-         (asoc-put 3 10 a :replace))
+         (asoc-put! 3 10 a :replace))
        :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
       ;; test with replace=non-nil, deletion at head of list
       (should-equal
        (let ((a '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25))))
-         (asoc-put 3 10 a :replace))
+         (asoc-put! 3 10 a :replace))
        :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
       )
 
