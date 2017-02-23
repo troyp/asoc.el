@@ -94,7 +94,8 @@ to `equal'. Possible values include `eq', `eql', `equal', `equalp'."
   "Associate KEY with VALUE in ALIST.
 
 When KEY already exists, if REPLACE is non-nil, previous entries with that key
-are removed. Otherwise, the pair is simply consed on the front of the alist."
+are removed. Otherwise, the pair is simply consed on the front of the alist.
+In the latter case, this is equivalent to `acons'."
   `(progn
      (when ,replace
        (setq ,alist (map-filter (lambda (k _) (not (asoc--compare k ,key)))
