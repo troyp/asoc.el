@@ -46,11 +46,14 @@
 
   (ert-deftest test-asoc-unit-tests-asoc-make ()
     "Unit tests for asoc-make."
+    ;; no args
     (should-equal (asoc-make) :result nil)
+    ;; with keys
     (should-equal (asoc-make '(a b c d))
                   :result '((a) (b) (c) (d)))
     (should-equal (asoc-make '(a b c d) nil)
                   :result '((a) (b) (c) (d)))
+    ;; with default
     (should-equal
      (asoc-make '(a b c d) 'undefined)
      :result '((a . undefined) (b . undefined) (c . undefined) (d . undefined)))
