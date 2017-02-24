@@ -36,8 +36,12 @@
        (  eq      ::  t    nil     nil      nil     t      nil      t  )
        (  eql     ::  t    nil     nil      nil     t      nil      t  )
        (  equal   ::  t    nil     t        nil     t      t        t  )
-       (  equalp  ::  t    t       t        t       t      t        t  ))
-     )
+       (  equalp  ::  t    t       t        t       t      t        t  )))
+    ;; float equality under #'eql
+    (should-equal
+     (let ((asoc-compare-fn #'eql))
+       (asoc--compare 3.0 3.0))
+     :result t)
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-make ()
