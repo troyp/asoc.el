@@ -16,27 +16,27 @@
        (dolist (fn
                 (list #'equalp #'equal #'eql #'eq)
                 table)
-         (let* ( result
+         (let* ( (result (list :: fn))
                  (p  '(1 2))
-                 (asoc-compare-fn fn)
-                 (fnresult (dolist (xy
-                                    (list '(    3   .   3    )   ;; 1. int
-                                          '(    3   .   3.0  )   ;; 2. int vs float
-                                          '(   "a"  .  "a"   )   ;; 4. strings
-                                          '(   "a"  .  "A"   )   ;; 5. strings, diff case
-                                          '(    x   .   x    )   ;; 6. symbols
-                                          '(  (1 2) . (1 2)  )   ;; 3. lists
-                                          `(   ,p   .  ,p    ))  ;; 7. same object
-                                    result)
-                             (setq result (cons (asoc--compare (car xy) (cdr xy))
-                                                result)))))
-           (setq table (cons (reverse fnresult) table)))))
+                 (asoc-compare-fn fn))
+           (dolist (xy
+                    (list '(    3   .   3    )   ;; 1. int
+                          '(    3   .   3.0  )   ;; 2. int vs float
+                          '(   "a"  .  "a"   )   ;; 4. strings
+                          '(   "a"  .  "A"   )   ;; 5. strings, diff case
+                          '(    x   .   x    )   ;; 6. symbols
+                          '(  (1 2) . (1 2)  )   ;; 3. lists
+                          `(   ,p   .  ,p    )   ;; 7. same object
+                          ))
+             (setq result (cons (asoc--compare (car xy) (cdr xy))
+                                result)))
+           (setq table (cons (reverse result) table)))))
      :result
-     '( ; 3~3  3~3.0  (1 2)~(1 2) "a"~"a"  "a"~"A"  x~x
-       (   t    nil       nil nil    t       nil nil)    ;; equalp
-       (   t    nil       nil nil    t       nil nil)    ;; equal
-       (   t    nil       t   nil    t       t   nil)    ;; eql
-       (   t    t         t   t      t       t   nil))   ;; eq
+     '( ;  FN        3~3  3~3.0  "a"~"a"  "a"~"A"  x~x (1 2)~(1 2) p~p
+       (  eq      ::  t    nil     nil      nil     t      nil      t  )
+       (  eql     ::  t    nil     nil      nil     t      nil      t  )
+       (  equal   ::  t    nil     t        nil     t      t        t  )
+       (  equalp  ::  t    t       t        t       t      t        t  ))
      )
     )
 
