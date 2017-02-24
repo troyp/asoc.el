@@ -20,13 +20,13 @@
                  (p  '(1 2))
                  (asoc-compare-fn fn)
                  (fnresult (dolist (xy
-                                    (list '(    3     . 3    )   ;; 1. int
-                                          '(    3     . 3.0  )   ;; 2. int vs float
-                                          '(    "a"   . "a"  )   ;; 4. strings
-                                          '(    "a"   . "A"  )   ;; 5. strings, diff case
-                                          '(    x     . x    )   ;; 6. symbols
-                                          '(    (1 2) . (1 2))   ;; 3. lists
-                                          (list p       p)   )   ;; 7. same object
+                                    (list '(    3   .   3    )   ;; 1. int
+                                          '(    3   .   3.0  )   ;; 2. int vs float
+                                          '(   "a"  .  "a"   )   ;; 4. strings
+                                          '(   "a"  .  "A"   )   ;; 5. strings, diff case
+                                          '(    x   .   x    )   ;; 6. symbols
+                                          '(  (1 2) . (1 2)  )   ;; 3. lists
+                                          `(   ,p   .  ,p    ))  ;; 7. same object
                                     result)
                              (setq result (cons (asoc--compare (car xy) (cdr xy))
                                                 result)))))
