@@ -81,7 +81,13 @@ to `equal'. Possible values include `eq', `eql', `equal', `equalp'."
     (t       (and (assoc key alist) t))))
 
 (defun asoc-contains-pair? (alist key value)
-  (and (member (cons key value) alist) t))
+  "Return t if ALIST contains an item (KEY . VALUE), nil otherwise."
+  (let (result)
+    (dolist (pair alist)
+      (when (and (asoc--compare (car pair) key)
+                 (asoc--compare (cdr pair) value))
+        (setq result t)))
+    result))
 
 ;; ,------------------,
 ;; | Access Functions |
