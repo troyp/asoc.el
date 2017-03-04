@@ -94,7 +94,45 @@
        ( equalp ::  t    t        t       t      t       t         t           t      t ))
      )
     )
-
+
+  (ert-deftest test-asoc-unit-tests-asoc-contains-pair? ()
+    "Unit tests for asoc-contains-pair?"
+    (should-equal
+     (let* (( table  nil     )
+            ( p      '(1 2)  )
+            ( q      '(1 . 2))
+            ( a      `( ,q (1 . 3.0) (1 . "a") (1 . ,p) ,p) )
+            (test-items
+             ;; TEST-ITEM ;;    ALIST-ELEM
+             `( (1 . 2)     ;;    q = (1 . 2)       | 1  ints
+                ,q          ;;    q                 | 2  ints, same cons
+                (1 . 3)     ;;    (1 . 3.0)         | 3  int value matches float
+                (1 . 3.0)   ;;    (1 . 3.0)         | 4  int keys, float values
+                (1 . "a")   ;;    (1 . "a")         | 5  int keys, string values
+                (1 . "A")   ;;    (1 . "a")         | 6  int keys, string value opp case
+                (1 . (1 2)) ;;    (1 . p=(1 2))     | 7  list values
+                (1 . ,p)    ;;    (1 . p=(1 2))     | 8  list values (values are the same object)
+                (1 . (2))   ;;    p=(1 2)=(1 . (2)) | 9  list values
+                ,p          ;;    p                 | 10 list values, same cons
+                )))
+       (dolist (fn (list #'equalp #'equal #'eql #'eq))
+         (let* (( result           (list :: fn) )
+                ( asoc-compare-fn  fn  ))
+           (dolist (test test-items)
+             (setq result (cons (asoc-contains-pair? a (car test) (cdr test))
+                                result)))
+           (setq table (cons (reverse result) table))))
+       table
+       )
+     :result
+     ;; ALIST ITEM:    q    q  (1 . 3.0) (1 . 3.0)  (1 . "a")  (1 . "a")  (1 .   p)   (1 . p)    p   p
+     ;;  TEST ITEM: (1 . 2) q  (1 . 3)   (1 . 3.0)  (1 . "a")  (1 . "A")  (1 . (1 2)) (1 . p)  (1 2) p
+     '(( eq      ::    t    t    nil       nil        nil        nil        nil          t     nil   t )
+       ( eql     ::    t    t    nil        t         nil        nil        nil          t     nil   t )
+       ( equal   ::    t    t    nil        t          t         nil         t           t      t    t )
+       ( equalp  ::    t    t     t         t          t          t          t           t      t    t ))
+     )
+    )
 
   (ert-deftest test-asoc-unit-tests-asoc-put! ()
     "Unit tests for asoc-put!."
