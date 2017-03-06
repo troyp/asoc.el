@@ -94,7 +94,7 @@ to `equal'. Possible values include `eq', `eql', `equal', `equalp'."
 ;; '------------------'
 
 (defun asoc-get (key alist &optional default)
-  (or (cdr (asoc--assoc key alist)) default))
+  (or (cdr (asoc--assoc key alist asoc-compare-fn)) default))
 
 (defmacro asoc-put! (key value alist &optional replace)
   "Associate KEY with VALUE in ALIST.
