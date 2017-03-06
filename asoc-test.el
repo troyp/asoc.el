@@ -10,7 +10,7 @@
                  (error "expected :result"))))
 
   (ert-deftest test-asoc-unit-tests-asoc--compare ()
-    "Unit tests for asoc--compare."
+    "Unit tests for `asoc--compare'."
     (should-equal
      (let (table)
        (dolist (fn
@@ -45,7 +45,7 @@
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-make ()
-    "Unit tests for asoc-make."
+    "Unit tests for `asoc-make'."
     ;; no args
     (should-equal (asoc-make) :result nil)
     ;; with keys
@@ -60,7 +60,7 @@
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-contains-key? ()
-    "Unit tests for asoc--contains-key?."
+    "Unit tests for `asoc--contains-key?'."
     (should-equal
      (let* (( table  nil    )
             ( p      '(1 2) )
@@ -96,7 +96,7 @@
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-contains-pair? ()
-    "Unit tests for asoc-contains-pair?"
+    "Unit tests for `asoc-contains-pair?'"
     (should-equal
      (let* (( table  nil     )
             ( p      '(1 2)  )
@@ -135,7 +135,7 @@
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-put! ()
-    "Unit tests for asoc-put!."
+    "Unit tests for `asoc-put!'."
       ;; test with replace=nil
       (should-equal
        (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
@@ -164,7 +164,7 @@
       )
 
   (ert-deftest test-asoc-docstring-examples-asoc-do ()
-    "Docstring examples for asoc functions and macros."
+    "Docstring examples for `asoc-do'."
     (should-equal
      (with-temp-buffer
        (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
@@ -181,6 +181,7 @@
              (setf sum (+ sum value))))))
      :result 30))
   (ert-deftest test-asoc-docstring-examples-asoc-fold ()
+    "Docstring examples for `asoc-fold'."
     (should-equal
      (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
            (s ""))
@@ -190,7 +191,7 @@
      :result "1\t1\n2\t4\n3\t9\n4\t16\n5\t25\n"))
 
   (ert-deftest test-asoc-unit-tests-asoc-do ()
-    "Docstring examples for asoc functions and macros."
+    "Unit tests for `asoc-do'."
     ;; error if the variable RESULT is not defined
     (should-error
      (let ((a '((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36))))
@@ -202,7 +203,7 @@
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-map-values ()
-    "Unit tests for asoc-map-values."
+    "Unit tests for `asoc-map-values'."
     (should-equal
      (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
        (asoc-map-values (lambda (x) (* x x)) a))
@@ -215,7 +216,7 @@
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-zip ()
-    "Unit tests for asoc-zip."
+    "Unit tests for `asoc-zip'."
     ;; #keys == #values
     (should-equal
      (asoc-zip '(1 2 3 4 5) '(1 4 9 16 25))
