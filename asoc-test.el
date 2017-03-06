@@ -134,6 +134,42 @@
      )
     )
 
+  (ert-deftest ert-deftest-unit-tests-asoc-get ()
+    "Unit-tests for `asoc-get'."
+    (should-equal
+     (let* (( table  nil    )
+            ( p      '(1 2) )
+            ( a      `((1   . 1) (2.0 . 2) ("a" . 3) (,p  . 4) (nil . 5)) )
+            (test-items
+             ;; TEST-ITEM ;;    ALIST-KEY
+             `( 1         ;;    1           | 1  int
+                1.0       ;;    1           | 2  float matches int
+                2.0       ;;    2.0         | 3  float
+                2         ;;    2.0         | 4  int matches float
+                "a"       ;;    "a"         | 5  string
+                "A"       ;;    "a"         | 6  string, other case
+                (1 2)     ;;    p = (1 2)   | 7  list, same structure
+                ,p        ;;    p           | 8  list, same object
+                nil       ;;    nil         | 9  nil
+                )))
+       (dolist (fn (list #'equalp #'equal #'eql #'eq))
+         (let* (( result           (list :: fn) )
+                ( asoc-compare-fn  fn  ))
+           (dolist (test test-items)
+             (setq result (cons (asoc-get test a)
+                                result)))
+           (setq table (cons (reverse result) table))))
+       table
+       )
+     :result
+     ;;  FN        1/1  1.0/1  2.0/2.0  2/2.0 "a"/"a" "A"/"a" (1 2)/(1 2) (1 2),same nil
+     '(( eq     ::  1    nil     nil     nil    nil     nil       nil          4      5 )
+       ( eql    ::  1    nil      2      nil    nil     nil       nil          4      5 )
+       ( equal  ::  1    nil      2      nil     3      nil        4           4      5 )
+       ( equalp ::  1     1       2       2      3       3         4           4      5 ))
+     )
+    )
+  
   (ert-deftest test-asoc-unit-tests-asoc-put! ()
     "Unit tests for `asoc-put!'."
       ;; test with replace=nil
