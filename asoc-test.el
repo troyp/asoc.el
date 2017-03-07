@@ -168,6 +168,9 @@
        ( equal  ::  1    nil      2      nil     3      nil        4           4      5 )
        ( equalp ::  1     1       2       2      3       3         4           4      5 ))
      )
+    ;; empty alist
+    (should-equal (asoc-get 1 nil) :result nil)
+    (should-equal (asoc-get nil nil) :result nil)
     )
   
   (ert-deftest test-asoc-unit-tests-asoc-put! ()
@@ -197,6 +200,17 @@
        (let ((a '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25))))
          (asoc-put! 3 10 a :replace))
        :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
+      ;; empty alist
+      (should-equal
+       (let ((a nil)) (asoc-put! 3 10 a))
+       :result '((3 . 10)))
+      ;; one-pair alist
+      (should-equal
+       (let ((a '((3 . 10)))) (asoc-put! 3 10 a))
+       :result '((3 . 10) (3 . 10)))
+      (should-equal
+       (let ((a '((3 . 10)))) (asoc-put! 3 10 a :replace))
+       :result '((3 . 10)))
       )
 
   (ert-deftest test-asoc-docstring-examples-asoc-do ()
