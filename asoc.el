@@ -123,7 +123,7 @@ The return value is obtained by evaluating RESULT.
 
 Example:
   (asoc-do ((k v) a)
-    (insert (format \"%S\t%S\n\" k v)))
+    (insert (format \"%S\t%S\\n\" k v)))
   ;; print keys and values
 
   (let ((sum 0))
