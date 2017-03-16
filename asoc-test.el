@@ -236,6 +236,12 @@
      (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
        (asoc-map-values #'list a))
      :result '((1 1) (2 4) (3 9) (4 16) (5 25))))
+  (ert-deftest test-asoc-docstring-examples-asoc-filter ()
+    "Docstring examples for `asoc-map-values'."
+    (should-equal
+     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+       (asoc-filter #'> fib))
+     :result '((2 . 1) (3 . 2) (4 . 3))))
   (ert-deftest test-asoc-docstring-examples-asoc-fold ()
     "Docstring examples for `asoc-fold'."
     (should-equal
