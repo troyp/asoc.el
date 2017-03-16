@@ -9,29 +9,29 @@ Associative list (alist) library for Emacs Lisp.
 * asoc-compare-fn
 
 ### Constructor Functions
-* asoc-make `(&optional keys)`
+* [asoc-make](#asoc-make-optional-keys-default) `(&optional keys default)`
 
 ### Predicates
-* asoc-contains-key? `(alist key)`
-* asoc-contains-pair? `(alist key value)`
+* [asoc-contains-key?](#asoc-contains-key?-alist-key) `(alist key)`
+* [asoc-contains-pair?](#asoc-contains-pair?-alist-key-value) `(alist key value)`
 
 ### Access Functions
-* asoc-get `(asoc-get key alist &optional default remove)`
-* asoc-put! `(key value alist &optional replace)`
-* asoc-find-key `(asoc-find-key key list)`
+* [asoc-get](#asoc-get-key-alist-optional-default) `(key alist &optional default)`
+* [asoc-put!](#asoc-put!-key-value-alist-optional-replace) `(key value alist &optional replace)`
+* [asoc-find-key](#asoc-find-key-key-alist-optional-test) `(key alist &optional test)`
 
 ### Looping Constructs
-* asoc-do `(spec &rest body)`
+* [asoc-do](#asoc-do-spec-rest-body) `(spec &rest body)`
 
 ### Mapping Functions
-* asoc-map-values `(func alist)`
-* asoc-zip `(keys values)`
+* [asoc-map-values](#asoc-map-values-func-alist) `(func alist)`
+* [asoc-zip](#asoc-zip-keys-values) `(keys values)`
 
 ### Filter Functions
-* [asoc-filter](#predicate-alist) `(predicate alist)`
+* [asoc-filter](#asoc-filter-predicate-alist) `(predicate alist)`
 
 ### Folds
-* asoc-fold `(alist init function)`
+* [asoc-fold](#asoc-fold-func-alist-init) `(func alist init)`
 
 -------------------------------------------------------------------------------
 
@@ -66,7 +66,7 @@ Return t if `alist` contains an item (`key` . `value`), nil otherwise.
 
 ### asoc-get `(key alist &optional default)`
 
-(or (cdr (asoc--assoc key alist asoc-compare-fn)) default)
+Return the value associated with `key` in `alist`, or `default` if missing.
 
 ### asoc-put! `(`key` `value` `alist` &optional `replace`)`
 
@@ -76,7 +76,7 @@ When `key` already exists, if `replace` is non-nil, previous entries with that `
 are removed. Otherwise, the pair is simply consed on the front of the `alist`.
 In the latter case, this is equivalent to `acons`.
 
-### asoc-find-key `(asoc--assoc)`
+### asoc-find-key `(key alist &optional test)`
 
 Alias for `asoc--assoc`.
 
