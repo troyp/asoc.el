@@ -193,17 +193,17 @@ FUNC should take a key, a value and the accumulated result and return
 an updated result.
 
 Example:
-   (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
-         (s \"\"))
-     (asoc-fold (lambda (k v acc)
-                  (concat acc (format \"%S\t%S\\n\" k v)))
-                a \"\"))
-   \"1	1
-   2	4
-   3	9
-   4	16
-   5	25
-   \"
+    (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
+          (s \"\"))
+      (asoc-fold (lambda (k v acc)
+                   (concat acc (format \"%S\t%S\\n\" k v)))
+                 a \"\"))
+    \"1	1
+    2	4
+    3	9
+    4	16
+    5	25
+    \"
 "
   (let ((result init))
     (asoc-do
