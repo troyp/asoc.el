@@ -160,7 +160,12 @@ Example:
 ;; '-------------------'
 
 (defun asoc-map-values (func alist)
-  "Return a modified copy of alist with values transformed by FUNC."
+  "Return a modified copy of alist with values transformed by FUNC.
+
+Example: convert alist to nested list
+    (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
+      (asoc-map-values #'list a))
+    ;; ((1 1) (2 4) (3 9) (4 16) (5 25))"
   (mapcar (lambda (k.v)
             (let ((k (car k.v))
                   (v (cdr k.v)))

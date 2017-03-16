@@ -230,6 +230,12 @@
            (when (symbolp key)
              (setf sum (+ sum value))))))
      :result 30))
+  (ert-deftest test-asoc-docstring-examples-asoc-map-values ()
+    "Docstring examples for `asoc-map-values'."
+    (should-equal
+     (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
+       (asoc-map-values #'list a))
+     :result '((1 1) (2 4) (3 9) (4 16) (5 25))))
   (ert-deftest test-asoc-docstring-examples-asoc-fold ()
     "Docstring examples for `asoc-fold'."
     (should-equal
