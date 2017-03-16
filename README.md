@@ -12,12 +12,12 @@ Associative list (alist) library for Emacs Lisp.
 * [asoc-make](#asoc-make-optional-keys-default) `(&optional keys default)`
 
 ### Predicates
-* [asoc-contains-key?](#asoc-contains-key?-alist-key) `(alist key)`
-* [asoc-contains-pair?](#asoc-contains-pair?-alist-key-value) `(alist key value)`
+* [asoc-contains-key?](#asoc-contains-key-alist-key) `(alist key)`
+* [asoc-contains-pair?](#asoc-contains-pair-alist-key-value) `(alist key value)`
 
 ### Access Functions
 * [asoc-get](#asoc-get-key-alist-optional-default) `(key alist &optional default)`
-* [asoc-put!](#asoc-put!-key-value-alist-optional-replace) `(key value alist &optional replace)`
+* [asoc-put!](#asoc-put-keyvaluealistoptionalreplace) `(key value alist &optional replace)`
 * [asoc-find-key](#asoc-find-key-key-alist-optional-test) `(key alist &optional test)`
 
 ### Looping Constructs
