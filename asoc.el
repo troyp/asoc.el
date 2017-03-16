@@ -182,6 +182,22 @@ If KEYS is longer than VALUES, the excess keys have value nil."
          (values (append values (make-list n nil))))
     (mapcar* #'cons keys values)))
 
+;; ,------------------,
+;; | Filter Functions |
+;; '------------------'
+
+(defun asoc-filter (predicate alist)
+  "Return a copy of ALIST with key-value pairs satisfying PREDICATE removed.
+
+PREDICATE should take two arguments, KEY and VALUE.
+
+Example: filter out pairs where KEY > VALUE
+    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+      (asoc-filter #'> fib))
+    ;; ((2 . 1) (3 . 2) (4 . 3))
+"
+  (seq-filter (lambda (pair) (funcall predicate (car pair) (cdr pair))) alist))
+
 ;; ,-------,
 ;; | Folds |
 ;; '-------'
