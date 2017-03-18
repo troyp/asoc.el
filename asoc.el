@@ -188,7 +188,7 @@ If KEYS is longer than VALUES, the excess keys have value nil."
 ;; '------------------'
 
 (defun asoc-filter (predicate alist)
-  "Return a copy of ALIST with key-value pairs satisfying PREDICATE removed.
+  "Return a copy of ALIST with key-value pairs failing PREDICATE removed.
 
 PREDICATE should take two arguments, KEY and VALUE.
 
