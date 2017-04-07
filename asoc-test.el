@@ -213,45 +213,6 @@
        :result '((3 . 10)))
       )
 
-  (ert-deftest test-asoc-docstring-examples-asoc-do ()
-    "Docstring examples for `asoc-do'."
-    (should-equal
-     (with-temp-buffer
-       (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
-         (asoc-do ((k v) a)
-           (insert (format "%S\t%S\n" k v))))
-       (buffer-string))
-     :result "1	1\n2	4\n3	9\n4	16\n5	25\n")
-    ;; with RESULT
-    (should-equal
-     (let ((a '((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36))))
-       (let ((sum 0))
-         (asoc-do ((key value) a sum)
-           (when (symbolp key)
-             (setf sum (+ sum value))))))
-     :result 30))
-  (ert-deftest test-asoc-docstring-examples-asoc-map-values ()
-    "Docstring examples for `asoc-map-values'."
-    (should-equal
-     (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
-       (asoc-map-values #'list a))
-     :result '((1 1) (2 4) (3 9) (4 16) (5 25))))
-  (ert-deftest test-asoc-docstring-examples-asoc-filter ()
-    "Docstring examples for `asoc-map-values'."
-    (should-equal
-     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
-       (asoc-filter #'> fib))
-     :result '((2 . 1) (3 . 2) (4 . 3))))
-  (ert-deftest test-asoc-docstring-examples-asoc-fold ()
-    "Docstring examples for `asoc-fold'."
-    (should-equal
-     (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
-           (s ""))
-       (asoc-fold (lambda (k v acc)
-                    (concat acc (format "%S\t%S\n" k v)))
-                  a ""))
-     :result "1\t1\n2\t4\n3\t9\n4\t16\n5\t25\n"))
-
   (ert-deftest test-asoc-unit-tests-asoc-do ()
     "Unit tests for `asoc-do'."
     ;; error if the variable RESULT is not defined
@@ -304,6 +265,45 @@
      :result '((1 . ?q) (2 . ?w) (3 . ?e) (4 . ?r) (5 . ?t) (6 . ?y)))
     )
 
+
+  (ert-deftest test-asoc-docstring-examples-asoc-do ()
+    "Docstring examples for `asoc-do'."
+    (should-equal
+     (with-temp-buffer
+       (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
+         (asoc-do ((k v) a)
+           (insert (format "%S\t%S\n" k v))))
+       (buffer-string))
+     :result "1	1\n2	4\n3	9\n4	16\n5	25\n")
+    ;; with RESULT
+    (should-equal
+     (let ((a '((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36))))
+       (let ((sum 0))
+         (asoc-do ((key value) a sum)
+           (when (symbolp key)
+             (setf sum (+ sum value))))))
+     :result 30))
+  (ert-deftest test-asoc-docstring-examples-asoc-map-values ()
+    "Docstring examples for `asoc-map-values'."
+    (should-equal
+     (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
+       (asoc-map-values #'list a))
+     :result '((1 1) (2 4) (3 9) (4 16) (5 25))))
+  (ert-deftest test-asoc-docstring-examples-asoc-filter ()
+    "Docstring examples for `asoc-map-values'."
+    (should-equal
+     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+       (asoc-filter #'> fib))
+     :result '((2 . 1) (3 . 2) (4 . 3))))
+  (ert-deftest test-asoc-docstring-examples-asoc-fold ()
+    "Docstring examples for `asoc-fold'."
+    (should-equal
+     (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
+           (s ""))
+       (asoc-fold (lambda (k v acc)
+                    (concat acc (format "%S\t%S\n" k v)))
+                  a ""))
+     :result "1\t1\n2\t4\n3\t9\n4\t16\n5\t25\n"))
 
   )
 
