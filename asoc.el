@@ -59,6 +59,11 @@ to `equal'. Possible values include `eq', `eql', `equal', `equalp'."
                      (not (funcall test (caar alist) key)))
            (setf alist (cdr alist)))
          (car alist)))))
+
+(defun asoc--member (key list)
+  (cond ((null list) nil)
+        ((funcall (or asoc-compare-fn #'equal) key (car list)) list)
+        ((asoc--member key (cdr list)))))
 
 ;; ,-----------------------,
 ;; | Constructor Functions |
