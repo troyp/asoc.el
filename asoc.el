@@ -115,6 +115,14 @@ In the latter case, this is equivalent to `acons'."
      (setq ,alist (cons (cons ,key ,value) ,alist))))
 
 (defalias 'asoc-find-key 'asoc--assoc)
+
+(defun asoc-keys (alist)
+  "Return a list of unique keys in ALIST."
+  (let (result)
+    (dolist (pair alist)
+      (unless (asoc--member (car pair) result)
+        (setq result (cons (car pair) result))))
+    (reverse result)))
 
 ;; ,--------------------,
 ;; | Looping Constructs |

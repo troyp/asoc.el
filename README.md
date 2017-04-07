@@ -19,6 +19,7 @@ Associative list (alist) library for Emacs Lisp.
 * [asoc-get](#asoc-get-key-alist-optional-default) `(key alist &optional default)`
 * [asoc-put!](#asoc-put-keyvaluealistoptionalreplace) `(key value alist &optional replace)`
 * [asoc-find-key](#asoc-find-key-key-alist-optional-test) `(key alist &optional test)`
+* [asoc-keys](#asoc-keys-alist) `(alist)`
 
 ### Looping Constructs
 * [asoc-do](#asoc-do-spec-rest-body) `(spec &rest body)`
@@ -80,6 +81,9 @@ In the latter case, this is equivalent to `acons`.
 
 Alias for `asoc--assoc`.
 
+### asoc-keys `(alist)`
+
+Return a list of unique keys in `alist`.
 
 ## Looping Constructs
 

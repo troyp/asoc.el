@@ -213,6 +213,38 @@
        :result '((3 . 10)))
       )
 
+  (ert-deftest test-asoc-unit-tests-asoc-keys ()
+    "Unit tests for `asoc-keys'."
+    ;; empty alist
+    (should-equal
+     (let ((a nil))
+       (asoc-keys a))
+     :result nil)
+    ;; alist with duplicates
+    (should-equal
+     (let ((a '((1 . 1) (2 . 4) (1 . 1) (3 . 9) (1 . 1) (4 . 16) (5 . 25))))
+       (asoc-keys a))
+     :result '(1 2 3 4 5))
+    ;; test with different choices of asoc-compare-fn
+    (should-equal
+     (let* (( p      '(1 2) )
+            ( a      `((1   . nil) ("a" . nil) (,p  . nil)   (nil . nil)
+                       (1.0 . nil) ("a" . nil) ((1 2) . nil) (nil . nil) ))
+            (result))
+
+       (dolist (fn (list #'equalp #'equal #'eql #'eq))
+         (let* (( asoc-compare-fn  fn  ))
+           (setq result (cons (list fn :: (asoc-keys a))
+                              result))))
+       result)
+     :result   ;; <-first occurrences->         <-duplicates->
+     '((eq     ::  (1  "a"  (1 2)  nil          1.0  "a" (1 2) ))
+       (eql    ::  (1  "a"  (1 2)  nil          1.0  "a" (1 2) ))
+       (equal  ::  (1  "a"  (1 2)  nil          1.0            ))
+       (equalp ::  (1  "a"  (1 2)  nil                         )))
+     )
+    )
+
   (ert-deftest test-asoc-unit-tests-asoc-do ()
     "Unit tests for `asoc-do'."
     ;; error if the variable RESULT is not defined
