@@ -172,7 +172,7 @@
     (should-equal (asoc-get 1 nil) :result nil)
     (should-equal (asoc-get nil nil) :result nil)
     )
-  
+
   (ert-deftest test-asoc-unit-tests-asoc-put! ()
     "Unit tests for `asoc-put!'."
       ;; test with replace=nil
