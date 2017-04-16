@@ -61,6 +61,10 @@ to `equal'. Possible values include `eq', `eql', `equal', `equalp'."
          (car alist)))))
 
 (defun asoc--member (key list)
+  "Return non-nil if KEY is a member of LIST.
+
+Similar to `member', `memq' and `memql', but the equality test to used is
+determined by `asoc-compare-fn'."
   (cond ((null list) nil)
         ((funcall (or asoc-compare-fn #'equal) key (car list)) list)
         ((asoc--member key (cdr list)))))
