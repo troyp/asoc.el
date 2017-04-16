@@ -233,7 +233,7 @@
          (let* (( result           (list :: fn) )
                 ( asoc-compare-fn  fn  ))
            (dolist (test test-items)
-             (setq result (cons (asoc-get test a)
+             (setq result (cons (asoc-get a test)
                                 result)))
            (setq table (cons (reverse result) table))))
        table
@@ -246,7 +246,7 @@
        ( equalp ::  1     1       2       2      3       3         4           4      5 ))
      )
     ;; empty alist
-    (should-equal (asoc-get 1 nil) :result nil)
+    (should-equal (asoc-get nil 1) :result nil)
     (should-equal (asoc-get nil nil) :result nil)
     )
 
@@ -255,38 +255,38 @@
       ;; test with replace=nil
       (should-equal
        (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
-         (asoc-put! 3 10 a))
+         (asoc-put! a 3 10))
        :result '((3 . 10) (1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
       ;; test with replace=non-nil
       (should-equal
        (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
-         (asoc-put! 3 10 a :replace))
+         (asoc-put! a 3 10 :replace))
        :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
       ;; test with replace=non-nil, multiple deletions
       (should-equal
        (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (3 . 1) (5 . 25))))
-         (asoc-put! 3 10 a :replace))
+         (asoc-put! a 3 10 :replace))
        :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
       ;; test with replace=non-nil, no deletions
       (should-equal
        (let ((a '((1 . 1) (2 . 4) (4 . 16) (5 . 25))))
-         (asoc-put! 3 10 a :replace))
+         (asoc-put! a 3 10 :replace))
        :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
       ;; test with replace=non-nil, deletion at head of list
       (should-equal
        (let ((a '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25))))
-         (asoc-put! 3 10 a :replace))
+         (asoc-put! a 3 10 :replace))
        :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
       ;; empty alist
       (should-equal
-       (let ((a nil)) (asoc-put! 3 10 a))
+       (let ((a nil)) (asoc-put! a 3 10))
        :result '((3 . 10)))
       ;; one-pair alist
       (should-equal
-       (let ((a '((3 . 10)))) (asoc-put! 3 10 a))
+       (let ((a '((3 . 10)))) (asoc-put! a 3 10))
        :result '((3 . 10) (3 . 10)))
       (should-equal
-       (let ((a '((3 . 10)))) (asoc-put! 3 10 a :replace))
+       (let ((a '((3 . 10)))) (asoc-put! a 3 10 :replace))
        :result '((3 . 10)))
       )
 

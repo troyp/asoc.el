@@ -4,7 +4,7 @@
 
 ;; Author: Troy Pracy
 ;; Keywords: alist data-types
-;; Version: 0.0.2
+;; Version: 0.1.0
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -102,11 +102,11 @@ determined by `asoc-compare-fn'."
 ;; | Access Functions |
 ;; '------------------'
 
-(defun asoc-get (key alist &optional default)
+(defun asoc-get (alist key &optional default)
   "Return the value associated with KEY in ALIST, or DEFAULT if missing."
   (or (cdr (asoc--assoc key alist asoc-compare-fn)) default))
 
-(defmacro asoc-put! (key value alist &optional replace)
+(defmacro asoc-put! (alist key value &optional replace)
   "Associate KEY with VALUE in ALIST.
 
 When KEY already exists, if REPLACE is non-nil, previous entries with that key

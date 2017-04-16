@@ -16,8 +16,8 @@ Associative list (alist) library for Emacs Lisp.
 * [asoc-contains-pair?](#asoc-contains-pair-alist-key-value) `(alist key value)`
 
 ### Access Functions
-* [asoc-get](#asoc-get-key-alist-optional-default) `(key alist &optional default)`
-* [asoc-put!](#asoc-put-keyvaluealistoptionalreplace) `(key value alist &optional replace)`
+* [asoc-get](#asoc-get-alist-key-optional-default) `(alist key &optional default)`
+* [asoc-put!](#asoc-put-alistkeyvalueoptionalreplace) `(alist key value &optional replace)`
 * [asoc-find-key](#asoc-find-key-key-alist-optional-test) `(key alist &optional test)`
 * [asoc-keys](#asoc-keys-alist) `(alist)`
 
@@ -65,11 +65,11 @@ Return t if `alist` contains an item (`key` . `value`), nil otherwise.
 
 ## Access Functions
 
-### asoc-get `(key alist &optional default)`
+### asoc-get `(alist key &optional default)`
 
 Return the value associated with `key` in `alist`, or `default` if missing.
 
-### asoc-put! `(`key` `value` `alist` &optional `replace`)`
+### asoc-put! `(alist key value &optional replace)`
 
 Associate `key` with `value` in `alist`.
 
