@@ -44,6 +44,83 @@
      :result t)
     )
 
+  (ert-deftest test-asoc-unit-tests-asoc--assoc ()
+    "Unit tests for `asoc--assoc'."
+    (should-equal
+     (let* (( table  nil    )
+            ( p      '(1 2) )
+            ( a      `((1   . t) (2.0 . t) ("a" . t) (,p  . t) (nil . t)) )
+            (test-items
+             ;; TEST-ITEM ;;    ALIST-ELEM
+             `( 1         ;;    1           | 1  int
+                1.0       ;;    1           | 2  float matches int
+                2.0       ;;    2.0         | 3  float
+                2         ;;    2.0         | 4  int matches float
+                "a"       ;;    "a"         | 5  string
+                "A"       ;;    "a"         | 6  string, other case
+                (1 2)     ;;    p = (1 2)   | 7  list, same structure
+                ,p        ;;    p           | 8  list, same object
+                nil       ;;    nil         | 9  nil
+             )))
+       (dolist (eqfn (list #'equalp #'equal #'eql #'eq))
+         (let* (( result  (list :: eqfn) ))
+           (dolist (test test-items)
+             (setq result (cons (asoc--assoc test a eqfn)
+                                result)))
+           (setq table (cons (reverse result) table))))
+       table
+       )
+     :result
+     ;;  FN         1/1    1.0/1   2.0/2.0    2/2.0    "a"/"a"   "A"/"a"  (1 2)/(1 2) (1 2),same     nil
+     '((eq     :: (1 . t)   nil      nil       nil       nil       nil        nil     ((1 2) . t) (nil . t))
+       (eql    :: (1 . t)   nil   (2.0 . t)    nil       nil       nil        nil     ((1 2) . t) (nil . t))
+       (equal  :: (1 . t)   nil   (2.0 . t)    nil    ("a" . t)    nil    ((1 2) . t) ((1 2) . t) (nil . t))
+       (equalp :: (1 . t) (1 . t) (2.0 . t) (2.0 . t) ("a" . t) ("a" . t) ((1 2) . t) ((1 2) . t) (nil . t)))
+     )
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc--member ()
+    "Unit tests for `asoc--member'."
+    (should-equal
+     (let* (( table  nil     )
+            ( p      '(1 2)  )
+            ;; l        8 7 6    5  4   3  2  1     | length of tail from elt
+            ( l      `( 1 2 3.0 ,p "a" 'c nil t ))
+            (test-items
+             ;; TEST-ITEM   ;;  LIST-ELEM
+             `( 2           ;;    2       | 1   ints
+                2.0         ;;    2       | 2   int elt, float test item
+                3           ;;    3.0     | 3   float elt, int test item
+                3.0         ;;    3.0     | 4   floats
+                ,p          ;;    p       | 5   list, same object
+                (1 2)       ;;    p       | 6   lists with same elts, different objects
+                "a"         ;;    "a"     | 7   letters
+                "A"         ;;    "a"     | 8   letters, opposite case
+                c           ;;    c       | 9   symbols
+                nil         ;;    nil     | 10  nil
+                t           ;;    t       | 11  t
+                )))
+       (dolist (f (list #'equalp #'equal #'eql #'eq))
+         (let* (( result           (list :: f) )
+                ( asoc-compare-fn       f       ) )
+           (dolist (test test-items)
+             (let ((ltail (asoc--member test l)))
+               (setq result (cons (when ltail (length ltail))
+                                  result))))
+           (setq table (cons (reverse result) table))))
+       table
+       )
+     :result
+     ;;  Integers represent the length of the tail starting with TEST-ITEM
+     ;;  LIST ITEM:  2  2    3.0  3.0  ,p   ,p      "a"  "a" 'c   nil  t
+     ;;  TEST ITEM:  2  2.0  3    3.0  ,p   (1  2)  "a"  "A"  c   nil  t
+     '((eq        ::  7  nil  nil  nil  5    nil     nil  nil  nil  2   1 )
+       (eql       ::  7  nil  nil  6    5    nil     nil  nil  nil  2   1 )
+       (equal     ::  7  nil  nil  6    5    5       4    nil  nil  2   1 )
+       (equalp    ::  7  7    6    6    5    5       4    4    nil  2   1 ))
+     )
+    )
+
   (ert-deftest test-asoc-unit-tests-asoc-make ()
     "Unit tests for `asoc-make'."
     ;; no args
