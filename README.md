@@ -124,7 +124,7 @@ Return a copy of `alist` with key-value pairs satisfying `predicate` removed.
 
 `predicate` should take two arguments, KEY and VALUE.
 
-Example: filter out pairs where KEY > VALUE
+    ;; filter out pairs where KEY > VALUE
     (let ((fib `((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-filter #'> fib))
     ;; ((2 . 1) (3 . 2) (4 . 3))
@@ -139,15 +139,9 @@ Reduce `alist` using `func` on the values, starting with value `init`.
 `func` should take a key, a value and the accumulated result and return
 an updated result.
 
-Example:
-   (let ((a `((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
-         (s ""))
-     (asoc-fold (lambda (k v acc)
-                  (concat acc (format "%S	%S\n" k v)))
-                a ""))
-   "1	1
-   2	4
-   3	9
-   4	16
-   5	25
-   "
+    (let ((a `((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
+          (s ""))
+      (asoc-fold (lambda (k v acc)
+                   (concat acc (format "%S	%S\n" k v)))
+                 a ""))
+    ;; "1	1\n2	4\n3	9\n4	16\n5	25"
