@@ -17,7 +17,7 @@ Associative list (alist) library for Emacs Lisp.
 
 ### Access Functions
 * [asoc-get](#asoc-get-alist-key-optional-default) `(alist key &optional default)`
-* [asoc-put!](#asoc-put-alistkeyvalueoptionalreplace) `(alist key value &optional replace)`
+* [asoc-put!](#asoc-put-alist-key-value-optional-replace) `(alist key value &optional replace)`
 * [asoc-find-key](#asoc-find-key-key-alist-optional-test) `(key alist &optional test)`
 * [asoc-keys](#asoc-keys-alist) `(alist)`
 
