@@ -233,6 +233,23 @@ Example: filter out pairs where VALUE <= 3
       (asoc-filter-values (lambda (v) (<= v 3)) fib))
 ;; ((1 . 1) (2 . 1) (3 . 2) (4 . 3))"
   (seq-filter (lambda (pair) (funcall predicate (cdr pair))) alist))
+
+(defun asoc-uniq (alist)
+  "Return a copy of ALIST with duplicate keys removed.
+
+The foremost occurrence of each key is retained.
+
+Example:
+    (asoc-uniq '((a 1) (c 6) (b 2) (c 3) (d 4)))
+    ;; ((a 1) (c 6) (b 2) (d 4))"
+  (let (result keys)
+    (dolist (pair alist result)
+      (let ((k (car pair)))
+        (unless (asoc--member k keys)
+          (setq result (cons pair result))
+          (setq keys (cons k keys))
+          )))
+    (nreverse result)))
 
 ;; ,-------,
 ;; | Folds |

@@ -30,6 +30,7 @@ Associative list (alist) library for Emacs Lisp.
 
 ### Filter Functions
 * [asoc-filter](#asoc-filter-predicate-alist) `(predicate alist)`
+* [asoc-uniq](#asoc-uniq-alist) `(alist)`
 
 ### Folds
 * [asoc-fold](#asoc-fold-func-alist-init) `(func alist init)`
@@ -129,6 +130,14 @@ Return a copy of `alist` with key-value pairs satisfying `predicate` removed.
       (asoc-filter #'> fib))
     ;; ((2 . 1) (3 . 2) (4 . 3))
 
+### asoc-uniq `(alist)`
+
+Return a copy of `alist` with duplicate keys removed.
+
+The foremost occurrence of each key is retained.
+
+    (asoc-uniq `((a 1) (c 6) (b 2) (c 3) (d 4)))
+    ;; ((a 1) (c 6) (b 2) (d 4))
 
 ## Folds
 

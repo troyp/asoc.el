@@ -373,8 +373,62 @@
      (asoc-zip '(1 2 3 4 5 6) "qwerty")
      :result '((1 . ?q) (2 . ?w) (3 . ?e) (4 . ?r) (5 . ?t) (6 . ?y)))
     )
-
 
+  (ert-deftest test-asoc-unit-tests-asoc-uniq ()
+    "Unit tests for `asoc-uniq'."
+    ;; empty list
+    (should-equal
+     (asoc-uniq nil)
+    :result nil)
+    ;; 1-element list
+    (should-equal
+     (asoc-uniq '((1 1)))
+     :result '((1 1)))
+    ;; list with multiple repeats
+    (should-equal
+     (asoc-uniq '((1 1) (2 2) (1 3) (1 4) (1 5) (2 3)))
+     :result '((1 1) (2 2)))
+    (should-equal
+     (let* (( result   nil    )
+            ( p       '(1 2)  )
+            ( a       `( (1 1)   (,p 1)    ("a" 1) ('c 1) (nil 1) (t 1)
+                         (1 2)   (,p 2)    ("a" 2) ('c 2) (nil 2) (t 2)
+                         (1.0 3) ((1 2) 3) ("A" 3)                      )))
+       (dolist (f (list #'equalp #'equal #'eql #'eq))
+         (let (( asoc-compare-fn f ))
+           (setq result (cons (list f ::: (asoc-uniq a))
+                              result))))
+       (reverse result))
+     :result
+     '((equalp ::: ( (1 1) ((1 2) 1) ("a" 1) ('c 1) (nil 1) (t 1)                                          ) )
+       (equal  ::: ( (1 1) ((1 2) 1) ("a" 1) ('c 1) (nil 1) (t 1)                (1.0 3)           ("A" 3) ) )
+       (eql    ::: ( (1 1) ((1 2) 1) ("a" 1) ('c 1) (nil 1) (t 1) ("a" 2) ('c 2) (1.0 3) ((1 2) 3) ("A" 3) ) )
+       (eq     ::: ( (1 1) ((1 2) 1) ("a" 1) ('c 1) (nil 1) (t 1) ("a" 2) ('c 2) (1.0 3) ((1 2) 3) ("A" 3) ) ))
+     )
+    ;; Duplicate floating point keys are removed with #'equalp, #'equal and #'eql
+    (should-equal
+     (list
+      (append '(equalp :::)
+              (let ((asoc-compare-fn #'equalp))
+                (asoc-uniq '((1.0 1) (1.0 2)))))
+      (append '(equal :::)
+              (let ((asoc-compare-fn #'equal))
+                (asoc-uniq '((1.0 1) (1.0 2)))))
+      (append '(eql :::)
+              (let ((asoc-compare-fn #'eql))
+                (asoc-uniq '((1.0 1) (1.0 2)))))
+      )
+     :result
+     '((equalp ::: (1.0 1))
+       (equal  ::: (1.0 1))
+       (eql    ::: (1.0 1)))
+     )
+    )
+
+  ;; ,-----------------,
+  ;; | Docstring Tests |
+  ;; '-----------------'
+
   (ert-deftest test-asoc-docstring-examples-asoc-do ()
     "Docstring examples for `asoc-do'."
     (should-equal
@@ -392,18 +446,21 @@
            (when (symbolp key)
              (setf sum (+ sum value))))))
      :result 30))
+
   (ert-deftest test-asoc-docstring-examples-asoc-map-values ()
     "Docstring examples for `asoc-map-values'."
     (should-equal
      (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
        (asoc-map-values #'list a))
      :result '((1 1) (2 4) (3 9) (4 16) (5 25))))
+
   (ert-deftest test-asoc-docstring-examples-asoc-filter ()
     "Docstring examples for `asoc-map-values'."
     (should-equal
      (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
        (asoc-filter #'> fib))
      :result '((2 . 1) (3 . 2) (4 . 3))))
+
   (ert-deftest test-asoc-docstring-examples-asoc-fold ()
     "Docstring examples for `asoc-fold'."
     (should-equal
@@ -413,6 +470,13 @@
                     (concat acc (format "%S\t%S\n" k v)))
                   a ""))
      :result "1\t1\n2\t4\n3\t9\n4\t16\n5\t25\n"))
+
+  (ert-deftest test-asoc-docstring-examples-asoc-uniq ()
+    "Docstring examples for `asoc-uniq'."
+    (should-equal
+     (asoc-uniq '((a 1) (c 6) (b 2) (c 3) (d 4)))
+     :result '((a 1) (c 6) (b 2) (d 4))
+     ))
 
   )
 
