@@ -3,7 +3,7 @@ Asoc.el
 
 Associative list (alist) library for Emacs Lisp.
 
-##API
+## API
 
 ### Variables
 * asoc-compare-fn
