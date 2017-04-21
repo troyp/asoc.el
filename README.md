@@ -6,7 +6,7 @@ Associative list (alist) library for Emacs Lisp.
 ## API
 
 ### Variables
-* asoc-compare-fn
+* [asoc-compare-fn](#asoc-compare-fn-nil)
 
 ### Constructor Functions
 * [asoc-make](#asoc-make-optional-keys-default) `(&optional keys default)`
