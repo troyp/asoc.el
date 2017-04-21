@@ -19,6 +19,7 @@ Associative list (alist) library for Emacs Lisp.
 * [asoc-get](#asoc-get-alist-key-optional-default) `(alist key &optional default)`
 * [asoc-put!](#asoc-put-alist-key-value-optional-replace) `(alist key value &optional replace)`
 * [asoc-find-key](#asoc-find-key-key-alist-optional-test) `(key alist &optional test)`
+* [asoc-remove!](#asoc-remove!-alist-key-optional-remove-all) `(alist key &optional remove-all)`
 * [asoc-keys](#asoc-keys-alist) `(alist)`
 
 ### Looping Constructs
@@ -77,6 +78,13 @@ Associate `key` with `value` in `alist`.
 When `key` already exists, if `replace` is non-nil, previous entries with that `key`
 are removed. Otherwise, the pair is simply consed on the front of the `alist`.
 In the latter case, this is equivalent to `acons`.
+
+### asoc-remove! `(alist key &optional remove-all)`
+
+Remove the foremost element with `key` and return the modified list.
+
+The list is modified in place unless the result is nil. If `remove-all` is
+non-nil, remove all elements with `key`.
 
 ### asoc-find-key `(key alist &optional test)`
 

@@ -4,7 +4,7 @@
 
 ;; Author: Troy Pracy
 ;; Keywords: alist data-types
-;; Version: 0.1.1
+;; Version: 0.1.2
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -119,6 +119,35 @@ In the latter case, this is equivalent to `acons'."
      (setq ,alist (cons (cons ,key ,value) ,alist))))
 
 (defalias 'asoc-find-key 'asoc--assoc)
+
+(defun asoc-remove! (alist key &optional remove-all)
+  "Remove the foremost element with KEY and return the modified list.
+
+The list is modified in place unless the result is nil. If REMOVE-ALL is
+non-nil, remove all elements with KEY."
+  (let* ((head (car alist))
+         (tail (cdr alist))
+         (head-key (car head)))
+    (cond
+     ;; empty list
+     ((null alist)  nil)
+     ;; single pair
+     ((null  tail)  (if (asoc--compare key head-key) nil alist))
+     ;; two or more pairs
+     (t
+      (if (asoc--compare key head-key)    ;; remove foremost pair
+          (progn
+            (setcar alist (car tail))
+            (setcdr alist (cdr tail))
+            (if remove-all
+                ;; recurse to remove other matches
+                (asoc-remove! alist key remove-all)
+              ;; return after first removal
+              alist))
+        (progn                             ;; keep foremost pair
+          (unless (asoc-remove! tail key remove-all)
+            (setcdr alist nil))
+          alist))))))
 
 (defun asoc-keys (alist)
   "Return a list of unique keys in ALIST."

@@ -290,6 +290,81 @@
        :result '((3 . 10)))
       )
 
+  (ert-deftest test-asoc-unit-tests-asoc-remove! ()
+    "Unit tests for `asoc-remove!'."
+    ;; test nil, 1-pair (match/non-match), 2-pairs (match/non)
+    (should-equal
+     (let ((a nil))
+       (asoc-remove! a 'x))
+     :result nil)
+    (should-equal
+     (let ((a '((x 1))))
+       (asoc-remove! a 'x))
+     :result nil)
+    (should-equal
+     (let ((a '((y 2))))
+       (asoc-remove! a 'x))
+     :result '((y 2)))
+    (should-equal
+     (let ((a '((x 1) (y 2))))
+       (asoc-remove! a 'x))
+     :result '((y 2)))
+    (should-equal
+     (let ((a '((y 2) (x 1))))
+       (asoc-remove! a 'x))
+     :result '((y 2)))
+    (should-equal
+     (let ((a '((x 1) (x 11))))
+       (asoc-remove! a 'x))
+     :result '((x 11)))
+    (should-equal
+     (let ((a '((x 1) (x 11) (x 111))))
+       (asoc-remove! a 'x))
+     :result '((x 11) (x 111)))
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-remove!/remove-all ()
+    "Unit tests for `asoc-remove!' with remove-all set."
+    ;; test nil, 1-pair (match/non-match), 2-pairs (match/non)
+    (should-equal
+     (let ((a nil))
+       (asoc-remove! a 'x :all))
+       :result nil)
+    (should-equal
+     (let ((a '((x 1))))
+       (asoc-remove! a 'x :all))
+     :result nil)
+    (should-equal
+     (let ((a '((y 2))))
+       (asoc-remove! a 'x :all))
+     :result '((y 2)))
+    (should-equal
+     (let ((a '((x 1) (y 2))))
+       (asoc-remove! a 'x :all))
+     :result '((y 2)))
+    (should-equal
+     (let ((a '((y 2) (x 1))))
+       (asoc-remove! a 'x :all))
+     :result '((y 2)))
+    (should-equal
+     (let ((a '((x 1) (x 11))))
+       (asoc-remove! a 'x :all))
+     :result nil)
+    (should-equal
+     (let ((a '((x 1) (x 11) (x 111))))
+       (asoc-remove! a 'x :all))
+     :result nil)
+    (should-equal
+     (let ((a '((x . 1) (y . 2) (x . 11) (z . 3) (x . 111) (x . 1111))))
+       (asoc-remove! a 'x :all))
+     :result '((y . 2) (z . 3)))
+    (should-equal
+     (let ((a '((x . 1) (y . 2) (x . 11) (z . 3) (x . 111) (x . 1111) (z . 33))))
+       (asoc-remove! a 'x :all))
+     :result '((y . 2) (z . 3) (z . 33)))
+    )
+
+
   (ert-deftest test-asoc-unit-tests-asoc-keys ()
     "Unit tests for `asoc-keys'."
     ;; empty alist
