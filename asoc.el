@@ -241,14 +241,13 @@ PREDICATE should take two arguments, KEY and VALUE.
 Example: filter for pairs where KEY > VALUE
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-filter #'> fib))
-    ;; ((2 . 1) (3 . 2) (4 . 3))
-"
+    ;; ((2 . 1) (3 . 2) (4 . 3))"
   (seq-filter (lambda (pair) (funcall predicate (car pair) (cdr pair))) alist))
 
 (defun asoc-filter-keys (predicate alist)
   "Return a copy of ALIST with keys failing PREDICATE removed.
 
-Example: filter out pairs where KEY <= 3
+Example: filter for pairs where KEY <= 3
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-filter-keys (lambda (k) (<= k 3)) fib))
 ;; ((1 . 1) (2 . 1) (3 . 2))"
@@ -257,7 +256,7 @@ Example: filter out pairs where KEY <= 3
 (defun asoc-filter-values (predicate alist)
   "Return a copy of ALIST with pairs whose value fails PREDICATE removed.
 
-Example: filter out pairs where VALUE <= 3
+Example: filter for pairs where VALUE <= 3
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-filter-values (lambda (v) (<= v 3)) fib))
 ;; ((1 . 1) (2 . 1) (3 . 2) (4 . 3))"
