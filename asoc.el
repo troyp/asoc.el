@@ -238,7 +238,7 @@ If KEYS is longer than VALUES, the excess keys have value nil."
 
 PREDICATE should take two arguments, KEY and VALUE.
 
-Example: filter out pairs where KEY > VALUE
+Example: filter for pairs where KEY > VALUE
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-filter #'> fib))
     ;; ((2 . 1) (3 . 2) (4 . 3))

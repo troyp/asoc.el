@@ -129,11 +129,11 @@ If `keys` is longer than `values`, the excess `keys` have value nil.
 
 ### asoc-filter `(predicate alist)`
 
-Return a copy of `alist` with key-value pairs satisfying `predicate` removed.
+Return a copy of `alist` with key-value pairs failing `predicate` removed.
 
 `predicate` should take two arguments, KEY and VALUE.
 
-    ;; filter out pairs where KEY > VALUE
+    ;; filter for pairs where KEY > VALUE
     (let ((fib `((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-filter #'> fib))
     ;; ((2 . 1) (3 . 2) (4 . 3))
