@@ -121,6 +121,90 @@
      )
     )
 
+  (ert-deftest test-asoc-unit-tests-asoc--list-filter ()
+    "Unit tests for `asoc--list-filter'."
+    ;; numeric predicate
+    (should-equal
+     (let ((list (number-sequence 1 10)))
+       (asoc--list-filter (lambda (n) (zerop (% n 3)))
+                          list)
+       )
+     :result '(3 6 9)
+     )
+    ;; returns original list with constant t predicate
+    (should-equal
+     (let* ((results nil)
+            (lists '(
+                     nil
+                     (1 2 3 4)
+                     (nil t)
+                     )))
+       (dolist (list lists)
+         (let ((result (asoc--list-filter (lambda (x) t)
+                                          list)))
+           (setq results (cons (cons list result) results))))
+       (reverse results))
+     :result
+     '(( nil       . nil       )
+       ( (1 2 3 4) . (1 2 3 4) )
+       ( (nil t)   . (nil t))  )
+     )
+    ;; check interned DEL symbols are not removed
+    (should-equal
+     (let ((list '(DEL DEL)))
+       (asoc--list-filter #'symbolp list))
+     :result '(DEL DEL)
+     )
+    ;; check nil is not removed
+    (should-equal
+     (let ((list '(nil nil)))
+       (asoc--list-filter #'symbolp list))
+     :result '(nil nil)
+     )
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc--list-remove ()
+    "Unit tests for `asoc--list-remove'."
+    ;; numeric predicate
+    (should-equal
+     (let ((list (number-sequence 1 10)))
+       (asoc--list-remove (lambda (n) (zerop (% n 3)))
+                          list)
+       )
+     :result '(1 2 4 5 7 8 10)
+     )
+    ;; returns original list with constant nil predicate
+    (should-equal
+     (let* ((results nil)
+            (lists '(
+                     nil
+                     (1 2 3 4)
+                     (nil t)
+                     )))
+       (dolist (list lists)
+         (let ((result (asoc--list-remove (lambda (x) nil)
+                                          list)))
+           (setq results (cons (cons list result) results))))
+       (reverse results))
+     :result
+     '(( nil       . nil       )
+       ( (1 2 3 4) . (1 2 3 4) )
+       ( (nil t)   . (nil t))  )
+     )
+    ;; check interned DEL symbols are not removed
+    (should-equal
+     (let ((list '(DEL DEL)))
+       (asoc--list-remove #'integerp list))
+     :result '(DEL DEL)
+     )
+    ;; check nil is not removed
+    (should-equal
+     (let ((list '(nil nil)))
+       (asoc--list-remove #'integerp list))
+     :result '(nil nil)
+     )
+    )
+
   (ert-deftest test-asoc-unit-tests-asoc-make ()
     "Unit tests for `asoc-make'."
     ;; no args

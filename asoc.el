@@ -68,6 +68,21 @@ determined by `asoc-compare-fn'."
   (cond ((null list) nil)
         ((funcall (or asoc-compare-fn #'equal) key (car list)) list)
         ((asoc--list-member key (cdr list)))))
+
+(defun asoc--list-filter (pred list)
+  (let ((DELMARKER (make-symbol "DEL")))
+    (delq
+     DELMARKER
+     (mapcar (lambda (x) (if (funcall pred x) x DELMARKER))
+             list))))
+
+(defun asoc--list-remove (pred list)
+      (let ((DELMARKER (make-symbol "DEL")))
+        (delq
+        DELMARKER
+        (mapcar (lambda (x) (if (funcall pred x) DELMARKER x))
+                list))))
+
 
 ;; ,-----------------------,
 ;; | Constructor Functions |
@@ -245,7 +260,7 @@ Example: filter for pairs where KEY > VALUE
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-filter #'> fib))
     ;; ((2 . 1) (3 . 2) (4 . 3))"
-  (seq-filter (lambda (pair) (funcall predicate (car pair) (cdr pair))) alist))
+  (asoc--list-filter (lambda (pair) (funcall predicate (car pair) (cdr pair))) alist))
 
 (defun asoc-filter-keys (predicate alist)
   "Return a copy of ALIST with keys failing PREDICATE removed.
@@ -255,7 +270,7 @@ Example: filter for pairs where KEY <= 3
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-filter-keys (lambda (k) (<= k 3)) fib))
 ;; ((1 . 1) (2 . 1) (3 . 2))"
-  (seq-filter (lambda (pair) (funcall predicate (car pair))) alist))
+  (asoc--list-filter (lambda (pair) (funcall predicate (car pair))) alist))
 
 (defun asoc-filter-values (predicate alist)
   "Return a copy of ALIST with pairs whose value fails PREDICATE removed.
@@ -265,7 +280,7 @@ Example: filter for pairs where VALUE <= 3
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-filter-values (lambda (v) (<= v 3)) fib))
 ;; ((1 . 1) (2 . 1) (3 . 2) (4 . 3))"
-  (seq-filter (lambda (pair) (funcall predicate (cdr pair))) alist))
+  (asoc--list-filter (lambda (pair) (funcall predicate (cdr pair))) alist))
 
 (defun asoc-remove (predicate alist)
   "Return a copy of ALIST with key-value pairs satisfying PREDICATE removed.
@@ -279,7 +294,7 @@ Example: filter out pairs where KEY > VALUE
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-remove #'> fib))
     ;; ((1 . 1) (5 . 5) (6 . 8) (7 . 13) (8 . 21))"
-  (seq-remove (lambda (pair) (funcall predicate (car pair) (cdr pair))) alist))
+  (asoc--list-remove (lambda (pair) (funcall predicate (car pair) (cdr pair))) alist))
 
 (defun asoc-remove-keys (predicate alist)
   "Return a copy of ALIST with keys satisfying PREDICATE removed.
@@ -291,7 +306,7 @@ Example: filter out pairs where KEY <= 3
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-remove-keys (lambda (k) (<= k 3)) fib))
     ;; ((4 . 3) (5 . 5) (6 . 8) (7 . 13) (8 . 21))"
-  (seq-remove (lambda (pair) (funcall predicate (car pair))) alist))
+  (asoc--list-remove (lambda (pair) (funcall predicate (car pair))) alist))
 
 (defun asoc-remove-values (predicate alist)
   "Return a copy of ALIST with pairs whose value satisfying PREDICATE removed.
@@ -303,7 +318,7 @@ Example: filter out pairs where VALUE <= 3
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-remove-values (lambda (v) (<= v 3)) fib))
     ;; ((5 . 5) (6 . 8) (7 . 13) (8 . 21))"
-  (seq-remove (lambda (pair) (funcall predicate (cdr pair))) alist))
+  (asoc--list-remove (lambda (pair) (funcall predicate (cdr pair))) alist))
 
 (defalias 'asoc-reject 'asoc-remove)
 (defalias 'asoc-reject-keys 'asoc-remove-keys)
