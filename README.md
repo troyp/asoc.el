@@ -31,6 +31,11 @@ Associative list (alist) library for Emacs Lisp.
 
 ### Filter Functions
 * [asoc-filter](#asoc-filter-predicate-alist) `(predicate alist)`
+* [asoc-filter-keys](#asoc-filter-keys-predicate-alist) `(predicate alist)`
+* [asoc-filter-values](#asoc-filter-values-predicate-alist) `(predicate alist)`
+* [asoc-remove](#asoc-remove-predicate-alist) `(predicate alist)`
+* [asoc-remove-keys](#asoc-remove-keys-predicate-alist) `(predicate alist)`
+* [asoc-remove-values](#asoc-remove-values-predicate-alist) `(predicate alist)`
 * [asoc-uniq](#asoc-uniq-alist) `(alist)`
 
 ### Folds
@@ -137,6 +142,59 @@ Return a copy of `alist` with key-value pairs failing `predicate` removed.
     (let ((fib `((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-filter #'> fib))
     ;; ((2 . 1) (3 . 2) (4 . 3))
+
+### asoc-filter-keys `(predicate alist)`
+
+Return a copy of `alist` with keys failing `predicate` removed.
+
+    ;; filter for pairs where KEY <= 3
+    (let ((fib `((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+      (asoc-filter-keys (lambda (k) (<= k 3)) fib))
+    ;; ((1 . 1) (2 . 1) (3 . 2))
+
+### asoc-filter-values `(predicate alist)`
+
+Return a copy of `alist` with pairs whose value fails `predicate` removed.
+
+    ;; filter for pairs where VALUE <= 3
+    (let ((fib `((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+      (asoc-filter-values (lambda (v) (<= v 3)) fib))
+    ;; ((1 . 1) (2 . 1) (3 . 2) (4 . 3))
+
+### asoc-remove `(predicate alist)`
+
+Return a copy of `alist` with key-value pairs satisfying `predicate` removed.
+
+`predicate` should take two arguments, KEY and VALUE.
+
+Alias: __`asoc-reject`__
+
+    ;; filter out pairs where KEY > VALUE
+    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+      (asoc-remove #'> fib))
+    ;; ((1 . 1) (5 . 5) (6 . 8) (7 . 13) (8 . 21))
+
+### asoc-remove-keys `(predicate alist)`
+
+Return a copy of `alist` with keys satisfying `predicate` removed.
+
+Alias: __`asoc-reject-keys`__
+
+    ;; filter out pairs where KEY <= 3
+    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+      (asoc-remove-keys (lambda (k) (<= k 3)) fib))
+    ;; ((4 . 3) (5 . 5) (6 . 8) (7 . 13) (8 . 21))
+
+### asoc-remove-values `(predicate alist)`
+
+Return a copy of `alist` with pairs whose value satisfying `predicate` removed.
+
+Alias: __`asoc-reject-values`__
+
+    ;; filter out pairs where VALUE <= 3
+    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+      (asoc-remove-values (lambda (v) (<= v 3)) fib))
+    ;; ((5 . 5) (6 . 8) (7 . 13) (8 . 21))
 
 ### asoc-uniq `(alist)`
 
