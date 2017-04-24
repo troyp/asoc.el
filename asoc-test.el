@@ -290,77 +290,77 @@
        :result '((3 . 10)))
       )
 
-  (ert-deftest test-asoc-unit-tests-asoc-remove! ()
-    "Unit tests for `asoc-remove!'."
+  (ert-deftest test-asoc-unit-tests-asoc-delete! ()
+    "Unit tests for `asoc-delete!'."
     ;; test nil, 1-pair (match/non-match), 2-pairs (match/non)
     (should-equal
      (let ((a nil))
-       (asoc-remove! a 'x))
+       (asoc-delete! a 'x))
      :result nil)
     (should-equal
      (let ((a '((x 1))))
-       (asoc-remove! a 'x))
+       (asoc-delete! a 'x))
      :result nil)
     (should-equal
      (let ((a '((y 2))))
-       (asoc-remove! a 'x))
+       (asoc-delete! a 'x))
      :result '((y 2)))
     (should-equal
      (let ((a '((x 1) (y 2))))
-       (asoc-remove! a 'x))
+       (asoc-delete! a 'x))
      :result '((y 2)))
     (should-equal
      (let ((a '((y 2) (x 1))))
-       (asoc-remove! a 'x))
+       (asoc-delete! a 'x))
      :result '((y 2)))
     (should-equal
      (let ((a '((x 1) (x 11))))
-       (asoc-remove! a 'x))
+       (asoc-delete! a 'x))
      :result '((x 11)))
     (should-equal
      (let ((a '((x 1) (x 11) (x 111))))
-       (asoc-remove! a 'x))
+       (asoc-delete! a 'x))
      :result '((x 11) (x 111)))
     )
 
-  (ert-deftest test-asoc-unit-tests-asoc-remove!/remove-all ()
-    "Unit tests for `asoc-remove!' with remove-all set."
+  (ert-deftest test-asoc-unit-tests-asoc-delete!/remove-all ()
+    "Unit tests for `asoc-delete!' with remove-all set."
     ;; test nil, 1-pair (match/non-match), 2-pairs (match/non)
     (should-equal
      (let ((a nil))
-       (asoc-remove! a 'x :all))
+       (asoc-delete! a 'x :all))
        :result nil)
     (should-equal
      (let ((a '((x 1))))
-       (asoc-remove! a 'x :all))
+       (asoc-delete! a 'x :all))
      :result nil)
     (should-equal
      (let ((a '((y 2))))
-       (asoc-remove! a 'x :all))
+       (asoc-delete! a 'x :all))
      :result '((y 2)))
     (should-equal
      (let ((a '((x 1) (y 2))))
-       (asoc-remove! a 'x :all))
+       (asoc-delete! a 'x :all))
      :result '((y 2)))
     (should-equal
      (let ((a '((y 2) (x 1))))
-       (asoc-remove! a 'x :all))
+       (asoc-delete! a 'x :all))
      :result '((y 2)))
     (should-equal
      (let ((a '((x 1) (x 11))))
-       (asoc-remove! a 'x :all))
+       (asoc-delete! a 'x :all))
      :result nil)
     (should-equal
      (let ((a '((x 1) (x 11) (x 111))))
-       (asoc-remove! a 'x :all))
+       (asoc-delete! a 'x :all))
      :result nil)
     (should-equal
      (let ((a '((x . 1) (y . 2) (x . 11) (z . 3) (x . 111) (x . 1111))))
-       (asoc-remove! a 'x :all))
+       (asoc-delete! a 'x :all))
      :result '((y . 2) (z . 3)))
     (should-equal
      (let ((a '((x . 1) (y . 2) (x . 11) (z . 3) (x . 111) (x . 1111) (z . 33))))
-       (asoc-remove! a 'x :all))
+       (asoc-delete! a 'x :all))
      :result '((y . 2) (z . 3) (z . 33)))
     )
 
@@ -530,11 +530,46 @@
      :result '((1 1) (2 4) (3 9) (4 16) (5 25))))
 
   (ert-deftest test-asoc-docstring-examples-asoc-filter ()
-    "Docstring examples for `asoc-map-values'."
+    "Docstring examples for `asoc-filter'."
     (should-equal
      (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
        (asoc-filter #'> fib))
      :result '((2 . 1) (3 . 2) (4 . 3))))
+
+  (ert-deftest test-asoc-docstring-examples-asoc-filter-keys ()
+    "Docstring examples for `asoc-filter-keys'."
+    (should-equal
+     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+       (asoc-filter-keys (lambda (k) (<= k 3)) fib))
+     :result '((1 . 1) (2 . 1) (3 . 2))))
+
+  (ert-deftest test-asoc-docstring-examples-asoc-filter-values ()
+    "Docstring examples for `asoc-filter-values'."
+    (should-equal
+     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+       (asoc-filter-values (lambda (v) (<= v 3)) fib))
+     :result '((1 . 1) (2 . 1) (3 . 2) (4 . 3))))
+
+  (ert-deftest test-asoc-docstring-examples-asoc-remove ()
+    "Docstring examples for `asoc-remove'."
+    (should-equal
+     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+       (asoc-remove #'> fib))
+     :result '((1 . 1) (5 . 5) (6 . 8) (7 . 13) (8 . 21))))
+
+  (ert-deftest test-asoc-docstring-examples-asoc-remove-keys ()
+    "Docstring examples for `asoc-remove-keys'."
+    (should-equal
+     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+       (asoc-remove-keys (lambda (k) (<= k 3)) fib))
+     :result '((4 . 3) (5 . 5) (6 . 8) (7 . 13) (8 . 21))))
+
+  (ert-deftest test-asoc-docstring-examples-asoc-remove-values ()
+    "Docstring examples for `asoc-remove-values'."
+    (should-equal
+     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+       (asoc-remove-values (lambda (v) (<= v 3)) fib))
+     :result '((5 . 5) (6 . 8) (7 . 13) (8 . 21))))
 
   (ert-deftest test-asoc-docstring-examples-asoc-fold ()
     "Docstring examples for `asoc-fold'."
