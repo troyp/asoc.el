@@ -169,6 +169,7 @@ For each iteration, KEYVAR is bound to the key and VALUEVAR is bound to the valu
 The return value is obtained by evaluating RESULT.
 
 Example:
+
   (asoc-do ((k v) a)
     (insert (format \"%S\t%S\\n\" k v)))
   ;; print keys and values
@@ -210,6 +211,7 @@ Example:
   "Return a modified copy of alist with values transformed by FUNC.
 
 Example: convert alist to nested list
+
     (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
       (asoc-map-values #'list a))
     ;; ((1 1) (2 4) (3 9) (4 16) (5 25))"
@@ -239,6 +241,7 @@ If KEYS is longer than VALUES, the excess keys have value nil."
 PREDICATE should take two arguments, KEY and VALUE.
 
 Example: filter for pairs where KEY > VALUE
+
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-filter #'> fib))
     ;; ((2 . 1) (3 . 2) (4 . 3))"
@@ -248,6 +251,7 @@ Example: filter for pairs where KEY > VALUE
   "Return a copy of ALIST with keys failing PREDICATE removed.
 
 Example: filter for pairs where KEY <= 3
+
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-filter-keys (lambda (k) (<= k 3)) fib))
 ;; ((1 . 1) (2 . 1) (3 . 2))"
@@ -257,6 +261,7 @@ Example: filter for pairs where KEY <= 3
   "Return a copy of ALIST with pairs whose value fails PREDICATE removed.
 
 Example: filter for pairs where VALUE <= 3
+
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-filter-values (lambda (v) (<= v 3)) fib))
 ;; ((1 . 1) (2 . 1) (3 . 2) (4 . 3))"
@@ -270,6 +275,7 @@ PREDICATE should take two arguments, KEY and VALUE.
 Alias: `asoc-reject'
 
 Example: filter out pairs where KEY > VALUE
+
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-remove #'> fib))
     ;; ((1 . 1) (5 . 5) (6 . 8) (7 . 13) (8 . 21))"
@@ -281,6 +287,7 @@ Example: filter out pairs where KEY > VALUE
 Alias: `asoc-reject-keys'
 
 Example: filter out pairs where KEY <= 3
+
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-remove-keys (lambda (k) (<= k 3)) fib))
     ;; ((4 . 3) (5 . 5) (6 . 8) (7 . 13) (8 . 21))"
@@ -292,6 +299,7 @@ Example: filter out pairs where KEY <= 3
 Alias: `asoc-reject-values'
 
 Example: filter out pairs where VALUE <= 3
+
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-remove-values (lambda (v) (<= v 3)) fib))
     ;; ((5 . 5) (6 . 8) (7 . 13) (8 . 21))"
@@ -307,6 +315,7 @@ Example: filter out pairs where VALUE <= 3
 The foremost occurrence of each key is retained.
 
 Example:
+
     (asoc-uniq '((a 1) (c 6) (b 2) (c 3) (d 4)))
     ;; ((a 1) (c 6) (b 2) (d 4))"
   (let (result keys)
@@ -329,6 +338,7 @@ FUNC should take a key, a value and the accumulated result and return
 an updated result.
 
 Example:
+
     (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
           (s \"\"))
       (asoc-fold (lambda (k v acc)
