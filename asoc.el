@@ -60,14 +60,14 @@ to `equal'. Possible values include `eq', `eql', `equal', `equalp'."
            (setf alist (cdr alist)))
          (car alist)))))
 
-(defun asoc--member (key list)
+(defun asoc--list-member (key list)
   "Return non-nil if KEY is a member of LIST.
 
 Similar to `member', `memq' and `memql', but the equality test to used is
 determined by `asoc-compare-fn'."
   (cond ((null list) nil)
         ((funcall (or asoc-compare-fn #'equal) key (car list)) list)
-        ((asoc--member key (cdr list)))))
+        ((asoc--list-member key (cdr list)))))
 
 ;; ,-----------------------,
 ;; | Constructor Functions |
@@ -153,7 +153,7 @@ non-nil, remove all elements with KEY."
   "Return a list of unique keys in ALIST."
   (let (result)
     (dolist (pair alist)
-      (unless (asoc--member (car pair) result)
+      (unless (asoc--list-member (car pair) result)
         (setq result (cons (car pair) result))))
     (reverse result)))
 
@@ -321,7 +321,7 @@ Example:
   (let (result keys)
     (dolist (pair alist result)
       (let ((k (car pair)))
-        (unless (asoc--member k keys)
+        (unless (asoc--list-member k keys)
           (setq result (cons pair result))
           (setq keys (cons k keys))
           )))

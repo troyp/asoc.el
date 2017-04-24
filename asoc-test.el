@@ -79,8 +79,8 @@
      )
     )
 
-  (ert-deftest test-asoc-unit-tests-asoc--member ()
-    "Unit tests for `asoc--member'."
+  (ert-deftest test-asoc-unit-tests-asoc--list-member ()
+    "Unit tests for `asoc--list-member'."
     (should-equal
      (let* (( table  nil     )
             ( p      '(1 2)  )
@@ -104,7 +104,7 @@
          (let* (( result           (list :: f) )
                 ( asoc-compare-fn       f       ) )
            (dolist (test test-items)
-             (let ((ltail (asoc--member test l)))
+             (let ((ltail (asoc--list-member test l)))
                (setq result (cons (when ltail (length ltail))
                                   result))))
            (setq table (cons (reverse result) table))))
