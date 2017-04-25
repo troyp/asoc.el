@@ -533,6 +533,38 @@
      :result '((1 . ?q) (2 . ?w) (3 . ?e) (4 . ?r) (5 . ?t) (6 . ?y)))
     )
 
+  (ert-deftest test-asoc-unit-tests-asoc-filter ()
+    "Unit tests for `asoc-filter'."
+    ;; TODO
+    t
+    )
+  (ert-deftest test-asoc-unit-tests-asoc-filter-keys ()
+    "Unit tests for `asoc-filter-keys'."
+    ;; TODO
+    t
+    )
+  (ert-deftest test-asoc-unit-tests-asoc-filter-values ()
+    "Unit tests for `asoc-filter-values'."
+    ;; TODO
+    t
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-remove ()
+    "Unit tests for `asoc-remove'."
+    ;; TODO
+    t
+    )
+  (ert-deftest test-asoc-unit-tests-asoc-remove-keys ()
+    "Unit tests for `asoc-remove-keys'."
+    ;; TODO
+    t
+    )
+  (ert-deftest test-asoc-unit-tests-asoc-remove-values ()
+    "Unit tests for `asoc-remove-values'."
+    ;; TODO
+    t
+    )
+
   (ert-deftest test-asoc-unit-tests-asoc-uniq ()
     "Unit tests for `asoc-uniq'."
     ;; empty list
@@ -582,6 +614,12 @@
        (equal  ::: (1.0 1))
        (eql    ::: (1.0 1)))
      )
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-fold ()
+    "Unit tests for `asoc-fold'."
+    ;; TODO
+    t
     )
 
   ;; ,-----------------,
