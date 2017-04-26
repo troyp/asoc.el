@@ -486,6 +486,115 @@
      )
     )
 
+  (ert-deftest test-asoc-unit-tests-asoc-values ()
+    "Unit tests for `asoc-values'."
+    ;; empty alist
+    (should-equal
+     (let ((a nil))
+       (asoc-values a))
+     :result nil)
+    ;; alist with duplicates
+    (should-equal
+     (let ((a '((1 . 1) (2 . 4) (1 . 1) (3 . 9) (1 . 1) (4 . 16) (5 . 25))))
+       (asoc-values a))
+     :result '(1 4 9 16 25))
+    ;; test with different choices of asoc-compare-fn
+    (should-equal
+     (let* (( p      '(1 2) )
+            ( a      `((1   . 1)   ("a" . "a") (,p    . ,p)    (nil . nil)
+                       (1.0 . 1.0) ("a" . "a") ((1 2) . (1 2)) (nil . nil) ))
+            (result))
+
+       (dolist (fn (list #'equalp #'equal #'eql #'eq))
+         (let* (( asoc-compare-fn  fn  ))
+           (setq result (cons (list fn :: (asoc-values a))
+                              result))))
+       result)
+     :result   ;; <-first occurrences->         <-duplicates->
+     '((eq     ::  (1  "a"  (1 2)  nil          1.0  "a" (1 2) ))
+       (eql    ::  (1  "a"  (1 2)  nil          1.0  "a" (1 2) ))
+       (equal  ::  (1  "a"  (1 2)  nil          1.0            ))
+       (equalp ::  (1  "a"  (1 2)  nil                         )))
+     )
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-unzip ()
+    "Unit tests for `asoc-unzip'."
+    ;; #keys == #values
+    (should-equal
+     (asoc-unzip '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
+     :result '((1 2 3 4 5) (1 4 9 16 25)))
+    ;; #keys > #values
+    (should-equal
+     (asoc-unzip '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25) (6) (7)))
+     :result '((1 2 3 4 5 6 7) (1 4 9 16 25 () ())))
+    ;; empty list
+    (should-equal
+     (asoc-unzip nil)
+     :result '(() ()))
+    ;; empty values
+    (should-equal
+     (asoc-unzip '((1) (2) (3) (4) (5)))
+      :result '((1 2 3 4 5) (() () () () ())))
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-unzip-zip ()
+    "Tests for `asoc-zip' reversing `asoc-unzip'."
+    (let ((a '((1 . 1) (2 . 4) (1 . 1) (3 . 9) (1 . 1) (4 . 16) (5 . 25)))
+          (b nil)
+          (c '((1 . 1)))
+          (d '((nil . nil))))
+      (and
+       (should-equal
+        (apply #'asoc-zip (asoc-unzip a))
+        :result a)
+       (should-equal
+        (apply #'asoc-zip (asoc-unzip b))
+        :result b)
+       (should-equal
+        (apply #'asoc-zip (asoc-unzip c))
+        :result c)
+       (should-equal
+        (apply #'asoc-zip (asoc-unzip d))
+        :result d)
+       ))
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-zip-unzip ()
+    "Tests for `asoc-unzip' reversing `asoc-zip'."
+    ;; HOLDS
+    (let ((a '((1 2 1 3 1 4 5) (1 4 1 9 1 16 25)))
+          (b '(nil nil))
+          (c '((1) (1)))
+          (d '((nil) (nil))))
+      (should-equal
+       (asoc-unzip (apply #'asoc-zip a))
+       :result a)
+      (should-equal
+       (asoc-unzip (apply #'asoc-zip b))
+       :result b)
+      (should-equal
+       (asoc-unzip (apply #'asoc-zip c))
+       :result c)
+      (should-equal
+       (asoc-unzip (apply #'asoc-zip d))
+       :result d)
+      )
+    ;; DOESN'T HOLD
+    (let (;; #keys > #values
+          (a '((1 2 3 4 5 6 7) '(1 4 9 16 25)))
+          ;; string argument
+          (b '((1 2 3 4 5 6) "qwerty")))
+      (should-not-equal
+       (asoc-unzip (apply #'asoc-zip a))
+       :result a)
+      (should-not-equal
+        (asoc-unzip (apply #'asoc-zip b))
+        :result b)
+      )
+    )
+
+
   (ert-deftest test-asoc-unit-tests-asoc-do ()
     "Unit tests for `asoc-do'."
     ;; error if the variable RESULT is not defined

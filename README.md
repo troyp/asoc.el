@@ -21,6 +21,8 @@ Associative list (alist) library for Emacs Lisp.
 * [asoc-find-key](#asoc-find-key-key-alist-optional-test) `(key alist &optional test)`
 * [asoc-delete!](#asoc-delete-alist-key-optional-remove-all) `(alist key &optional remove-all)`
 * [asoc-keys](#asoc-keys-alist) `(alist)`
+* [asoc-values](#asoc-values-alist) `(alist)`
+* [asoc-unzip](#asoc-unzip-alist) `(alist)`
 
 ### Looping Constructs
 * [asoc-do](#asoc-do-spec-rest-body) `(spec &rest body)`
@@ -99,6 +101,23 @@ Alias for `asoc--assoc`.
 ### asoc-keys `(alist)`
 
 Return a list of unique keys in `alist`.
+
+### asoc-values `(alist)`
+
+Return a list of unique values in `alist`.
+
+### asoc-unzip `(alist)`
+
+Return a list of all keys and a list of all values in `alist`.
+
+Returns `(KEYLIST VALUELIST) where KEYLIST and VALUELIST contain all the keys
+and values in `alist` in order, including repeats. The original `alist` can be
+reconstructed with
+
+    (asoc-zip KEYLIST VALUELIST).
+
+asoc-unzip will also reverse `asoc-zip` as long as the original arguments of
+`asoc-zip` were both lists and were of equal length.
 
 ## Looping Constructs
 

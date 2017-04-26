@@ -4,7 +4,7 @@
 
 ;; Author: Troy Pracy
 ;; Keywords: alist data-types
-;; Version: 0.2.2
+;; Version: 0.2.3
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -160,6 +160,31 @@ This may destructively modify ALIST."
       (unless (asoc--list-member (car pair) result)
         (setq result (cons (car pair) result))))
     (reverse result)))
+
+(defun asoc-values (alist)
+  "Return a list of unique values in ALIST."
+  (let (result)
+    (dolist (pair alist)
+      (unless (asoc--list-member (cdr pair) result)
+        (setq result (cons (cdr pair) result))))
+    (reverse result)))
+
+(defun asoc-unzip (alist)
+  "Return a list of all keys and a list of all values in ALIST.
+
+Returns '(KEYLIST VALUELIST) where KEYLIST and VALUELIST contain all the keys
+and values in ALIST in order, including repeats. The original alist can be
+reconstructed with
+
+    (asoc-zip KEYLIST VALUELIST).
+
+asoc-unzip will also reverse `asoc-zip' as long as the original arguments of
+`asoc-zip' were both lists and were of equal length."
+  (let (keylist valuelist)
+    (dolist (pair (reverse alist))
+      (setq keylist (cons (car pair) keylist))
+      (setq valuelist (cons (cdr pair) valuelist)))
+    (list keylist valuelist)))
 
 ;; ,--------------------,
 ;; | Looping Constructs |
