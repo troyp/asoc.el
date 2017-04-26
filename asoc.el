@@ -4,7 +4,7 @@
 
 ;; Author: Troy Pracy
 ;; Keywords: alist data-types
-;; Version: 0.2.0
+;; Version: 0.2.1
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -156,11 +156,11 @@ non-nil, remove all elements with KEY."
             (setcdr alist (cdr tail))
             (if remove-all
                 ;; recurse to remove other matches
-                (asoc-remove! alist key remove-all)
+                (asoc-delete! alist key remove-all)
               ;; return after first removal
               alist))
         (progn                             ;; keep foremost pair
-          (unless (asoc-remove! tail key remove-all)
+          (unless (asoc-delete! tail key remove-all)
             (setcdr alist nil))
           alist))))))
 
