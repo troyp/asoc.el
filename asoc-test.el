@@ -7,6 +7,11 @@
                (expr keyword result)
                (if (eq keyword :result)
                    `(should (equal ,expr ,result))
+                 (error "expected :result")))
+              (should-not-equal
+               (expr keyword result)
+               (if (eq keyword :result)
+                   `(should-not (equal ,expr ,result))
                  (error "expected :result"))))
 
   (ert-deftest test-asoc-unit-tests-asoc--compare ()
