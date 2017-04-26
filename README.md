@@ -86,10 +86,11 @@ In the latter case, this is equivalent to `acons`.
 
 ### asoc-delete! `(alist key &optional remove-all)`
 
-Remove the foremost element with `key` and return the modified list.
+Return a modified list excluding the first, or all, pair(s) with `key`.
 
-The list is modified in place unless the result is nil. If `remove-all` is
-non-nil, remove all elements with `key`.
+If `remove-all` is non-nil, remove all elements with `key`.
+
+This may destructively modify `alist`.
 
 ### asoc-find-key `(key alist &optional test)`
 

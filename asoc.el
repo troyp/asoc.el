@@ -4,7 +4,7 @@
 
 ;; Author: Troy Pracy
 ;; Keywords: alist data-types
-;; Version: 0.2.1
+;; Version: 0.2.2
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -136,33 +136,22 @@ In the latter case, this is equivalent to `acons'."
 (defalias 'asoc-find-key 'asoc--assoc)
 
 (defun asoc-delete! (alist key &optional remove-all)
-  "Remove the foremost element with KEY and return the modified list.
+  "Return a modified list excluding the first, or all, pair(s) with KEY.
 
-The list is modified in place unless the result is nil. If REMOVE-ALL is
-non-nil, remove all elements with KEY."
-  (let* ((head (car alist))
-         (tail (cdr alist))
-         (head-key (car head)))
-    (cond
-     ;; empty list
-     ((null alist)  nil)
-     ;; single pair
-     ((null  tail)  (if (asoc--compare key head-key) nil alist))
-     ;; two or more pairs
-     (t
-      (if (asoc--compare key head-key)    ;; remove foremost pair
-          (progn
-            (setcar alist (car tail))
-            (setcdr alist (cdr tail))
-            (if remove-all
-                ;; recurse to remove other matches
-                (asoc-delete! alist key remove-all)
-              ;; return after first removal
-              alist))
-        (progn                             ;; keep foremost pair
-          (unless (asoc-delete! tail key remove-all)
-            (setcdr alist nil))
-          alist))))))
+If REMOVE-ALL is non-nil, remove all elements with KEY.
+
+This may destructively modify ALIST."
+  (if ;; empty list
+      (null alist)  nil
+    ;; nonempty
+    (let* ((head (car alist))
+           (tail (cdr alist))
+           (head-key (car head)))
+      (if (asoc--compare key head-key)
+          ;; recurse to other matches if remove-all==t
+          (if remove-all (asoc-delete! tail key t) tail)
+        (setcdr alist (asoc-delete! tail key remove-all))
+        alist))))
 
 (defun asoc-keys (alist)
   "Return a list of unique keys in ALIST."
