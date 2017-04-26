@@ -17,7 +17,7 @@
   (ert-deftest test-asoc-unit-tests-asoc--compare ()
     "Unit tests for `asoc--compare'."
     (should-equal
-     (let (table)
+     (let ( table )
        (dolist (fn
                 (list #'equalp #'equal #'eql #'eq)
                 table)
@@ -33,9 +33,9 @@
                           '(  (1 2) . (1 2)  )   ;; 3. lists
                           `(   ,p   .  ,p    )   ;; 7. same object
                           ))
-             (setq result (cons (asoc--compare (car xy) (cdr xy))
-                                result)))
-           (setq table (cons (reverse result) table)))))
+             (push (asoc--compare (car xy) (cdr xy))
+                   result))
+           (push (reverse result) table))))
      :result
      '( ;  FN        3~3  3~3.0  "a"~"a"  "a"~"A"  x~x (1 2)~(1 2) p~p
        (  eq      ::  t    nil     nil      nil     t      nil      t  )
@@ -52,7 +52,7 @@
   (ert-deftest test-asoc-unit-tests-asoc--assoc ()
     "Unit tests for `asoc--assoc'."
     (should-equal
-     (let* (( table  nil    )
+     (let* (  table
             ( p      '(1 2) )
             ( a      `((1   . t) (2.0 . t) ("a" . t) (,p  . t) (nil . t)) )
             (test-items
@@ -70,11 +70,10 @@
        (dolist (eqfn (list #'equalp #'equal #'eql #'eq))
          (let* (( result  (list :: eqfn) ))
            (dolist (test test-items)
-             (setq result (cons (asoc--assoc test a eqfn)
-                                result)))
-           (setq table (cons (reverse result) table))))
-       table
-       )
+             (push (asoc--assoc test a eqfn)
+                   result))
+           (push (reverse result) table)))
+       table)
      :result
      ;;  FN         1/1    1.0/1   2.0/2.0    2/2.0    "a"/"a"   "A"/"a"  (1 2)/(1 2) (1 2),same     nil
      '((eq     :: (1 . t)   nil      nil       nil       nil       nil        nil     ((1 2) . t) (nil . t))
@@ -87,7 +86,7 @@
   (ert-deftest test-asoc-unit-tests-asoc--list-member ()
     "Unit tests for `asoc--list-member'."
     (should-equal
-     (let* (( table  nil     )
+     (let* (  table
             ( p      '(1 2)  )
             ;; l        8 7 6    5  4   3  2  1     | length of tail from elt
             ( l      `( 1 2 3.0 ,p "a" 'c nil t ))
@@ -110,11 +109,10 @@
                 ( asoc-compare-fn       f       ) )
            (dolist (test test-items)
              (let ((ltail (asoc--list-member test l)))
-               (setq result (cons (when ltail (length ltail))
-                                  result))))
-           (setq table (cons (reverse result) table))))
-       table
-       )
+               (push (when ltail (length ltail))
+                     result)))
+           (push (reverse result) table)))
+       table)
      :result
      ;;  Integers represent the length of the tail starting with TEST-ITEM
      ;;  LIST ITEM:  2  2    3.0  3.0  ,p   ,p      "a"  "a" 'c   nil  t
@@ -132,40 +130,34 @@
     (should-equal
      (let ((list (number-sequence 1 10)))
        (asoc--list-filter (lambda (n) (zerop (% n 3)))
-                          list)
-       )
-     :result '(3 6 9)
-     )
+                          list))
+     :result '(3 6 9))
     ;; returns original list with constant t predicate
     (should-equal
-     (let* ((results nil)
-            (lists '(
-                     nil
-                     (1 2 3 4)
-                     (nil t)
-                     )))
+     (let* ( results
+            (lists '( nil
+                      (1 2 3 4)
+                      (nil t)   )) )
        (dolist (list lists)
          (let ((result (asoc--list-filter (lambda (x) t)
                                           list)))
-           (setq results (cons (cons list result) results))))
+           (push (cons list result) results)))
        (reverse results))
      :result
-     '(( nil       . nil       )
-       ( (1 2 3 4) . (1 2 3 4) )
-       ( (nil t)   . (nil t))  )
+     '( ( nil       . nil       )
+        ( (1 2 3 4) . (1 2 3 4) )
+        ( (nil t)   . (nil t))  )
      )
     ;; check interned DEL symbols are not removed
     (should-equal
      (let ((list '(DEL DEL)))
        (asoc--list-filter #'symbolp list))
-     :result '(DEL DEL)
-     )
+     :result '(DEL DEL))
     ;; check nil is not removed
     (should-equal
      (let ((list '(nil nil)))
        (asoc--list-filter #'symbolp list))
-     :result '(nil nil)
-     )
+     :result '(nil nil))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc--list-remove ()
@@ -174,10 +166,8 @@
     (should-equal
      (let ((list (number-sequence 1 10)))
        (asoc--list-remove (lambda (n) (zerop (% n 3)))
-                          list)
-       )
-     :result '(1 2 4 5 7 8 10)
-     )
+                          list))
+     :result '(1 2 4 5 7 8 10))
     ;; returns original list with constant nil predicate
     (should-equal
      (let* ((results nil)
@@ -189,7 +179,7 @@
        (dolist (list lists)
          (let ((result (asoc--list-remove (lambda (x) nil)
                                           list)))
-           (setq results (cons (cons list result) results))))
+           (push (cons list result) results)))
        (reverse results))
      :result
      '(( nil       . nil       )
@@ -206,8 +196,7 @@
     (should-equal
      (let ((list '(nil nil)))
        (asoc--list-remove #'integerp list))
-     :result '(nil nil)
-     )
+     :result '(nil nil))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-make ()
@@ -247,11 +236,10 @@
          (let* (( result           (list :: fn) )
                 ( asoc-compare-fn  fn  ))
            (dolist (test test-items)
-             (setq result (cons (asoc-contains-key? a test)
-                                result)))
-           (setq table (cons (reverse result) table))))
-       table
-       )
+             (push (asoc-contains-key? a test)
+                   result))
+           (push (reverse result) table)))
+       table)
      :result
      ;;  FN        1/1  1.0/1  2.0/2.0  2/2.0 "a"/"a" "A"/"a" (1 2)/(1 2) (1 2),same nil
      `(( eq     ::  t    nil     nil     nil    nil     nil       nil          t      t )
@@ -285,11 +273,10 @@
          (let* (( result           (list :: fn) )
                 ( asoc-compare-fn  fn  ))
            (dolist (test test-items)
-             (setq result (cons (asoc-contains-pair? a (car test) (cdr test))
-                                result)))
-           (setq table (cons (reverse result) table))))
-       table
-       )
+             (push (asoc-contains-pair? a (car test) (cdr test))
+                   result))
+           (push (reverse result) table)))
+       table)
      :result
      ;; ALIST ITEM:    q    q  (1 . 3.0) (1 . 3.0)  (1 . "a")  (1 . "a")  (1 .   p)   (1 . p)    p   p
      ;;  TEST ITEM: (1 . 2) q  (1 . 3)   (1 . 3.0)  (1 . "a")  (1 . "A")  (1 . (1 2)) (1 . p)  (1 2) p
@@ -322,11 +309,10 @@
          (let* (( result           (list :: fn) )
                 ( asoc-compare-fn  fn  ))
            (dolist (test test-items)
-             (setq result (cons (asoc-get a test)
-                                result)))
-           (setq table (cons (reverse result) table))))
-       table
-       )
+             (push (asoc-get a test)
+                   result))
+           (push (reverse result) table)))
+       table)
      :result
      ;;  FN        1/1  1.0/1  2.0/2.0  2/2.0 "a"/"a" "A"/"a" (1 2)/(1 2) (1 2),same nil
      '(( eq     ::  1    nil     nil     nil    nil     nil       nil          4      5 )
@@ -475,8 +461,8 @@
 
        (dolist (fn (list #'equalp #'equal #'eql #'eq))
          (let* (( asoc-compare-fn  fn  ))
-           (setq result (cons (list fn :: (asoc-keys a))
-                              result))))
+           (push (list fn :: (asoc-keys a))
+                 result)))
        result)
      :result   ;; <-first occurrences->         <-duplicates->
      '((eq     ::  (1  "a"  (1 2)  nil          1.0  "a" (1 2) ))
@@ -507,8 +493,8 @@
 
        (dolist (fn (list #'equalp #'equal #'eql #'eq))
          (let* (( asoc-compare-fn  fn  ))
-           (setq result (cons (list fn :: (asoc-values a))
-                              result))))
+           (push (list fn :: (asoc-values a))
+                 result)))
        result)
      :result   ;; <-first occurrences->         <-duplicates->
      '((eq     ::  (1  "a"  (1 2)  nil          1.0  "a" (1 2) ))
@@ -701,8 +687,8 @@
                          (1.0 3) ((1 2) 3) ("A" 3)                      )))
        (dolist (f (list #'equalp #'equal #'eql #'eq))
          (let (( asoc-compare-fn f ))
-           (setq result (cons (list f ::: (asoc-uniq a))
-                              result))))
+           (push (list f ::: (asoc-uniq a))
+                 result)))
        (reverse result))
      :result
      '((equalp ::: ( (1 1) ((1 2) 1) ("a" 1) ('c 1) (nil 1) (t 1)                                          ) )
@@ -721,13 +707,11 @@
                 (asoc-uniq '((1.0 1) (1.0 2)))))
       (append '(eql :::)
               (let ((asoc-compare-fn #'eql))
-                (asoc-uniq '((1.0 1) (1.0 2)))))
-      )
+                (asoc-uniq '((1.0 1) (1.0 2))))))
      :result
      '((equalp ::: (1.0 1))
        (equal  ::: (1.0 1))
-       (eql    ::: (1.0 1)))
-     )
+       (eql    ::: (1.0 1))))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-fold ()
