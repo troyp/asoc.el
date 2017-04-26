@@ -635,8 +635,56 @@
 
   (ert-deftest test-asoc-unit-tests-asoc-filter ()
     "Unit tests for `asoc-filter'."
-    ;; TODO
-    t
+    ;; empty list
+    (should-equal
+     (let ( result
+            (fns   '((lambda (k v) t)
+                     (lambda (k v) nil)
+                     symbolp))          )
+       (dolist (f fns)
+         (push (asoc-filter f nil)
+               result))
+       result)
+     :result '(nil nil nil))
+    ;; constant true and false functions
+    (should-equal
+     (let ( table
+            (fns   '(( truefn  . (lambda (k v) t))
+                     ( falsefn . (lambda (k v) nil))))
+            (alists '(nil
+                      ((x . t))
+                      ((x . t) (x . t))
+                      ((x . t) (y . t) (z . t)))) )
+       (dolist (fnpair fns)
+         (let ( result
+                (fn      (cdr fnpair))
+                (fn-name (car fnpair)) )
+           (dolist (alist alists)
+             (push (asoc-filter fn alist)
+                   result))
+           (push (list fn-name ::: (reverse result)) table)))
+       (reverse table))
+     :result
+     '(( truefn  ::: ( ( )  ((x . t))  ((x . t) (x . t))  ((x . t) (y . t) (z . t)) ))
+       ( falsefn ::: ( ( )  ( )        ( )                ( )                       )))
+     )
+    ;; sample functions and alists
+    (should-equal
+     (let ((alist '((1 . 1) (2 . 4) (3 . 3) (4 . 2) (5 . 1) (6 . 7))))
+       (asoc-filter #'eq alist))
+     :result '((1 . 1) (3 . 3)))
+    (should-equal
+     (let ((alist '((a . 1) (b . nil) (c . 3) (nil . 4) (nil . nil))))
+       (asoc-filter (lambda (k v) (and k v)) alist))
+     :result '((a . 1) (c . 3)))
+    (should-equal
+     (let* ((nseq  (number-sequence 0 9))
+            (alist (asoc-zip nseq
+                             (mapcar (lambda (n) (- (* n n n) (* 13 n n))) nseq))))
+       (asoc-filter
+        (lambda (k v) (> (+ (* 51 k) v -57) 0))
+        alist))
+     :result '((2 . -44) (3 . -90) (4 . -144) (7 . -294) (8 . -320) (9 . -324)))
     )
   (ert-deftest test-asoc-unit-tests-asoc-filter-keys ()
     "Unit tests for `asoc-filter-keys'."
