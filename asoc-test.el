@@ -699,8 +699,27 @@
 
   (ert-deftest test-asoc-unit-tests-asoc-remove ()
     "Unit tests for `asoc-remove'."
-    ;; TODO
-    t
+    ;; test against asoc-filter
+    (let ((preds   '((lambda (k v) t)
+                     (lambda (k v) nil)
+                     eq
+                     (lambda (k v) (and k v))
+                     ))
+          (alists '(nil
+                    ((x . t))
+                    ((x . t) (x . t))
+                    ((x . t) (y . t) (z . t))
+                    ((1 . 1) (2 . 4) (3 . 3) (4 . 2) (5 . 1) (6 . 7))
+                    ((a . 1) (b . nil) (c . 3) (nil . 4) (nil . nil))
+                    ))
+          )
+      (dolist (pred preds)
+        (dolist (alist alists)
+          (should-equal
+           (asoc-remove pred alist)
+           :result
+           (asoc-filter (lambda (k v) (not (funcall pred k v)))
+                        alist)))))
     )
   (ert-deftest test-asoc-unit-tests-asoc-remove-keys ()
     "Unit tests for `asoc-remove-keys'."
