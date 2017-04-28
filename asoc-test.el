@@ -639,13 +639,22 @@
     (should-equal
      (let ( result
             (fns   '((lambda (k v) t)
-                     (lambda (k v) nil)
-                     symbolp))          )
+                     (lambda (k v) nil))) )
        (dolist (f fns)
          (push (asoc-filter f nil)
                result))
        result)
-     :result '(nil nil nil))
+     :result '(nil nil))
+    ;; empty list, predicates with wrong number of arguments
+    (should-equal
+     (let ( result
+            (fns   '(symbolp
+                     (lambda (a b c d e) t))) )
+       (dolist (f fns)
+         (push (asoc-filter f nil)
+               result))
+       result)
+     :result '(nil nil))
     ;; constant true and false functions
     (should-equal
      (let ( table
