@@ -729,7 +729,19 @@
            :result
            (asoc-filter (lambda (k v) (not (funcall pred k v)))
                         alist)))))
+    ;; empty list, predicates with wrong number of arguments
+    (should-equal
+     (let ( result
+            (preds-wrong-arity '( symbolp
+                                  (lambda (a b c d e) t) )) )
+       (dolist (pred preds-wrong-arity)
+         (push (asoc-filter pred nil)
+               result))
+       result)
+     :result '(nil nil)
+     )
     )
+
   (ert-deftest test-asoc-unit-tests-asoc-remove-keys ()
     "Unit tests for `asoc-remove-keys'."
     ;; TODO
