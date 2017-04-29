@@ -4,7 +4,7 @@
 
 ;; Author: Troy Pracy
 ;; Keywords: alist data-types
-;; Version: 0.2.5
+;; Version: 0.2.6
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -228,11 +228,13 @@ Example:
                        ,@body))
                    ,alist)
            ,result)
-      `(mapcar (lambda (,pairsym)
-                 (let ((,kvar (car ,pairsym))
-                       (,vvar (cdr ,pairsym)))
-                   ,@body))
-               ,alist))))
+      `(progn
+         (mapcar (lambda (,pairsym)
+                   (let ((,kvar (car ,pairsym))
+                         (,vvar (cdr ,pairsym)))
+                     ,@body))
+                 ,alist)
+         nil))))
 
 ;; ,-------------------,
 ;; | Mapping Functions |

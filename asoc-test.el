@@ -597,6 +597,13 @@
          (asoc-do ((key value) a sum)
            (when (symbolp key)
              (setf sum (+ sum value)))))))
+    ;; return nil if result variable is not specified
+    (should-equal
+     (let ((a '((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36))))
+       (with-temp-buffer
+         (asoc-do ((k v) a )
+           (insert (format "%S\t%S\n" k v)))))
+     :result nil)
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-map-values ()
