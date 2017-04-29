@@ -18,7 +18,7 @@ Associative list (alist) library for Emacs Lisp.
 ### Access Functions
 * [asoc-get](#asoc-get-alist-key-optional-default) `(alist key &optional default)`
 * [asoc-put!](#asoc-put-alist-key-value-optional-replace) `(alist key value &optional replace)`
-* [asoc-find-key](#asoc-find-key-key-alist-optional-test) `(key alist &optional test)`
+* [asoc-find-key](#asoc-find-key-key-alist) `(key alist)`
 * [asoc-delete!](#asoc-delete-alist-key-optional-remove-all) `(alist key &optional remove-all)`
 * [asoc-keys](#asoc-keys-alist) `(alist)`
 * [asoc-values](#asoc-values-alist) `(alist)`
@@ -96,9 +96,9 @@ If `remove-all` is non-nil, remove all elements with `key`.
 
 This may destructively modify `alist`.
 
-### asoc-find-key `(key alist &optional test)`
+### asoc-find-key `(key alist)`
 
-Alias for `asoc--assoc`.
+Return the first element of `alist` whose `car` matches `key`, or nil if none match.
 
 ### asoc-keys `(alist)`
 

@@ -365,6 +365,12 @@
        :result '((3 . 10)))
       )
 
+  (ert-deftest test-asoc-unit-tests-asoc-find-key ()
+    "Unit tests for `asoc-find-key'."
+    ;; TODO
+    t
+    )
+
   (ert-deftest test-asoc-unit-tests-asoc-delete! ()
     "Unit tests for `asoc-delete!'."
     ;; test nil, 1-pair (match/non-match), 2-pairs (match/non)

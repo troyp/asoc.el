@@ -133,7 +133,9 @@ In the latter case, this is equivalent to `acons'."
                                 ,alist)))
      (setq ,alist (cons (cons ,key ,value) ,alist))))
 
-(defalias 'asoc-find-key 'asoc--assoc)
+(defun asoc-find-key (key alist)
+    "Return the first element of ALIST whose `car' matches KEY, or nil if none match."
+    (asoc--assoc key alist asoc-compare-fn))
 
 (defun asoc-delete! (alist key &optional remove-all)
   "Return a modified list excluding the first, or all, pair(s) with KEY.
