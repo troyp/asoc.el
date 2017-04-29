@@ -995,6 +995,24 @@
              (setf sum (+ sum value))))))
      :result 30))
 
+  (ert-deftest test-asoc-unit-tests-asoc-map ()
+    "Unit tests for `asoc-map'."
+    (should-equal
+     (asoc-map (lambda (k v) (cons k (when (symbolp k) v)))
+               '((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36)))
+     :result '((one . 1) (two . 4) (3 . nil) (4 . nil) (five . 25) (6 . nil)))
+    (should-equal
+     (asoc-map (lambda (k v) (when (symbolp k) v))
+               '((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36)))
+     :result '(1 4 nil nil 25 nil)))
+
+  (ert-deftest test-asoc-unit-tests-asoc-map-keys ()
+    "Unit tests for `asoc-map-keys'."
+    (should-equal
+     (asoc-map-keys #'symbol-name
+                    '((one . 1) (two . 4) (three . 9) (four . 16) (five . 25)))
+     :result '(("one" . 1) ("two" . 4) ("three" . 9) ("four" . 16) ("five" . 25))))
+
   (ert-deftest test-asoc-docstring-examples-asoc-map-values ()
     "Docstring examples for `asoc-map-values'."
     (should-equal

@@ -28,6 +28,8 @@ Associative list (alist) library for Emacs Lisp.
 * [asoc-do](#asoc-do-spec-rest-body) `(spec &rest body)`
 
 ### Mapping Functions
+* [asoc-map](#asoc-map-function-alist) `(function alist)`
+* [asoc-map-keys](#asoc-map-keys-func-alist) `(func alist)`
 * [asoc-map-values](#asoc-map-values-func-alist) `(func alist)`
 * [asoc-zip](#asoc-zip-keys-values) `(keys values)`
 
@@ -141,9 +143,39 @@ The return value is obtained by evaluating `result`.
 
 ## Mapping Functions
 
+### asoc-map `(function alist)`
+
+Apply `function` to each element of `alist` and return the resulting list.
+
+`function` should be a function of two arguments `(key value)`.
+
+    ;; map value to nil when key is not a symbol...
+    (asoc-map (lambda (k v) (cons k (when (symbolp k) v)))
+              `((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36)))
+    ;; ((one . 1) (two . 4) (3 . nil) (4 . nil) (five . 25) (6 . nil))
+
+    ;; list of values for symbol keys (nil for other keys)
+    (asoc-map (lambda (k v) (when (symbolp k) v))
+              '((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36)))
+    ;; (1 4 nil nil 25 nil)
+
+### asoc-map-keys `(func alist)`
+
+Return a modified copy of `alist` with keys transformed by `func`.
+
+    ;; convert symbolic keys to strings
+    (asoc-map-keys #'symbol-name
+                   '((one . 1) (two . 4) (three . 9) (four . 16) (five . 25)))
+    ;; (("one" . 1) ("two" . 4) ("three" . 9) ("four" . 16) ("five" . 25))
+
 ### asoc-map-values `(func alist)`
 
 Return a modified copy of alist with values transformed by `func`.
+
+    ;; convert alist to nested list
+    (let ((a `((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
+      (asoc-map-values #'list a))
+    ;; ((1 1) (2 4) (3 9) (4 16) (5 25))
 
 ### asoc-zip `(keys values)`
 

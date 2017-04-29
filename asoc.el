@@ -4,7 +4,7 @@
 
 ;; Author: Troy Pracy
 ;; Keywords: alist data-types
-;; Version: 0.2.3
+;; Version: 0.2.4
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -235,6 +235,42 @@ Example:
 ;; ,-------------------,
 ;; | Mapping Functions |
 ;; '-------------------'
+
+(defun asoc-map (function alist)
+  "Apply FUNCTION to each element of ALIST and return the resulting list.
+
+FUNCTION should be a function of two arguments (KEY VALUE).
+
+Examples:
+
+    ;; map value to nil when key is not a symbol...
+    (asoc-map (lambda (k v) (cons k (when (symbolp k) v)))
+              '((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36)))
+    ;; ((one . 1) (two . 4) (3 . nil) (4 . nil) (five . 25) (6 . nil))
+
+    ;; list of values for symbol keys (nil for other keys)
+    (asoc-map (lambda (k v) (when (symbolp k) v))
+              '((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36)))
+    ;; (1 4 nil nil 25 nil)"
+  (mapcar (lambda (k.v)
+            (let ((key   (car k.v))
+                  (value (cdr k.v)))
+              (funcall function key value)))
+          alist))
+
+(defun asoc-map-keys (func alist)
+  "Return a modified copy of alist with keys transformed by FUNC.
+
+Example: convert symbolic keys to strings
+
+    (asoc-map-keys #'symbol-name
+                  '((one . 1) (two . 4) (three . 9) (four . 16) (five . 25)))
+    ;; ((\"one\" . 1) (\"two\" . 4) (\"three\" . 9) (\"four\" . 16) (\"five\" . 25))"
+  (mapcar (lambda (k.v)
+            (let ((k (car k.v))
+                  (v (cdr k.v)))
+              (cons (funcall func k) v)))
+          alist))
 
 (defun asoc-map-values (func alist)
   "Return a modified copy of alist with values transformed by FUNC.
