@@ -697,9 +697,60 @@
     )
   (ert-deftest test-asoc-unit-tests-asoc-filter-keys ()
     "Unit tests for `asoc-filter-keys'."
-    ;; TODO
-    t
+    ;; empty list
+    (should-equal
+     (let ( result
+            (preds  '((lambda (k) t)
+                      (lambda (k) nil))) )
+       (dolist (pred preds)
+         (push (asoc-filter-keys pred nil)
+               result))
+       result)
+     :result '(nil nil))
+    ;; empty list, predicates with wrong number of arguments
+    (should-equal
+     (let ( result
+            (preds   '(<
+                       (lambda (a b c d e) t))) )
+       (dolist (pred preds)
+         (push (asoc-filter pred nil)
+               result))
+       result)
+     :result '(nil nil))
+    ;; constant true and false functions
+    (should-equal
+     (let ( table
+            (preds  '(( truefn  . (lambda (k) t))
+                      ( falsefn . (lambda (k) nil))))
+            (alists '(nil
+                      ((x . t))
+                      ((x . t) (x . t))
+                      ((x . t) (y . t) (z . t)))) )
+       (dolist (fnpair preds)
+         (let ( result
+                (fn      (cdr fnpair))
+                (fn-name (car fnpair)) )
+           (dolist (alist alists)
+             (push (asoc-filter-keys fn alist)
+                   result))
+           (push (list fn-name ::: (reverse result)) table)))
+       (reverse table))
+     :result
+     '(( truefn  ::: ( ( )  ((x . t))  ((x . t) (x . t))  ((x . t) (y . t) (z . t)) ))
+       ( falsefn ::: ( ( )  ( )        ( )                ( )                       )))
+     )
+    ;; sample functions and alists
+    (should-equal
+     (let ((alist '((1 . 1) (2 . 4) (3 . 3) (4 . 2) (5 . 1) (6 . 7))))
+       (asoc-filter-keys (lambda (k) (< k 4))
+                         alist))
+     :result '((1 . 1) (2 . 4) (3 . 3)))
+    (should-equal
+     (let ((alist '((a . 1) (b . nil) (c . 3) (nil . 4) (nil . nil))))
+       (asoc-filter-keys #'identity alist))
+     :result '((a . 1) (b . nil) (c . 3)))
     )
+
   (ert-deftest test-asoc-unit-tests-asoc-filter-values ()
     "Unit tests for `asoc-filter-values'."
     ;; TODO
@@ -744,9 +795,43 @@
 
   (ert-deftest test-asoc-unit-tests-asoc-remove-keys ()
     "Unit tests for `asoc-remove-keys'."
-    ;; TODO
-    t
+    ;; test against asoc-filter-keys
+    (let ( table
+           (preds  '( (lambda (k) t)
+                      (lambda (k) nil) ))
+           (alists '( nil
+                      ((x . t))
+                      ((x . t) (x . t))
+                      ((x . t) (y . t) (z . t)) )) )
+      (dolist (pred preds)
+        (dolist (alist alists)
+          (should-equal
+           (asoc-remove-keys pred alist)
+           :result
+           (asoc-filter-keys (lambda (k) (not (funcall pred k)))
+                             alist)))))
+    ;; empty list, predicates with wrong number of arguments
+    (should-equal
+     (let ( result
+            (preds '( <
+                      (lambda (a b c d e) t))) )
+       (dolist (pred preds)
+         (push (asoc-remove-keys pred nil)
+               result))
+       result)
+     :result '(nil nil))
+    ;; sample functions and alists
+    (should-equal
+     (let ((alist '((1 . 1) (2 . 4) (3 . 3) (4 . 2) (5 . 1) (6 . 7))))
+       (asoc-remove-keys (lambda (k) (< k 4))
+                         alist))
+     :result '((4 . 2) (5 . 1) (6 . 7)))
+    (should-equal
+     (let ((alist '((a . 1) (b . nil) (c . 3) (nil . 4) (nil . nil))))
+       (asoc-remove-keys #'identity alist))
+     :result '((nil . 4) (nil)))
     )
+
   (ert-deftest test-asoc-unit-tests-asoc-remove-values ()
     "Unit tests for `asoc-remove-values'."
     ;; TODO
