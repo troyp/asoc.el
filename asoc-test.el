@@ -695,6 +695,7 @@
         alist))
      :result '((2 . -44) (3 . -90) (4 . -144) (7 . -294) (8 . -320) (9 . -324)))
     )
+
   (ert-deftest test-asoc-unit-tests-asoc-filter-keys ()
     "Unit tests for `asoc-filter-keys'."
     ;; empty list
@@ -750,7 +751,7 @@
        (asoc-filter-keys #'identity alist))
      :result '((a . 1) (b . nil) (c . 3)))
     )
-
+
   (ert-deftest test-asoc-unit-tests-asoc-filter-values ()
     "Unit tests for `asoc-filter-values'."
     ;; TODO
@@ -788,7 +789,7 @@
        result)
      :result '(nil nil))
     )
-
+
   (ert-deftest test-asoc-unit-tests-asoc-remove-keys ()
     "Unit tests for `asoc-remove-keys'."
     ;; test against asoc-filter-keys
@@ -827,7 +828,7 @@
        (asoc-remove-keys #'identity alist))
      :result '((nil . 4) (nil)))
     )
-
+
   (ert-deftest test-asoc-unit-tests-asoc-remove-values ()
     "Unit tests for `asoc-remove-values'."
     ;; TODO
