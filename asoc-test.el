@@ -14,8 +14,8 @@
                    `(should-not (equal ,expr ,result))
                  (error "expected :result"))))
 
-  (ert-deftest test-asoc-unit-tests-asoc--compare ()
-    "Unit tests for `asoc--compare'."
+  (ert-deftest test-asoc-unit-tests-asoc---compare ()
+    "Unit tests for `asoc---compare'."
     (should-equal
      (let ( table )
        (dolist (fn
@@ -33,7 +33,7 @@
                           '(  (1 2) . (1 2)  )   ;; 3. lists
                           `(   ,p   .  ,p    )   ;; 7. same object
                           ))
-             (push (asoc--compare (car xy) (cdr xy))
+             (push (asoc---compare (car xy) (cdr xy))
                    result))
            (push (reverse result) table))))
      :result
@@ -45,12 +45,12 @@
     ;; float equality under #'eql
     (should-equal
      (let ((asoc-compare-fn #'eql))
-       (asoc--compare 3.0 3.0))
+       (asoc---compare 3.0 3.0))
      :result t)
     )
 
-  (ert-deftest test-asoc-unit-tests-asoc--assoc ()
-    "Unit tests for `asoc--assoc'."
+  (ert-deftest test-asoc-unit-tests-asoc---assoc ()
+    "Unit tests for `asoc---assoc'."
     (should-equal
      (let* (  table
             ( p      '(1 2) )
@@ -70,7 +70,7 @@
        (dolist (eqfn (list #'equalp #'equal #'eql #'eq))
          (let* (( result  (list :: eqfn) ))
            (dolist (test test-items)
-             (push (asoc--assoc test a eqfn)
+             (push (asoc---assoc test a eqfn)
                    result))
            (push (reverse result) table)))
        table)
@@ -83,8 +83,8 @@
      )
     )
 
-  (ert-deftest test-asoc-unit-tests-asoc--list-member ()
-    "Unit tests for `asoc--list-member'."
+  (ert-deftest test-asoc-unit-tests-asoc---list-member ()
+    "Unit tests for `asoc---list-member'."
     (should-equal
      (let* (  table
             ( p      '(1 2)  )
@@ -108,7 +108,7 @@
          (let* (( result           (list :: f) )
                 ( asoc-compare-fn       f       ) )
            (dolist (test test-items)
-             (let ((ltail (asoc--list-member test l)))
+             (let ((ltail (asoc---list-member test l)))
                (push (when ltail (length ltail))
                      result)))
            (push (reverse result) table)))
@@ -124,12 +124,12 @@
      )
     )
 
-  (ert-deftest test-asoc-unit-tests-asoc--list-filter ()
-    "Unit tests for `asoc--list-filter'."
+  (ert-deftest test-asoc-unit-tests-asoc---list-filter ()
+    "Unit tests for `asoc---list-filter'."
     ;; numeric predicate
     (should-equal
      (let ((list (number-sequence 1 10)))
-       (asoc--list-filter (lambda (n) (zerop (% n 3)))
+       (asoc---list-filter (lambda (n) (zerop (% n 3)))
                           list))
      :result '(3 6 9))
     ;; returns original list with constant t predicate
@@ -139,7 +139,7 @@
                       (1 2 3 4)
                       (nil t)   )) )
        (dolist (list lists)
-         (let ((result (asoc--list-filter (lambda (x) t)
+         (let ((result (asoc---list-filter (lambda (x) t)
                                           list)))
            (push (cons list result) results)))
        (reverse results))
@@ -151,21 +151,21 @@
     ;; check interned DEL symbols are not removed
     (should-equal
      (let ((list '(DEL DEL)))
-       (asoc--list-filter #'symbolp list))
+       (asoc---list-filter #'symbolp list))
      :result '(DEL DEL))
     ;; check nil is not removed
     (should-equal
      (let ((list '(nil nil)))
-       (asoc--list-filter #'symbolp list))
+       (asoc---list-filter #'symbolp list))
      :result '(nil nil))
     )
 
-  (ert-deftest test-asoc-unit-tests-asoc--list-remove ()
-    "Unit tests for `asoc--list-remove'."
+  (ert-deftest test-asoc-unit-tests-asoc---list-remove ()
+    "Unit tests for `asoc---list-remove'."
     ;; numeric predicate
     (should-equal
      (let ((list (number-sequence 1 10)))
-       (asoc--list-remove (lambda (n) (zerop (% n 3)))
+       (asoc---list-remove (lambda (n) (zerop (% n 3)))
                           list))
      :result '(1 2 4 5 7 8 10))
     ;; returns original list with constant nil predicate
@@ -177,7 +177,7 @@
                      (nil t)
                      )))
        (dolist (list lists)
-         (let ((result (asoc--list-remove (lambda (x) nil)
+         (let ((result (asoc---list-remove (lambda (x) nil)
                                           list)))
            (push (cons list result) results)))
        (reverse results))
@@ -189,13 +189,13 @@
     ;; check interned DEL symbols are not removed
     (should-equal
      (let ((list '(DEL DEL)))
-       (asoc--list-remove #'integerp list))
+       (asoc---list-remove #'integerp list))
      :result '(DEL DEL)
      )
     ;; check nil is not removed
     (should-equal
      (let ((list '(nil nil)))
-       (asoc--list-remove #'integerp list))
+       (asoc---list-remove #'integerp list))
      :result '(nil nil))
     )
 
@@ -215,7 +215,7 @@
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-contains-key? ()
-    "Unit tests for `asoc--contains-key?'."
+    "Unit tests for `asoc---contains-key?'."
     (should-equal
      (let* (( table  nil    )
             ( p      '(1 2) )

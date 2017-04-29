@@ -4,7 +4,7 @@
 
 ;; Author: Troy Pracy
 ;; Keywords: alist data-types
-;; Version: 0.2.4
+;; Version: 0.2.5
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -42,11 +42,11 @@ This variable may be passed to asoc functions dynamically in a let binding.")
 ;; | Private Functions |
 ;; '-------------------'
 
-(defun asoc--compare (x y)
+(defun asoc---compare (x y)
   "Compare X and Y using `asoc-compare-fn'."
   (funcall (or asoc-compare-fn #'equal) x y))
 
-(defun asoc--assoc (key alist &optional test)
+(defun asoc---assoc (key alist &optional test)
   "Return the first element of ALIST whose `car' matches KEY, or nil if none match.
 
 The optional argument TEST specifies the equality test to be used, and defaults
@@ -60,23 +60,23 @@ to `equal'. Possible values include `eq', `eql', `equal', `equalp'."
            (setf alist (cdr alist)))
          (car alist)))))
 
-(defun asoc--list-member (key list)
+(defun asoc---list-member (key list)
   "Return non-nil if KEY is a member of LIST.
 
 Similar to `member', `memq' and `memql', but the equality test to used is
 determined by `asoc-compare-fn'."
   (cond ((null list) nil)
         ((funcall (or asoc-compare-fn #'equal) key (car list)) list)
-        ((asoc--list-member key (cdr list)))))
+        ((asoc---list-member key (cdr list)))))
 
-(defun asoc--list-filter (pred list)
+(defun asoc---list-filter (pred list)
   (let ((DELMARKER (make-symbol "DEL")))
     (delq
      DELMARKER
      (mapcar (lambda (x) (if (funcall pred x) x DELMARKER))
              list))))
 
-(defun asoc--list-remove (pred list)
+(defun asoc---list-remove (pred list)
       (let ((DELMARKER (make-symbol "DEL")))
         (delq
         DELMARKER
@@ -99,8 +99,8 @@ determined by `asoc-compare-fn'."
 (defun asoc-contains-key? (alist key)
   "Return t if ALIST contains an item with key KEY, nil otherwise."
   (case asoc-compare-fn
-    ('equalp (and (asoc--assoc key alist #'equalp) t))
-    ('eql    (and (asoc--assoc key alist #'eql) t))
+    ('equalp (and (asoc---assoc key alist #'equalp) t))
+    ('eql    (and (asoc---assoc key alist #'eql) t))
     ('eq     (and (assq  key alist) t))
     (t       (and (assoc key alist) t))))
 
@@ -108,8 +108,8 @@ determined by `asoc-compare-fn'."
   "Return t if ALIST contains an item (KEY . VALUE), nil otherwise."
   (let (result)
     (dolist (pair alist)
-      (when (and (asoc--compare (car pair) key)
-                 (asoc--compare (cdr pair) value))
+      (when (and (asoc---compare (car pair) key)
+                 (asoc---compare (cdr pair) value))
         (setq result t)))
     result))
 
@@ -119,7 +119,7 @@ determined by `asoc-compare-fn'."
 
 (defun asoc-get (alist key &optional default)
   "Return the value associated with KEY in ALIST, or DEFAULT if missing."
-  (or (cdr (asoc--assoc key alist asoc-compare-fn)) default))
+  (or (cdr (asoc---assoc key alist asoc-compare-fn)) default))
 
 (defmacro asoc-put! (alist key value &optional replace)
   "Associate KEY with VALUE in ALIST.
@@ -129,13 +129,13 @@ are removed. Otherwise, the pair is simply consed on the front of the alist.
 In the latter case, this is equivalent to `acons'."
   `(progn
      (when ,replace
-       (setq ,alist (map-filter (lambda (k _) (not (asoc--compare k ,key)))
+       (setq ,alist (map-filter (lambda (k _) (not (asoc---compare k ,key)))
                                 ,alist)))
      (setq ,alist (cons (cons ,key ,value) ,alist))))
 
 (defun asoc-find-key (key alist)
     "Return the first element of ALIST whose `car' matches KEY, or nil if none match."
-    (asoc--assoc key alist asoc-compare-fn))
+    (asoc---assoc key alist asoc-compare-fn))
 
 (defun asoc-delete! (alist key &optional remove-all)
   "Return a modified list excluding the first, or all, pair(s) with KEY.
@@ -149,7 +149,7 @@ This may destructively modify ALIST."
     (let* ((head (car alist))
            (tail (cdr alist))
            (head-key (car head)))
-      (if (asoc--compare key head-key)
+      (if (asoc---compare key head-key)
           ;; recurse to other matches if remove-all==t
           (if remove-all (asoc-delete! tail key t) tail)
         (setcdr alist (asoc-delete! tail key remove-all))
@@ -159,7 +159,7 @@ This may destructively modify ALIST."
   "Return a list of unique keys in ALIST."
   (let (result)
     (dolist (pair alist)
-      (unless (asoc--list-member (car pair) result)
+      (unless (asoc---list-member (car pair) result)
         (setq result (cons (car pair) result))))
     (reverse result)))
 
@@ -167,7 +167,7 @@ This may destructively modify ALIST."
   "Return a list of unique values in ALIST."
   (let (result)
     (dolist (pair alist)
-      (unless (asoc--list-member (cdr pair) result)
+      (unless (asoc---list-member (cdr pair) result)
         (setq result (cons (cdr pair) result))))
     (reverse result)))
 
@@ -312,7 +312,7 @@ Example: filter for pairs where KEY > VALUE
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-filter #'> fib))
     ;; ((2 . 1) (3 . 2) (4 . 3))"
-  (asoc--list-filter (lambda (pair) (funcall predicate (car pair) (cdr pair))) alist))
+  (asoc---list-filter (lambda (pair) (funcall predicate (car pair) (cdr pair))) alist))
 
 (defun asoc-filter-keys (predicate alist)
   "Return a copy of ALIST with keys failing PREDICATE removed.
@@ -322,7 +322,7 @@ Example: filter for pairs where KEY <= 3
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-filter-keys (lambda (k) (<= k 3)) fib))
 ;; ((1 . 1) (2 . 1) (3 . 2))"
-  (asoc--list-filter (lambda (pair) (funcall predicate (car pair))) alist))
+  (asoc---list-filter (lambda (pair) (funcall predicate (car pair))) alist))
 
 (defun asoc-filter-values (predicate alist)
   "Return a copy of ALIST with pairs whose value fails PREDICATE removed.
@@ -332,7 +332,7 @@ Example: filter for pairs where VALUE <= 3
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-filter-values (lambda (v) (<= v 3)) fib))
 ;; ((1 . 1) (2 . 1) (3 . 2) (4 . 3))"
-  (asoc--list-filter (lambda (pair) (funcall predicate (cdr pair))) alist))
+  (asoc---list-filter (lambda (pair) (funcall predicate (cdr pair))) alist))
 
 (defun asoc-remove (predicate alist)
   "Return a copy of ALIST with key-value pairs satisfying PREDICATE removed.
@@ -346,7 +346,7 @@ Example: filter out pairs where KEY > VALUE
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-remove #'> fib))
     ;; ((1 . 1) (5 . 5) (6 . 8) (7 . 13) (8 . 21))"
-  (asoc--list-remove (lambda (pair) (funcall predicate (car pair) (cdr pair))) alist))
+  (asoc---list-remove (lambda (pair) (funcall predicate (car pair) (cdr pair))) alist))
 
 (defun asoc-remove-keys (predicate alist)
   "Return a copy of ALIST with keys satisfying PREDICATE removed.
@@ -358,7 +358,7 @@ Example: filter out pairs where KEY <= 3
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-remove-keys (lambda (k) (<= k 3)) fib))
     ;; ((4 . 3) (5 . 5) (6 . 8) (7 . 13) (8 . 21))"
-  (asoc--list-remove (lambda (pair) (funcall predicate (car pair))) alist))
+  (asoc---list-remove (lambda (pair) (funcall predicate (car pair))) alist))
 
 (defun asoc-remove-values (predicate alist)
   "Return a copy of ALIST with pairs whose value satisfying PREDICATE removed.
@@ -370,7 +370,7 @@ Example: filter out pairs where VALUE <= 3
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-remove-values (lambda (v) (<= v 3)) fib))
     ;; ((5 . 5) (6 . 8) (7 . 13) (8 . 21))"
-  (asoc--list-remove (lambda (pair) (funcall predicate (cdr pair))) alist))
+  (asoc---list-remove (lambda (pair) (funcall predicate (cdr pair))) alist))
 
 (defalias 'asoc-reject 'asoc-remove)
 (defalias 'asoc-reject-keys 'asoc-remove-keys)
@@ -388,7 +388,7 @@ Example:
   (let (result keys)
     (dolist (pair alist result)
       (let ((k (car pair)))
-        (unless (asoc--list-member k keys)
+        (unless (asoc---list-member k keys)
           (setq result (cons pair result))
           (setq keys (cons k keys))
           )))
