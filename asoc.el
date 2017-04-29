@@ -236,8 +236,8 @@ Example:
 ;; | Mapping Functions |
 ;; '-------------------'
 
-(defun asoc-map (function alist)
-  "Apply FUNCTION to each element of ALIST and return the resulting list.
+(defun asoc-map (func alist)
+  "Apply FUNC to each element of ALIST and return the resulting list.
 
 FUNCTION should be a function of two arguments (KEY VALUE).
 
@@ -255,7 +255,7 @@ Examples:
   (mapcar (lambda (k.v)
             (let ((key   (car k.v))
                   (value (cdr k.v)))
-              (funcall function key value)))
+              (funcall func key value)))
           alist))
 
 (defun asoc-map-keys (func alist)

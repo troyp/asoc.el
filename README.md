@@ -145,9 +145,9 @@ The return value is obtained by evaluating `result`.
 
 ### asoc-map `(function alist)`
 
-Apply `function` to each element of `alist` and return the resulting list.
+Apply `func` to each element of `alist` and return the resulting list.
 
-`function` should be a function of two arguments `(key value)`.
+`func` should be a function of two arguments `(key value)`.
 
     ;; map value to nil when key is not a symbol...
     (asoc-map (lambda (k v) (cons k (when (symbolp k) v)))
