@@ -492,22 +492,21 @@
      :result '(1 4 9 16 25))
     ;; test with different choices of asoc-compare-fn
     (should-equal
-     (let* (( p      '(1 2) )
-            ( a      `((1   . 1)   ("a" . "a") (,p    . ,p)    (nil . nil)
-                       (1.0 . 1.0) ("a" . "a") ((1 2) . (1 2)) (nil . nil) ))
-            (result))
+     (let* ( result
+            ( p  '(1 2) )
+            ( a  `((1   . 1)   ("a" . "a") (,p    . ,p)    (nil . nil)
+                   (1.0 . 1.0) ("a" . "a") ((1 2) . (1 2)) (nil . nil) )))
 
        (dolist (fn (list #'equalp #'equal #'eql #'eq))
          (let* (( asoc-compare-fn  fn  ))
            (push (list fn :: (asoc-values a))
                  result)))
        result)
-     :result   ;; <-first occurrences->         <-duplicates->
-     '((eq     ::  (1  "a"  (1 2)  nil          1.0  "a" (1 2) ))
-       (eql    ::  (1  "a"  (1 2)  nil          1.0  "a" (1 2) ))
-       (equal  ::  (1  "a"  (1 2)  nil          1.0            ))
-       (equalp ::  (1  "a"  (1 2)  nil                         )))
-     )
+     :result   ;; <-first occurrences->     <-duplicates->
+     '((eq     ::  (1  "a"  (1 2)  nil      1.0  "a" (1 2) ))
+       (eql    ::  (1  "a"  (1 2)  nil      1.0  "a" (1 2) ))
+       (equal  ::  (1  "a"  (1 2)  nil      1.0            ))
+       (equalp ::  (1  "a"  (1 2)  nil                     ))))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-unzip ()
@@ -582,8 +581,7 @@
        :result a)
       (should-not-equal
        (asoc-unzip (apply #'asoc-zip b))
-       :result b)
-      )
+       :result b))
     )
 
 
@@ -682,33 +680,33 @@
     ;; empty list
     (should-equal
      (let ( result
-            (fns   '((lambda (k v) t)
-                     (lambda (k v) nil))) )
-       (dolist (f fns)
-         (push (asoc-filter f nil)
+            (preds '( (lambda (k v) t)
+                      (lambda (k v) nil) )) )
+       (dolist (pred preds)
+         (push (asoc-filter pred nil)
                result))
        result)
      :result '(nil nil))
     ;; empty list, predicates with wrong number of arguments
     (should-equal
      (let ( result
-            (fns   '(symbolp
-                     (lambda (a b c d e) t))) )
-       (dolist (f fns)
-         (push (asoc-filter f nil)
+            (preds '( symbolp
+                      (lambda (a b c d e) t) )) )
+       (dolist (pred preds)
+         (push (asoc-filter pred nil)
                result))
        result)
      :result '(nil nil))
     ;; constant true and false functions
     (should-equal
      (let ( table
-            (fns   '(( truefn  . (lambda (k v) t))
+            (preds '(( truefn  . (lambda (k v) t))
                      ( falsefn . (lambda (k v) nil))))
             (alists '(nil
                       ((x . t))
                       ((x . t) (x . t))
                       ((x . t) (y . t) (z . t)))) )
-       (dolist (fnpair fns)
+       (dolist (fnpair preds)
          (let ( result
                 (fn      (cdr fnpair))
                 (fn-name (car fnpair)) )
