@@ -26,6 +26,7 @@ Associative list (alist) library for Emacs Lisp.
 
 ### Looping Constructs
 * [asoc-do](#asoc-do-spec-rest-body) `(spec &rest body)`
+* [asoc--do](#asoc--do-alist-rest-body) `(alist &rest body)`
 
 ### Mapping Functions
 * [asoc-map](#asoc-map-function-alist) `(function alist)`
@@ -140,6 +141,31 @@ The return value is obtained by evaluating `result`.
         (when (symbolp key)
           (setf sum (+ sum value))))))
     ;; add values associated with all keys that are symbols.
+
+### asoc--do `(alist &rest body)`
+
+Anaphoric variant of `asoc-do`.
+
+Iterate through `alist`, executing `body` for each key-value pair. For each
+iteration, the anaphoric variables `key and 'value are bound to they current
+key and value. The macro returns the value of the anaphoric variable 'result,
+which is initially nil.
+
+Optionally, initialization code can be included prior to the main body using
+the syntax (:initially INITCODE...).
+
+    (let ((a '((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36))))
+      (asoc--do a
+        (when (symbolp key)
+          (setf result (+ (or result 0) value)))))
+    ;; 30
+
+    (let ((a '((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36))))
+      (asoc--do a
+        (:initially (setf result 0))
+        (when (symbolp key)
+          (setf result (+ result value)))))
+    ;; 30
 
 ## Mapping Functions
 

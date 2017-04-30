@@ -606,6 +606,37 @@
      :result nil)
     )
 
+  (ert-deftest test-asoc-unit-tests-asoc--do ()
+    "Unit tests for `asoc--do'."
+    ;; null alist returns nil
+    (should-equal
+     (asoc--do nil
+       (setq result 'result-set))
+     :result nil)
+    ;; null alist with :initially clause runs init code
+    (should-equal
+     (asoc--do nil
+       (:initially (setq result 'result-set)))
+     :result 'result-set)
+    ;; empty body returns nil
+    (should-equal
+     (asoc--do nil)
+     :result nil)
+    (should-equal
+     (asoc--do '((a . 1) (b . 2) (c . 4)))
+     :result nil)
+    ;; sample code and alists
+    (should-equal
+     (asoc--do '((a . 1) (b . 2) (c . 4))
+       (push value result))
+     :result '(4 2 1))
+    (should-equal
+     (asoc--do '((a . 1) (b . 2) (c . 4))
+       (:initially (setq result 0))
+       (setq result (+ result value)))
+     :result 7)
+    )
+
   (ert-deftest test-asoc-unit-tests-asoc-map-values ()
     "Unit tests for `asoc-map-values'."
     (should-equal
@@ -1006,6 +1037,22 @@
          (asoc-do ((key value) a sum)
            (when (symbolp key)
              (setf sum (+ sum value))))))
+     :result 30))
+
+  (ert-deftest test-asoc-docstring-examples-asoc--do ()
+    "Docstring examples for `asoc--do'."
+    (should-equal
+     (let ((a '((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36))))
+       (asoc--do a
+         (when (symbolp key)
+           (setf result (+ (or result 0) value)))))
+     :result 30)
+    (should-equal
+     (let ((a '((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36))))
+       (asoc--do a
+         (:initially (setf result 0))
+         (when (symbolp key)
+           (setf result (+ result value)))))
      :result 30))
 
   (ert-deftest test-asoc-unit-tests-asoc-map ()

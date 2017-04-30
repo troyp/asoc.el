@@ -4,7 +4,7 @@
 
 ;; Author: Troy Pracy
 ;; Keywords: alist data-types
-;; Version: 0.2.6
+;; Version: 0.2.7
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -235,6 +235,48 @@ Example:
                      ,@body))
                  ,alist)
          nil))))
+
+(defmacro asoc--do (alist &rest body)
+  "Anaphoric variant of `asoc-do'.
+
+Iterate through ALIST, executing BODY for each key-value pair. For each
+iteration, the anaphoric variables 'key and 'value are bound to they current
+key and value. The macro returns the value of the anaphoric variable 'result,
+which is initially nil.
+
+Optionally, initialization code can be included prior to the main body using
+the syntax (:initially INITCODE...).
+
+Example:
+
+    (let ((a '((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36))))
+      (asoc--do a
+        (when (symbolp key)
+          (setf result (+ (or result 0) value)))))
+    ;; 30
+
+    (let ((a '((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36))))
+      (asoc--do a
+        (:initially (setf result 0))
+        (when (symbolp key)
+          (setf result (+ result value)))))
+    ;; 30
+
+\(fn (ALIST [(:initially INITCODE...)] BODY...)"
+  (declare (debug (sexp body))
+           (indent 1))
+  (let ((first-sexp (car body)))
+    (if (and (listp first-sexp)
+             (eq (car first-sexp) :initially))
+        ;; with :initially form
+        (let ((init (cdr first-sexp))
+              (body (cdr body)))
+          `(let ( result )
+             ,@init
+             (asoc-do ((key value) ,alist result) ,@body)))
+      ;; no :initially form
+      `(let ( result )
+         (asoc-do ((key value) ,alist result) ,@body)))))
 
 ;; ,-------------------,
 ;; | Mapping Functions |
