@@ -367,8 +367,35 @@
 
   (ert-deftest test-asoc-unit-tests-asoc-find-key ()
     "Unit tests for `asoc-find-key'."
-    ;; TODO
-    t
+    (should-equal
+     (let* (  table
+              ( p  '(1 2) )
+              ( a  `((1   . t) (2.0 . t) ("a" . t) (,p  . t) (nil . t)) )
+               ;;            TEST-ITEM ;;    ALIST-ELEM
+              (test-items `( 1         ;;    1           | 1  int
+                             1.0       ;;    1           | 2  float matches int
+                             2.0       ;;    2.0         | 3  float
+                             2         ;;    2.0         | 4  int matches float
+                             "a"       ;;    "a"         | 5  string
+                             "A"       ;;    "a"         | 6  string, other case
+                             (1 2)     ;;    p = (1 2)   | 7  list, same structure
+                             ,p        ;;    p           | 8  list, same object
+                             nil       ;;    nil         | 9  nil
+                             )))
+       (dolist (eqfn (list #'equalp #'equal #'eql #'eq))
+         (let ( (asoc-compare-fn  eqfn)
+                (result  (list :: eqfn)) )
+           (dolist (test test-items)
+             (push (asoc-find-key test a)
+                   result))
+           (push (reverse result) table)))
+       table)
+     :result
+     ;;  FN         1/1    1.0/1   2.0/2.0    2/2.0    "a"/"a"   "A"/"a"  (1 2)/(1 2) (1 2),same     nil
+     '((eq     :: (1 . t)   nil      nil       nil       nil       nil        nil     ((1 2) . t) (nil . t))
+       (eql    :: (1 . t)   nil   (2.0 . t)    nil       nil       nil        nil     ((1 2) . t) (nil . t))
+       (equal  :: (1 . t)   nil   (2.0 . t)    nil    ("a" . t)    nil    ((1 2) . t) ((1 2) . t) (nil . t))
+       (equalp :: (1 . t) (1 . t) (2.0 . t) (2.0 . t) ("a" . t) ("a" . t) ((1 2) . t) ((1 2) . t) (nil . t))))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-delete! ()
