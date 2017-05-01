@@ -1149,13 +1149,13 @@
 
   (ert-deftest test-asoc-docstring-examples-asoc-fold ()
     "Docstring examples for `asoc-fold'."
+    ;; list of keys with value of 0
     (should-equal
-     (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
-           (s ""))
-       (asoc-fold (lambda (k v acc)
-                    (concat acc (format "%S\t%S\n" k v)))
-                  a ""))
-     :result "1\t1\n2\t4\n3\t9\n4\t16\n5\t25\n"))
+     (let ((a '((1 . 0) (2 . 0) (3 . 0) (4 . 1) (5 . 0)
+                (6 . 2) (7 . 7) (8 . 3) (9 . 2) (10 . 0))))
+       (asoc-fold (lambda (k v acc) (if (zerop v) (cons k acc) acc))
+                  (reverse a) nil))
+     :result '(1 2 3 5 10)))
 
   (ert-deftest test-asoc-docstring-examples-asoc-uniq ()
     "Docstring examples for `asoc-uniq'."

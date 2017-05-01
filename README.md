@@ -292,9 +292,10 @@ Reduce `alist` using `func` on the values, starting with value `init`.
 `func` should take a key, a value and the accumulated result and return
 an updated result.
 
-    (let ((a `((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
-          (s ""))
-      (asoc-fold (lambda (k v acc)
-                   (concat acc (format "%S	%S\n" k v)))
-                 a ""))
-    ;; "1	1\n2	4\n3	9\n4	16\n5	25"
+Example: list of keys with value of 0
+
+    (let ((a `((1 . 0) (2 . 0) (3 . 0) (4 . 1) (5 . 0)
+               (6 . 2) (7 . 7) (8 . 3) (9 . 2) (10 . 0))))
+      (asoc-fold (lambda (k v acc) (if (zerop v) (cons k acc) acc))
+                 (reverse a) nil))
+    ;; (1 2 3 5 10)
