@@ -45,6 +45,7 @@ Associative list (alist) library for Emacs Lisp.
 
 ### Folds
 * [asoc-fold](#asoc-fold-func-alist-init) `(func alist init)`
+* [asoc--fold](#asoc--fold-form-alist-init) `(form alist init)`
 
 -------------------------------------------------------------------------------
 
@@ -298,4 +299,24 @@ Example: list of keys with value of 0
                (6 . 2) (7 . 7) (8 . 3) (9 . 2) (10 . 0))))
       (asoc-fold (lambda (k v acc) (if (zerop v) (cons k acc) acc))
                  (reverse a) nil))
+    ;; (1 2 3 5 10)
+
+### asoc--fold `(form alist init)`
+
+Anaphoric variant of `asoc-fold`.
+
+  Reduce `alist` using `form` on each value, starting from `init`.
+
+The anaphoric variables `key, 'value and 'acc represent the current
+key, value and accumulated value, respectively.
+
+The return value is the value of 'acc after the last element has
+been processed.
+
+Example: list of keys with value of 0
+
+    (let ((a '((1 . 0) (2 . 0) (3 . 0) (4 . 1) (5 . 0)
+              (6 . 2) (7 . 7) (8 . 3) (9 . 2) (10 . 0))))
+      (asoc--fold (if (zerop value) (cons key acc) acc)
+        (reverse a) nil))
     ;; (1 2 3 5 10)

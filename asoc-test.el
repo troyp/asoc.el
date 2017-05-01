@@ -1066,6 +1066,34 @@
      :result "1\t1\n2\t4\n3\t9\n4\t16\n5\t25\n")
     )
 
+  (ert-deftest test-asoc-unit-tests-asoc--fold ()
+    "Unit tests for `asoc--fold'."
+    ;; fold values only: sum of values
+    (should-equal
+     (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25) (6 . 36))))
+       (asoc-fold (lambda (k v acc) (+ acc v))
+                  a 0))
+     :result 91)
+    ;; fold keys only: list of unique keys (reverse-encountered-order)
+    (should-equal
+     (let ((a '((1 . "one") (2 . "two") (1 . "eins") (2 . "zwei") (3 . "three"))))
+       (asoc-fold (lambda (k v acc) (add-to-list 'acc k))
+                  a nil))
+     :result '(3 2 1))
+    ;; fold keys and values: number of keys which equal their value
+    (should-equal
+     (let ((a '((1 . 1) (2 . 3) (3 . 2) (4 . 4) (5 . 8) (6 . 5) (7 . 7))))
+       (asoc--fold (if (eq key value) (1+ acc) acc)
+         a 0))
+     :result 3)
+    ;; ... number of elements with nil value
+    (should-equal
+     (let ((a '((1 . 1) (2 . nil) (3 . 2) (4 . nil) (5 . nil) (6 . 5) (7 . nil))))
+       (asoc--fold (if (null value) (1+ acc) acc)
+         a 0))
+     :result 4)
+    )
+
   ;; ,-----------------,
   ;; | Docstring Tests |
   ;; '-----------------'
@@ -1179,6 +1207,16 @@
                 (6 . 2) (7 . 7) (8 . 3) (9 . 2) (10 . 0))))
        (asoc-fold (lambda (k v acc) (if (zerop v) (cons k acc) acc))
                   (reverse a) nil))
+     :result '(1 2 3 5 10)))
+
+  (ert-deftest test-asoc-unit-tests-asoc--fold ()
+    "Unit tests for `asoc--fold'."
+    ;; list of keys with value of 0
+    (should-equal
+     (let ((a '((1 . 0) (2 . 0) (3 . 0) (4 . 1) (5 . 0)
+                (6 . 2) (7 . 7) (8 . 3) (9 . 2) (10 . 0))))
+       (asoc--fold (if (zerop value) (cons key acc) acc)
+         (reverse a) nil))
      :result '(1 2 3 5 10)))
 
   (ert-deftest test-asoc-docstring-examples-asoc-uniq ()

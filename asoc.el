@@ -4,7 +4,7 @@
 
 ;; Author: Troy Pracy
 ;; Keywords: alist data-types
-;; Version: 0.2.7
+;; Version: 0.2.8
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -460,6 +460,29 @@ Example: list of keys with value of 0
         ((key value) alist)
       (setq result (funcall func key value result)))
     result))
+
+(defmacro asoc--fold (form alist init)
+  "Anaphoric variant of `asoc-fold'.
+
+  Reduce ALIST using FORM on each value, starting from INIT.
+
+The anaphoric variables 'key, 'value and 'acc represent the current
+key, value and accumulated value, respectively.
+
+The return value is the value of 'acc after the last element has
+been processed.
+
+Example: list of keys with value of 0
+
+    (let ((a '((1 . 0) (2 . 0) (3 . 0) (4 . 1) (5 . 0)
+              (6 . 2) (7 . 7) (8 . 3) (9 . 2) (10 . 0))))
+      (asoc--fold (if (zerop value) (cons key acc) acc)
+        (reverse a) nil))
+    ;; (1 2 3 5 10)"
+  (declare (debug (sexp sexp sexp))
+           (indent 1))
+  `(asoc-fold (lambda (key value acc) ,form)
+              ,alist ,init))
 
 
 (provide 'asoc)
