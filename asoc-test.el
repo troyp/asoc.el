@@ -1038,8 +1038,32 @@
 
   (ert-deftest test-asoc-unit-tests-asoc-fold ()
     "Unit tests for `asoc-fold'."
-    ;; TODO
-    t
+    ;; fold values only: sum of values
+    (should-equal
+     (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25) (6 . 36))))
+       (asoc-fold (lambda (k v acc) (+ acc v))
+                  a 0))
+     :result 91)
+    ;; fold keys only: list of unique keys (reverse-encountered-order)
+    (should-equal
+     (let ((a '((1 . "one") (2 . "two") (1 . "eins") (2 . "zwei") (3 . "three"))))
+       (asoc-fold (lambda (k v acc) (add-to-list 'acc k))
+                  a nil))
+     :result '(3 2 1))
+    ;; fold keys and values: number of keys which equal their value
+    (should-equal
+     (let ((a '((1 . 1) (2 . 3) (3 . 2) (4 . 4) (5 . 8) (6 . 5) (7 . 7))))
+       (asoc-fold (lambda (k v acc) (if (eq k v) (1+ acc) acc))
+                  a 0))
+     :result 3)
+    ;; ... build string
+    (should-equal
+     (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
+           (s ""))
+       (asoc-fold (lambda (k v acc)
+                    (concat acc (format "%S\t%S\n" k v)))
+                  a ""))
+     :result "1\t1\n2\t4\n3\t9\n4\t16\n5\t25\n")
     )
 
   ;; ,-----------------,
