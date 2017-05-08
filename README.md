@@ -10,6 +10,7 @@ Associative list (alist) library for Emacs Lisp.
 
 ### Constructor Functions
 * [asoc-make](#asoc-make-optional-keys-default) `(&optional keys default)`
+* [asoc-copy](#asoc-copy-alist) `(alist)`
 * [asoc-merge](#asoc-merge-rest-alists) `(&rest alists)`
 
 ### Predicates
@@ -66,6 +67,11 @@ This variable may be passed to asoc functions dynamically in a let binding.
 ### asoc-make `(&optional keys default)`
 
 Return an alist with `keys` each initialized to value nil.
+
+### asoc-copy `(alist)`
+_Alias of `copy-sequence`._
+
+Return a shallow copy of ALIST.
 
 ### asoc-merge `(&rest alists)`
 

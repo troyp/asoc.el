@@ -4,7 +4,7 @@
 
 ;; Author: Troy Pracy
 ;; Keywords: alist data-types
-;; Version: 0.2.8
+;; Version: 0.2.9
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -106,6 +106,8 @@ determined by `asoc-compare-fn'."
 (defun asoc-make (&optional keys default)
   "Return an alist with KEYS each initialized to value nil."
   (asoc-zip keys (make-list (length keys) default)))
+
+(defalias 'asoc-copy 'copy-sequence "Return a shallow copy of ALIST.")
 
 (defun asoc-merge (&rest alists)
   "Return an alist with unique keys resulting from merging ALISTS.
