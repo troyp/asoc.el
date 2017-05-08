@@ -188,21 +188,26 @@ This may destructively modify ALIST."
         (setcdr alist (asoc-delete! tail key remove-all))
         alist))))
 
-;; TODO: remove dolist
 (defun asoc-keys (alist)
   "Return a list of unique keys in ALIST."
-  (let (result)
-    (dolist (pair alist)
-      (unless (asoc---list-member (car pair) result)
-        (setq result (cons (car pair) result))))
+  (let ( result
+         (rest alist) )
+    (while rest
+      (let ((pair (car rest)))
+        (unless (asoc---list-member (car pair) result)
+          (push (car pair) result))
+        (setq rest (cdr rest))))
     (reverse result)))
 
 (defun asoc-values (alist)
   "Return a list of unique values in ALIST."
-  (let (result)
-    (dolist (pair alist)
-      (unless (asoc---list-member (cdr pair) result)
-        (setq result (cons (cdr pair) result))))
+  (let ( result
+         (rest alist) )
+    (while rest
+      (let ((pair (car rest)))
+        (unless (asoc---list-member (cdr pair) result)
+          (push (cdr pair) result))
+        (setq rest (cdr rest))))
     (reverse result)))
 
 (defun asoc-unzip (alist)
@@ -216,10 +221,14 @@ reconstructed with
 
 asoc-unzip will also reverse `asoc-zip' as long as the original arguments of
 `asoc-zip' were both lists and were of equal length."
-  (let (keylist valuelist)
-    (dolist (pair (reverse alist))
-      (setq keylist (cons (car pair) keylist))
-      (setq valuelist (cons (cdr pair) valuelist)))
+  (let ( keylist
+         valuelist
+         (rest      (reverse alist)) )
+    (while rest
+      (let ((pair (car rest)))
+        (push (car pair) keylist)
+        (push (cdr pair) valuelist)
+        (setq rest (cdr rest))))
     (list keylist valuelist)))
 
 ;; ,--------------------,
