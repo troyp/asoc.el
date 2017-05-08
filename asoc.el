@@ -138,8 +138,8 @@ identical keys occur within a single alist, the foremost takes precedence."
                  (asoc---compare (cdr pair) value))
             (progn
               (setq result t)))
-        (setq rest (cdr rest)))))
-  result)
+        (setq rest (cdr rest))))
+    result))
 
 ;; ,------------------,
 ;; | Access Functions |
