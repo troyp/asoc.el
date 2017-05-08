@@ -33,8 +33,8 @@
 (defvar asoc-compare-fn nil
   "Special variable holding the equality predicate used in asoc functions.
 
-May take the values `equalp', `equal', `eql', `eq'. When unset, or set to any
-other value, functions default to using `equal'.
+May take the values `equalp', `equal', `eql', `eq'. When unset, functions
+default to using `equal'.
 
 This variable may be passed to asoc functions dynamically in a let binding.")
 
