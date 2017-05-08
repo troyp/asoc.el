@@ -303,8 +303,7 @@ Reduce `alist` using `func` on the values, starting with value `init`.
 `func` should take a key, a value and the accumulated result and return
 an updated result.
 
-Example: list of keys with value of 0
-
+    ;; list of keys with value of 0
     (let ((a `((1 . 0) (2 . 0) (3 . 0) (4 . 1) (5 . 0)
                (6 . 2) (7 . 7) (8 . 3) (9 . 2) (10 . 0))))
       (asoc-fold (lambda (k v acc) (if (zerop v) (cons k acc) acc))
@@ -323,8 +322,7 @@ key, value and accumulated value, respectively.
 The return value is the value of 'acc after the last element has
 been processed.
 
-Example: list of keys with value of 0
-
+    ;; list of keys with value of 0
     (let ((a '((1 . 0) (2 . 0) (3 . 0) (4 . 1) (5 . 0)
               (6 . 2) (7 . 7) (8 . 3) (9 . 2) (10 . 0))))
       (asoc--fold (if (zerop value) (cons key acc) acc)
