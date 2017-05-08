@@ -8,10 +8,18 @@ Associative list (alist) library for Emacs Lisp.
 ### Variables
 * [asoc-compare-fn](#asoc-compare-fn-nil)
 
-### Constructor Functions
+### Constructor and Filter Functions
 * [asoc-make](#asoc-make-optional-keys-default) `(&optional keys default)`
 * [asoc-copy](#asoc-copy-alist) `(alist)`
+* [asoc-zip](#asoc-zip-keys-values) `(keys values)`
 * [asoc-merge](#asoc-merge-rest-alists) `(&rest alists)`
+* [asoc-uniq](#asoc-uniq-alist) `(alist)`
+* [asoc-filter](#asoc-filter-predicate-alist) `(predicate alist)`
+* [asoc-filter-keys](#asoc-filter-keys-predicate-alist) `(predicate alist)`
+* [asoc-filter-values](#asoc-filter-values-predicate-alist) `(predicate alist)`
+* [asoc-remove](#asoc-remove-predicate-alist) `(predicate alist)`
+* [asoc-remove-keys](#asoc-remove-keys-predicate-alist) `(predicate alist)`
+* [asoc-remove-values](#asoc-remove-values-predicate-alist) `(predicate alist)`
 
 ### Predicates
 * [asoc-contains-key?](#asoc-contains-key-alist-key) `(alist key)`
@@ -20,8 +28,8 @@ Associative list (alist) library for Emacs Lisp.
 ### Access Functions
 * [asoc-get](#asoc-get-alist-key-optional-default) `(alist key &optional default)`
 * [asoc-put!](#asoc-put-alist-key-value-optional-replace) `(alist key value &optional replace)`
-* [asoc-find-key](#asoc-find-key-key-alist) `(key alist)`
 * [asoc-delete!](#asoc-delete-alist-key-optional-remove-all) `(alist key &optional remove-all)`
+* [asoc-find-key](#asoc-find-key-key-alist) `(key alist)`
 * [asoc-keys](#asoc-keys-alist) `(alist)`
 * [asoc-values](#asoc-values-alist) `(alist)`
 * [asoc-unzip](#asoc-unzip-alist) `(alist)`
@@ -34,16 +42,6 @@ Associative list (alist) library for Emacs Lisp.
 * [asoc-map](#asoc-map-function-alist) `(function alist)`
 * [asoc-map-keys](#asoc-map-keys-func-alist) `(func alist)`
 * [asoc-map-values](#asoc-map-values-func-alist) `(func alist)`
-* [asoc-zip](#asoc-zip-keys-values) `(keys values)`
-
-### Filter Functions
-* [asoc-filter](#asoc-filter-predicate-alist) `(predicate alist)`
-* [asoc-filter-keys](#asoc-filter-keys-predicate-alist) `(predicate alist)`
-* [asoc-filter-values](#asoc-filter-values-predicate-alist) `(predicate alist)`
-* [asoc-remove](#asoc-remove-predicate-alist) `(predicate alist)`
-* [asoc-remove-keys](#asoc-remove-keys-predicate-alist) `(predicate alist)`
-* [asoc-remove-values](#asoc-remove-values-predicate-alist) `(predicate alist)`
-* [asoc-uniq](#asoc-uniq-alist) `(alist)`
 
 ### Folds
 * [asoc-fold](#asoc-fold-func-alist-init) `(func alist init)`
@@ -62,7 +60,7 @@ other value, functions default to using `equal`.
 
 This variable may be passed to asoc functions dynamically in a let binding.
 
-## Constructor Functions
+## Constructor and Filter Functions
 
 ### asoc-make `(&optional keys default)`
 
@@ -73,12 +71,90 @@ _Alias of `copy-sequence`._
 
 Return a shallow copy of ALIST.
 
+### asoc-zip `(keys values)`
+
+Return an alist associating `keys` with corresponding `values`.
+If `keys` is longer than `values`, the excess `keys` have value nil.
+
 ### asoc-merge `(&rest alists)`
 
 Return an alist with unique keys resulting from merging `alists`.
 
 When identical keys occur in two alists, the latter takes precedence. When
 identical keys occur within a single alist, the foremost takes precedence.
+
+### asoc-uniq `(alist)`
+
+Return a copy of `alist` with duplicate keys removed.
+
+The foremost occurrence of each key is retained.
+
+    (asoc-uniq `((a 1) (c 6) (b 2) (c 3) (d 4)))
+    ;; ((a 1) (c 6) (b 2) (d 4))
+
+### asoc-filter `(predicate alist)`
+
+Return a copy of `alist` with key-value pairs failing `predicate` removed.
+
+`predicate` should take two arguments, KEY and VALUE.
+
+    ;; filter for pairs where KEY > VALUE
+    (let ((fib `((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+      (asoc-filter #'> fib))
+    ;; ((2 . 1) (3 . 2) (4 . 3))
+
+### asoc-filter-keys `(predicate alist)`
+
+Return a copy of `alist` with keys failing `predicate` removed.
+
+    ;; filter for pairs where KEY <= 3
+    (let ((fib `((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+      (asoc-filter-keys (lambda (k) (<= k 3)) fib))
+    ;; ((1 . 1) (2 . 1) (3 . 2))
+
+### asoc-filter-values `(predicate alist)`
+
+Return a copy of `alist` with pairs whose value fails `predicate` removed.
+
+    ;; filter for pairs where VALUE <= 3
+    (let ((fib `((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+      (asoc-filter-values (lambda (v) (<= v 3)) fib))
+    ;; ((1 . 1) (2 . 1) (3 . 2) (4 . 3))
+
+### asoc-remove `(predicate alist)`
+
+Return a copy of `alist` with key-value pairs satisfying `predicate` removed.
+
+`predicate` should take two arguments, KEY and VALUE.
+
+Alias: __`asoc-reject`__
+
+    ;; filter out pairs where KEY > VALUE
+    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+      (asoc-remove #'> fib))
+    ;; ((1 . 1) (5 . 5) (6 . 8) (7 . 13) (8 . 21))
+
+### asoc-remove-keys `(predicate alist)`
+
+Return a copy of `alist` with keys satisfying `predicate` removed.
+
+Alias: __`asoc-reject-keys`__
+
+    ;; filter out pairs where KEY <= 3
+    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+      (asoc-remove-keys (lambda (k) (<= k 3)) fib))
+    ;; ((4 . 3) (5 . 5) (6 . 8) (7 . 13) (8 . 21))
+
+### asoc-remove-values `(predicate alist)`
+
+Return a copy of `alist` with pairs whose value satisfying `predicate` removed.
+
+Alias: __`asoc-reject-values`__
+
+    ;; filter out pairs where VALUE <= 3
+    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+      (asoc-remove-values (lambda (v) (<= v 3)) fib))
+    ;; ((5 . 5) (6 . 8) (7 . 13) (8 . 21))
 
 ## Predicates
 
@@ -128,8 +204,8 @@ Return a list of unique values in `alist`.
 
 Return a list of all keys and a list of all values in `alist`.
 
-Returns `(KEYLIST VALUELIST) where KEYLIST and VALUELIST contain all the keys
-and values in `alist` in order, including repeats. The original `alist` can be
+Returns `(KEYLIST VALUELIST)` where KEYLIST and VALUELIST contain all the keys
+and values in `alist` in order, including repeats. The original alist can be
 reconstructed with
 
     (asoc-zip KEYLIST VALUELIST).
@@ -217,86 +293,6 @@ Return a modified copy of alist with values transformed by `func`.
     (let ((a `((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
       (asoc-map-values #'list a))
     ;; ((1 1) (2 4) (3 9) (4 16) (5 25))
-
-### asoc-zip `(keys values)`
-
-Return an alist associating `keys` with corresponding `values`.
-If `keys` is longer than `values`, the excess `keys` have value nil.
-
-## Filters
-
-### asoc-filter `(predicate alist)`
-
-Return a copy of `alist` with key-value pairs failing `predicate` removed.
-
-`predicate` should take two arguments, KEY and VALUE.
-
-    ;; filter for pairs where KEY > VALUE
-    (let ((fib `((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
-      (asoc-filter #'> fib))
-    ;; ((2 . 1) (3 . 2) (4 . 3))
-
-### asoc-filter-keys `(predicate alist)`
-
-Return a copy of `alist` with keys failing `predicate` removed.
-
-    ;; filter for pairs where KEY <= 3
-    (let ((fib `((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
-      (asoc-filter-keys (lambda (k) (<= k 3)) fib))
-    ;; ((1 . 1) (2 . 1) (3 . 2))
-
-### asoc-filter-values `(predicate alist)`
-
-Return a copy of `alist` with pairs whose value fails `predicate` removed.
-
-    ;; filter for pairs where VALUE <= 3
-    (let ((fib `((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
-      (asoc-filter-values (lambda (v) (<= v 3)) fib))
-    ;; ((1 . 1) (2 . 1) (3 . 2) (4 . 3))
-
-### asoc-remove `(predicate alist)`
-
-Return a copy of `alist` with key-value pairs satisfying `predicate` removed.
-
-`predicate` should take two arguments, KEY and VALUE.
-
-Alias: __`asoc-reject`__
-
-    ;; filter out pairs where KEY > VALUE
-    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
-      (asoc-remove #'> fib))
-    ;; ((1 . 1) (5 . 5) (6 . 8) (7 . 13) (8 . 21))
-
-### asoc-remove-keys `(predicate alist)`
-
-Return a copy of `alist` with keys satisfying `predicate` removed.
-
-Alias: __`asoc-reject-keys`__
-
-    ;; filter out pairs where KEY <= 3
-    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
-      (asoc-remove-keys (lambda (k) (<= k 3)) fib))
-    ;; ((4 . 3) (5 . 5) (6 . 8) (7 . 13) (8 . 21))
-
-### asoc-remove-values `(predicate alist)`
-
-Return a copy of `alist` with pairs whose value satisfying `predicate` removed.
-
-Alias: __`asoc-reject-values`__
-
-    ;; filter out pairs where VALUE <= 3
-    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
-      (asoc-remove-values (lambda (v) (<= v 3)) fib))
-    ;; ((5 . 5) (6 . 8) (7 . 13) (8 . 21))
-
-### asoc-uniq `(alist)`
-
-Return a copy of `alist` with duplicate keys removed.
-
-The foremost occurrence of each key is retained.
-
-    (asoc-uniq `((a 1) (c 6) (b 2) (c 3) (d 4)))
-    ;; ((a 1) (c 6) (b 2) (d 4))
 
 ## Folds
 
