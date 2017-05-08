@@ -1165,6 +1165,13 @@
   ;; | Docstring Tests |
   ;; '-----------------'
 
+  (ert-deftest test-asoc-docstring-examples-asoc-merge ()
+    "Docstring examples for `asoc-merge'."
+    (should-equal
+     (asoc-merge '((a . 1) (b . 2) (a . 4))
+                 '((a . 4) (c . 5) (c . 6)))
+     :result '((a . 4) (c . 5) (b . 2))))
+
   (ert-deftest test-asoc-docstring-examples-asoc-do ()
     "Docstring examples for `asoc-do'."
     (should-equal

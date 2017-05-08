@@ -113,7 +113,12 @@ determined by `asoc-compare-fn'."
   "Return an alist with unique keys resulting from merging ALISTS.
 
 When identical keys occur in two alists, the latter takes precedence. When
-identical keys occur within a single alist, the foremost takes precedence."
+identical keys occur within a single alist, the foremost takes precedence.
+Example:
+
+    (asoc-merge '((a . 1) (b . 2) (a . 4))
+                '((a . 4) (c . 5) (c . 6)))
+    ;; ((a . 4) (c . 5) (b . 2))"
   (asoc---uniq (apply #'append (nreverse alists))))
 
 ;; ,------------,
