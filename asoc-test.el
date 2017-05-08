@@ -250,6 +250,37 @@
      :result '((a . undefined) (b . undefined) (c . undefined) (d . undefined)))
     )
 
+  (ert-deftest test-asoc-unit-tests-asoc-merge ()
+    "Unit tests for `asoc-merge'."
+    ;; no list
+    (should-equal
+     (asoc-merge)
+     :result nil)
+    ;; null lists
+    (should-equal
+     (asoc-merge nil nil nil)
+     :result nil)
+    ;; last alist takes precedence
+    (should-equal
+     (let ((a1 '((x . 1)        ))
+           (a2 '((x . 2)        ))
+           (a3 '((x . 3) (y . 3)))
+           (a4 '(        (y . 4))))
+       (asoc-merge a1 a2 a3 a4))
+     :result '((y . 4) (x . 3)))
+     ;; first pair in alist takes precedence
+    (should-equal
+     (asoc-merge '((a . 1) (b . 1) (b . 2) (a . 2) (a . 3) (c . 1)))
+     :result '((a . 1) (b . 1) (c . 1)))
+    ;; multiple alists with repeated keys
+    (should-equal
+     (let ((a '((a . 1) (a . 2) (b . 1) (c . 1)))
+           (b '((a . 3) (b . 2) (c . 2) (d . 1)))
+           (c '((e . 1) (e . 2) (f . 1) (g . 1))))
+       (asoc-merge a b c))
+     :result '((e . 1) (f . 1) (g . 1) (a . 3) (b . 2) (c . 2) (d . 1)))
+    )
+
   (ert-deftest test-asoc-unit-tests-asoc-contains-key? ()
     "Unit tests for `asoc---contains-key?'."
     (should-equal

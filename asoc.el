@@ -106,6 +106,13 @@ determined by `asoc-compare-fn'."
 (defun asoc-make (&optional keys default)
   "Return an alist with KEYS each initialized to value nil."
   (asoc-zip keys (make-list (length keys) default)))
+
+(defun asoc-merge (&rest alists)
+  "Return an alist with unique keys resulting from merging ALISTS.
+
+When identical keys occur in two alists, the latter takes precedence. When
+identical keys occur within a single alist, the foremost takes precedence."
+  (asoc---uniq (apply #'append (nreverse alists))))
 
 ;; ,------------,
 ;; | Predicates |
