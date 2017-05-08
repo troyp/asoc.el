@@ -130,12 +130,16 @@ identical keys occur within a single alist, the foremost takes precedence."
 
 (defun asoc-contains-pair? (alist key value)
   "Return t if ALIST contains an item (KEY . VALUE), nil otherwise."
-  (let (result)
-    (dolist (pair alist)
-      (when (and (asoc---compare (car pair) key)
+  (let ( result
+         (rest alist) )
+    (while rest
+      (let ((pair (car rest)))
+        (if (and (asoc---compare (car pair) key)
                  (asoc---compare (cdr pair) value))
-        (setq result t)))
-    result))
+            (progn
+              (setq result t)))
+        (setq rest (cdr rest)))))
+  result)
 
 ;; ,------------------,
 ;; | Access Functions |
@@ -179,6 +183,7 @@ This may destructively modify ALIST."
         (setcdr alist (asoc-delete! tail key remove-all))
         alist))))
 
+;; TODO: remove dolist
 (defun asoc-keys (alist)
   "Return a list of unique keys in ALIST."
   (let (result)
