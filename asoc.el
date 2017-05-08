@@ -60,6 +60,21 @@ to `equal'. Possible values include `eq', `eql', `equal', `equalp'."
            (setf alist (cdr alist)))
          (car alist)))))
 
+(defun asoc---uniq (alist)
+  "Return a copy of ALIST with duplicate keys removed.
+
+The first pair with a given key is kept, later pairs are omitted. Key equality
+is determined using `asoc-compare-fn'."
+  (let ( result
+         (rest alist) )
+    (while rest
+      (let* ((pair  (car rest))
+             (key   (car pair)))
+        (unless (asoc---assoc key result asoc-compare-fn)
+          (push pair result)))
+      (setq rest (cdr rest)))
+    (nreverse result)))
+
 (defun asoc---list-member (key list)
   "Return non-nil if KEY is a member of LIST.
 

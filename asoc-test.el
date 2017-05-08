@@ -83,6 +83,42 @@
      )
     )
 
+  (ert-deftest test-asoc-unit-tests-asoc---uniq ()
+    "Unit tests for `asoc---uniq'."
+    ;; null list
+    (should-equal
+     (asoc---uniq nil)
+     :result nil)
+    ;; unique keys
+    (let ((alist (asoc-zip (number-sequence 1 10) (number-sequence 2 20 2))))
+      (should-equal
+       (asoc---uniq alist)
+       :result alist))
+    ;; duplicate keys
+    (should-equal
+     (let ((alist '((a . 1) (a . 2) (a . 3) (a . 4))))
+       (asoc---uniq alist))
+     :result '((a . 1)))
+    ;; choice of asoc-compare-fn
+    (should-equal
+     (let* (( p      '(1 2) )
+            ( a      `((1   . 1) ("a" . 1) (,p    . 1) (nil . 1)
+                       (1.0 . 2) ("A" . 2) ((1 2) . 2) (nil . 2)
+                                 ("a" . 3)                      ))
+            (result))
+       (dolist (fn (list #'equalp #'equal #'eql #'eq))
+         (let* (( asoc-compare-fn  fn  ))
+           (push (list fn :: (asoc---uniq a))
+                 result)))
+       result)
+     :result    ;; <-----------first occurrences----------> <---------------duplicates--------------->
+     '( (eq     :: ((1 . 1) ("a" . 1) ((1 2) . 1) (nil . 1) (1.0 . 2) ("A" . 2) ((1 2) . 2) ("a" . 3)) )
+        (eql    :: ((1 . 1) ("a" . 1) ((1 2) . 1) (nil . 1) (1.0 . 2) ("A" . 2) ((1 2) . 2) ("a" . 3)) )
+        (equal  :: ((1 . 1) ("a" . 1) ((1 2) . 1) (nil . 1) (1.0 . 2) ("A" . 2)                      ) )
+        (equalp :: ((1 . 1) ("a" . 1) ((1 2) . 1) (nil . 1)                                            ) ))
+     )
+    )
+
   (ert-deftest test-asoc-unit-tests-asoc---list-member ()
     "Unit tests for `asoc---list-member'."
     (should-equal
