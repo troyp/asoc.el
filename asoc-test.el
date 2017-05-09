@@ -1062,12 +1062,12 @@
      :result nil)
     ;; 1-element list
     (should-equal
-     (asoc-uniq '((1 1)))
-     :result '((1 1)))
+     (asoc-uniq '((1 . 1)))
+     :result '((1 . 1)))
     ;; list with multiple repeats
     (should-equal
-     (asoc-uniq '((1 1) (2 2) (1 3) (1 4) (1 5) (2 3)))
-     :result '((1 1) (2 2)))
+     (asoc-uniq '((1 . 1) (2 . 2) (1 . 3) (1 . 4) (1 . 5) (2 . 3)))
+     :result '((1 . 1) (2 . 2)))
     (should-equal
      (let* (( result   nil    )
             ( p       '(1 2)  )
@@ -1090,17 +1090,66 @@
      (list
       (append '(equalp :::)
               (let ((asoc-compare-fn #'equalp))
-                (asoc-uniq '((1.0 1) (1.0 2)))))
+                (asoc-uniq '((1.0 . 1) (1.0 . 2)))))
       (append '(equal :::)
               (let ((asoc-compare-fn #'equal))
-                (asoc-uniq '((1.0 1) (1.0 2)))))
+                (asoc-uniq '((1.0 . 1) (1.0 . 2)))))
       (append '(eql :::)
               (let ((asoc-compare-fn #'eql))
-                (asoc-uniq '((1.0 1) (1.0 2))))))
+                (asoc-uniq '((1.0 . 1) (1.0 . 2))))))
      :result
-     '((equalp ::: (1.0 1))
-       (equal  ::: (1.0 1))
-       (eql    ::: (1.0 1))))
+     '((equalp ::: (1.0 . 1))
+       (equal  ::: (1.0 . 1))
+       (eql    ::: (1.0 . 1))))
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-uniq-keep-last ()
+    "Unit tests for `asoc-uniq' with :keep-last option."
+    ;; empty list
+    (should-equal
+     (asoc-uniq nil :keep-last)
+     :result nil)
+    ;; 1-element list
+    (should-equal
+     (asoc-uniq '((1 . 1)) :keep-last)
+     :result '((1 . 1)))
+    ;; list with multiple repeats
+    (should-equal
+     (asoc-uniq '((1 . 1) (2 . 2) (1 . 3) (1 . 4) (1 . 5) (2 . 3)) :keep-last)
+     :result '((1 . 5) (2 . 3)))
+    (should-equal
+     (let* (( result   nil    )
+            ( p       '(1 2)  )
+            ( a       `( (1 1)   (,p 1)    ("a" 1) ('c 1) (nil 1) (t 1)
+                         (1 2)   (,p 2)    ("a" 2) ('c 2) (nil 2) (t 2)
+                         (1.0 3) ((1 2) 3) ("A" 3)                      )))
+       (dolist (f (list #'equalp #'equal #'eql #'eq))
+         (let (( asoc-compare-fn f ))
+           (push (list f ::: (asoc-uniq a :keep-last))
+                 result)))
+       (reverse result))
+     :result
+     '((equalp ::: (                                       ('c 2) (nil 2) (t 2) (1.0 3) ((1 2) 3) ("A" 3) ))
+       (equal  ::: (               (1 2)           ("a" 2) ('c 2) (nil 2) (t 2) (1.0 3) ((1 2) 3) ("A" 3) ))
+       (eql    ::: (("a" 1) ('c 1) (1 2) ((1 2) 2) ("a" 2) ('c 2) (nil 2) (t 2) (1.0 3) ((1 2) 3) ("A" 3) ))
+       (eq     ::: (("a" 1) ('c 1) (1 2) ((1 2) 2) ("a" 2) ('c 2) (nil 2) (t 2) (1.0 3) ((1 2) 3) ("A" 3) )))
+     )
+    ;; Duplicate floating point keys are removed with #'equalp, #'equal and #'eql
+    (should-equal
+     (list
+      (append '(equalp :::)
+              (let ((asoc-compare-fn #'equalp))
+                (asoc-uniq '((1.0 . 1) (1.0 . 2)) :keep-last)))
+      (append '(equal :::)
+              (let ((asoc-compare-fn #'equal))
+                (asoc-uniq '((1.0 . 1) (1.0 . 2)) :keep-last)))
+      (append '(eql :::)
+              (let ((asoc-compare-fn #'eql))
+                (asoc-uniq '((1.0 . 1) (1.0 . 2)) :keep-last))))
+     :result
+     '((equalp ::: (1.0 . 2))
+       (equal  ::: (1.0 . 2))
+       (eql    ::: (1.0 . 2))))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-fold ()
@@ -1296,9 +1345,11 @@
   (ert-deftest test-asoc-docstring-examples-asoc-uniq ()
     "Docstring examples for `asoc-uniq'."
     (should-equal
-     (asoc-uniq '((a 1) (c 6) (b 2) (c 3) (d 4)))
-     :result '((a 1) (c 6) (b 2) (d 4))
-     ))
+     (asoc-uniq '((a 1) (b 2) (b 3) (c 4) (a 5)))
+     :result '((a 1) (b 2) (c 4)))
+    (should-equal
+     (asoc-uniq '((a 1) (b 2) (b 3) (c 4) (a 5)) :keep-last)
+     :result '((b 3) (c 4) (a 5))))
 
   )
 

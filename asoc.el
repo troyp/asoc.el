@@ -4,7 +4,7 @@
 
 ;; Author: Troy Pracy
 ;; Keywords: alist data-types
-;; Version: 0.2.9
+;; Version: 0.3.0
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -463,23 +463,23 @@ Example: filter out pairs where VALUE <= 3
 (defalias 'asoc-reject-keys 'asoc-remove-keys)
 (defalias 'asoc-reject-values 'asoc-remove-values)
 
-(defun asoc-uniq (alist)
+(defun asoc-uniq (alist &optional keep)
   "Return a copy of ALIST with duplicate keys removed.
 
-The foremost occurrence of each key is retained.
+By default, the first occurrence of each key is retained.
 
-Example:
+If KEEP is :keep-last, the last occurrence of each key is retained.
 
-    (asoc-uniq '((a 1) (c 6) (b 2) (c 3) (d 4)))
-    ;; ((a 1) (c 6) (b 2) (d 4))"
-  (let (result keys)
-    (dolist (pair alist result)
-      (let ((k (car pair)))
-        (unless (asoc---list-member k keys)
-          (setq result (cons pair result))
-          (setq keys (cons k keys))
-          )))
-    (nreverse result)))
+Examples:
+
+    (asoc-uniq '((a 1) (b 2) (b 3) (c 4) (a 5)))
+    ;; ((a 1) (b 2) (c 4))
+    (asoc-uniq '((a 1) (b 2) (b 3) (c 4) (a 5)) :keep-last)
+    ;; ((b 3) (c 4) (a 5))"
+  (declare (indent 1))
+  (if (eq keep :keep-last)
+      (nreverse (asoc---uniq (reverse alist)))
+    (asoc---uniq alist)))
 
 ;; ,-------,
 ;; | Folds |

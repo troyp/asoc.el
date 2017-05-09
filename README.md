@@ -13,7 +13,7 @@ Associative list (alist) library for Emacs Lisp.
 * [asoc-copy](#asoc-copy-alist) `(alist)`
 * [asoc-zip](#asoc-zip-keys-values) `(keys values)`
 * [asoc-merge](#asoc-merge-rest-alists) `(&rest alists)`
-* [asoc-uniq](#asoc-uniq-alist) `(alist)`
+* [asoc-uniq](#asoc-uniq-alist-optional-keep) `(alist &optional keep)`
 * [asoc-filter](#asoc-filter-predicate-alist) `(predicate alist)`
 * [asoc-filter-keys](#asoc-filter-keys-predicate-alist) `(predicate alist)`
 * [asoc-filter-values](#asoc-filter-values-predicate-alist) `(predicate alist)`
@@ -83,14 +83,18 @@ Return an alist with unique keys resulting from merging `alists`.
 When identical keys occur in two alists, the latter takes precedence. When
 identical keys occur within a single alist, the foremost takes precedence.
 
-### asoc-uniq `(alist)`
+### asoc-uniq `(alist &optional keep)`
 
 Return a copy of `alist` with duplicate keys removed.
 
-The foremost occurrence of each key is retained.
+By default, the first occurrence of each key is retained.
 
-    (asoc-uniq `((a 1) (c 6) (b 2) (c 3) (d 4)))
-    ;; ((a 1) (c 6) (b 2) (d 4))
+If `keep` is `:keep-last`, the last occurrence of each key is retained.
+
+    (asoc-uniq `((a 1) (b 2) (b 3) (c 4) (a 5)))
+    ;; ((a 1) (b 2) (c 4))
+    (asoc-uniq '((a 1) (b 2) (b 3) (c 4) (a 5)) :keep-last)
+    ;; ((b 3) (c 4) (a 5))
 
 ### asoc-filter `(predicate alist)`
 
