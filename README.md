@@ -163,10 +163,12 @@ Alias: __`asoc-reject-values`__
 ## Predicates
 
 ### asoc-contains-key\? `(alist key)`
+_alias: `asoc-contains-key-p`_
 
 Return t if `alist` contains an item with key `key`, nil otherwise.
 
 ### asoc-contains-pair\? `(alist key value)`
+_alias: `asoc-contains-pair-p`_
 
 Return t if `alist` contains an item (`key` . `value`), nil otherwise.
 

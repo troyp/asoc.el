@@ -145,6 +145,9 @@ Example:
               (setq result t)))
         (setq rest (cdr rest))))
     result))
+
+(defalias 'asoc-contains-key-p 'asoc-contains-key?)
+(defalias 'asoc-contains-pair-p 'asoc-contains-pair?)
 
 ;; ,------------------,
 ;; | Access Functions |
