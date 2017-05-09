@@ -6,27 +6,7 @@ standard list functions is awkward and requires additional processing.
 `asoc` provides a rich API for creating, accessing and manipulating associative
 lists.
 
-### Conventions
-
-Where appropriate, the `asoc` API follows established conventions for naming,
-argument order, etc. In particular, it follows the prefix conventions of
-[`dash.el`](https://github.com/magnars/dash.el):
-
-* __`asoc-`__:   prefix for regular functions, macros and variables
-* __`asoc--`__:  prefix for anaphoric macros
-* __`asoc---`__: prefix for private functions, macros and variables
-
-The following suffixes are used:
-
-* __`?`__ or __`-p`__:  marks a predicate function
-* __`!`__:          marks a function which may modify its alist argument
-
-`asoc` also follows `dash` in using a special variable to set the predicate used
-in equality tests. To control the predicate used for a given call,
-`asoc-compare-fn` may be set within a dynamically-scoped let-block containing
-the function call.
-
-### Builtin List Functions
+#### Builtin List Functions
 
 For some operations, no distinction need be made between alists and general lists.
 `asoc` does not provide functions for such operations, since regular list functions
@@ -34,6 +14,8 @@ may be used. For instance, `cons`, `car`, `cdr`, `push`, `pop`, `append`  should
 be used for assembling and disassembling alists.
 
 ## API
+
+* [Conventions](#conventions)
 
 ### Variables
 * [asoc-compare-fn](#asoc-compare-fn-nil)
@@ -77,6 +59,30 @@ be used for assembling and disassembling alists.
 * [asoc-fold](#asoc-fold-func-alist-init) `(func alist init)`
 * [asoc--fold](#asoc--fold-form-alist-init) `(form alist init)`
 
+[Other Packages](#other-packages)
+
+-------------------------------------------------------------------------------
+
+## Conventions
+
+Where appropriate, the `asoc` API follows established conventions for naming,
+argument order, etc. In particular, it follows the prefix conventions of
+[`dash.el`](https://github.com/magnars/dash.el):
+
+* __`asoc-`__:   prefix for regular functions, macros and variables
+* __`asoc--`__:  prefix for anaphoric macros
+* __`asoc---`__: prefix for private functions, macros and variables
+
+The following suffixes are used:
+
+* __`?`__ or __`-p`__:  marks a predicate function
+* __`!`__:          marks a function which may modify its alist argument
+
+`asoc` also follows `dash` in using a special variable to set the predicate used
+in equality tests. To control the predicate used for a given call,
+`asoc-compare-fn` may be set within a dynamically-scoped let-block containing
+the function call.
+
 -------------------------------------------------------------------------------
 
 ## Variables
@@ -89,6 +95,8 @@ May take the values `equalp`, `equal`, `eql`, `eq`. When unset, or set to any
 other value, functions default to using `equal`.
 
 This variable may be passed to asoc functions dynamically in a let binding.
+
+-------------------------------------------------------------------------------
 
 ## Constructor and Filter Functions
 
@@ -187,6 +195,8 @@ Return a copy of `alist` with pairs whose value satisfying `predicate` removed.
       (asoc-remove-values (lambda (v) (<= v 3)) fib))
     ;; ((5 . 5) (6 . 8) (7 . 13) (8 . 21))
 
+-------------------------------------------------------------------------------
+
 ## Predicates
 
 ### asoc-contains-key\? `(alist key)`
@@ -198,6 +208,8 @@ Return t if `alist` contains an item with key `key`, nil otherwise.
 _alias: `asoc-contains-pair-p`_
 
 Return t if `alist` contains an item (`key` . `value`), nil otherwise.
+
+-------------------------------------------------------------------------------
 
 ## Access Functions
 
@@ -246,6 +258,8 @@ reconstructed with
 asoc-unzip will also reverse `asoc-zip` as long as the original arguments of
 `asoc-zip` were both lists and were of equal length.
 
+-------------------------------------------------------------------------------
+
 ## Looping Constructs
 
 ### asoc-do `((keyvar valuevar) alist [result] body...)`
@@ -291,6 +305,8 @@ the syntax (:initially INITCODE...).
           (setf result (+ result value)))))
     ;; 30
 
+-------------------------------------------------------------------------------
+
 ## Mapping Functions
 
 ### asoc-map `(function alist)`
@@ -327,6 +343,8 @@ Return a modified copy of alist with values transformed by `func`.
       (asoc-map-values #'list a))
     ;; ((1 1) (2 4) (3 9) (4 16) (5 25))
 
+-------------------------------------------------------------------------------
+
 ## Folds
 
 ### asoc-fold `(func alist init)`
@@ -361,6 +379,8 @@ been processed.
       (asoc--fold (if (zerop value) (cons key acc) acc)
         (reverse a) nil))
     ;; (1 2 3 5 10)
+
+-------------------------------------------------------------------------------
 
 ## Other Packages
 
