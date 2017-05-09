@@ -1,7 +1,37 @@
-Asoc.el
----------
+# asoc.el -- Associative List Library for Emacs Lisp.
 
-Associative list (alist) library for Emacs Lisp.
+Emacs Lisp provides only minimal facilities for dealing with alists, while using
+standard list functions is awkward and requires additional processing.
+
+`asoc` provides a rich API for creating, accessing and manipulating associative
+lists.
+
+### Conventions
+
+Where appropriate, the `asoc` API follows established conventions for naming,
+argument order, etc. In particular, it follows the prefix conventions of
+[`dash.el`](https://github.com/magnars/dash.el):
+
+* __`asoc-`__:   prefix for regular functions, macros and variables
+* __`asoc--`__:  prefix for anaphoric macros
+* __`asoc---`__: prefix for private functions, macros and variables
+
+The following suffixes are used:
+
+* __`?`__ or __`-p`__:  marks a predicate function
+* __`!`__:          marks a function which may modify its alist argument
+
+`asoc` also follows `dash` in using a special variable to set the predicate used
+in equality tests. To control the predicate used for a given call,
+`asoc-compare-fn` may be set within a dynamically-scoped let-block containing
+the function call.
+
+### Builtin List Functions
+
+For some operations, no distinction need be made between alists and general lists.
+`asoc` does not provide functions for such operations, since regular list functions
+may be used. For instance, `cons`, `car`, `cdr`, `push`, `pop`, `append`  should
+be used for assembling and disassembling alists.
 
 ## API
 
@@ -67,7 +97,7 @@ This variable may be passed to asoc functions dynamically in a let binding.
 Return an alist with `keys` each initialized to value nil.
 
 ### asoc-copy `(alist)`
-_Alias of `copy-sequence`._
+_alias of `copy-sequence`._
 
 Return a shallow copy of ALIST.
 
@@ -126,12 +156,11 @@ Return a copy of `alist` with pairs whose value fails `predicate` removed.
     ;; ((1 . 1) (2 . 1) (3 . 2) (4 . 3))
 
 ### asoc-remove `(predicate alist)`
+_alias: `asoc-reject`_
 
 Return a copy of `alist` with key-value pairs satisfying `predicate` removed.
 
 `predicate` should take two arguments, KEY and VALUE.
-
-Alias: __`asoc-reject`__
 
     ;; filter out pairs where KEY > VALUE
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
@@ -139,10 +168,9 @@ Alias: __`asoc-reject`__
     ;; ((1 . 1) (5 . 5) (6 . 8) (7 . 13) (8 . 21))
 
 ### asoc-remove-keys `(predicate alist)`
+_alias: `asoc-reject-keys`_
 
 Return a copy of `alist` with keys satisfying `predicate` removed.
-
-Alias: __`asoc-reject-keys`__
 
     ;; filter out pairs where KEY <= 3
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
@@ -150,10 +178,9 @@ Alias: __`asoc-reject-keys`__
     ;; ((4 . 3) (5 . 5) (6 . 8) (7 . 13) (8 . 21))
 
 ### asoc-remove-values `(predicate alist)`
+_alias: `asoc-reject-values`_
 
 Return a copy of `alist` with pairs whose value satisfying `predicate` removed.
-
-Alias: __`asoc-reject-values`__
 
     ;; filter out pairs where VALUE <= 3
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
@@ -334,3 +361,9 @@ been processed.
       (asoc--fold (if (zerop value) (cons key acc) acc)
         (reverse a) nil))
     ;; (1 2 3 5 10)
+
+## Other Packages
+
+(`let-alist`)[https://elpa.gnu.org/packages/let-alist.html] provides a macro of
+the same name, which allows convenient access to alist values when the keys are
+symbols.
