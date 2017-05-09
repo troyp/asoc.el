@@ -15,7 +15,7 @@ be used for assembling and disassembling alists.
 
 ## API
 
-* [Conventions](#conventions)
+[Conventions](#conventions)
 
 ### Variables
 * [asoc-compare-fn](#asoc-compare-fn-nil)
