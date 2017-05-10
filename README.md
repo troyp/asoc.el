@@ -6,12 +6,11 @@ standard list functions is awkward and requires additional processing.
 `asoc` provides a rich API for creating, accessing and manipulating associative
 lists.
 
-#### Builtin List Functions
-
-For some operations, no distinction need be made between alists and general lists.
-`asoc` does not provide functions for such operations, since regular list functions
-may be used. For instance, `cons`, `car`, `cdr`, `push`, `pop`, `append`  should
-be used for assembling and disassembling alists.
+__note on builtin list functions__: For some operations, no distinction need be made
+between alists and general lists. `asoc` does not provide functions for such
+operations, since regular list functions may be used. For instance,
+`cons`, `car`, `cdr`, `push`, `pop`, `append` should be used for assembling and
+disassembling alists.
 
 ## API
 
