@@ -769,6 +769,38 @@
      :result '((1 . ?q) (2 . ?w) (3 . ?e) (4 . ?r) (5 . ?t) (6 . ?y)))
     )
 
+  (ert-deftest test-asoc-unit-tests-asoc-sort-keys ()
+    "Unit tests for `asoc-sort-keys'."
+    ;; null list
+    (should-equal
+     (asoc-sort-keys nil #'<)
+     :result nil)
+    ;; sort numeric
+    (should-equal
+     (let ((a '((5 . t) (3 . t) (1 . t) (2 . t) (4 . t))))
+       (asoc-sort-keys a #'<))
+     :result '((1 . t) (2 . t) (3 . t) (4 . t) (5 . t)))
+    ;; sort symbolic
+    (should-equal
+     (let ((a '((b . t) (a . t) (e . t) (d . t) (c . t))))
+       (asoc-sort-keys a #'string<))
+     :result '((a . t) (b . t) (c . t) (d . t) (e . t)))
+    ;; stability
+    (should-equal
+     (let ((a '((1 . a) (2 . c) (1 . b) (2 . b) (1 . c) (2 . a))))
+       (asoc-sort-keys a #'<))
+     :result '((1 . a) (1 . b) (1 . c) (2 . c) (2 . b) (2 . a)))
+    ;; constant comparators
+    (should-equal
+     (let ((a '((1 . a) (2 . c) (1 . b) (2 . b) (1 . c) (2 . a))))
+       (asoc-sort-keys a (lambda (x y) nil)))
+     :result '((1 . a) (2 . c) (1 . b) (2 . b) (1 . c) (2 . a)))
+    (should-equal
+     (let ((a '((1 . a) (2 . c) (1 . b) (2 . b) (1 . c) (2 . a))))
+       (asoc-sort-keys a (lambda (x y) t)))
+     :result '((2 . a) (1 . c) (2 . b) (1 . b) (2 . c) (1 . a)))
+    )
+
   (ert-deftest test-asoc-unit-tests-asoc-filter ()
     "Unit tests for `asoc-filter'."
     ;; empty list
@@ -1279,6 +1311,13 @@
      (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
        (asoc-map-values #'list a))
      :result '((1 1) (2 4) (3 9) (4 16) (5 25))))
+
+  (ert-deftest test-asoc-docstring-examples-asoc-sort-keys ()
+    "Docstring examples for `asoc-sort-keys'."
+    (should-equal
+     (let ((a '((b . 2) (a . 1) (e . 5) (d . 4) (c . 3))))
+       (asoc-sort-keys a #'string<))
+     :result '((a . 1) (b . 2) (c . 3) (d . 4) (e . 5))))
 
   (ert-deftest test-asoc-docstring-examples-asoc-filter ()
     "Docstring examples for `asoc-filter'."

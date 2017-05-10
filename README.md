@@ -25,6 +25,7 @@ disassembling alists.
 * [asoc-zip](#asoc-zip-keys-values) `(keys values)`
 * [asoc-merge](#asoc-merge-rest-alists) `(&rest alists)`
 * [asoc-uniq](#asoc-uniq-alist-optional-keep) `(alist &optional keep)`
+* [asoc-sort-keys](#asoc-sort-keys-alist-comparator) `(alist comparator)`
 * [asoc-filter](#asoc-filter-predicate-alist) `(predicate alist)`
 * [asoc-filter-keys](#asoc-filter-keys-predicate-alist) `(predicate alist)`
 * [asoc-filter-values](#asoc-filter-values-predicate-alist) `(predicate alist)`
@@ -132,6 +133,16 @@ If `keep` is `:keep-last`, the last occurrence of each key is retained.
     ;; ((a 1) (b 2) (c 4))
     (asoc-uniq '((a 1) (b 2) (b 3) (c 4) (a 5)) :keep-last)
     ;; ((b 3) (c 4) (a 5))
+
+### asoc-sort-keys `(alist comparator)`
+
+Return a copy of `alist` sorted by keys.
+
+The keys are sorted stably using `comparator`.
+
+    (let ((a '((b . 2) (a . 1) (e . 5) (d . 4) (c . 3))))
+      (asoc-sort-keys a #'string<))
+    ;; ((a . 1) (b . 2) (c . 3) (d . 4) (e . 5))
 
 ### asoc-filter `(predicate alist)`
 
