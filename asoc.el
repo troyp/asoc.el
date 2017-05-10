@@ -99,9 +99,9 @@ determined by `asoc-compare-fn'."
                 list))))
 
 
-;; ,-----------------------,
-;; | Constructor Functions |
-;; '-----------------------'
+;; ,----------------------------------,
+;; | Constructor and Filter Functions |
+;; '----------------------------------'
 
 (defun asoc-make (&optional keys default)
   "Return an alist with KEYS each initialized to value nil."
@@ -120,6 +120,98 @@ Example:
                 '((a . 4) (c . 5) (c . 6)))
     ;; ((a . 4) (c . 5) (b . 2))"
   (asoc---uniq (apply #'append (nreverse alists))))
+
+(defun asoc-uniq (alist &optional keep)
+  "Return a copy of ALIST with duplicate keys removed.
+
+By default, the first occurrence of each key is retained.
+
+If KEEP is :keep-last, the last occurrence of each key is retained.
+
+Examples:
+
+    (asoc-uniq '((a 1) (b 2) (b 3) (c 4) (a 5)))
+    ;; ((a 1) (b 2) (c 4))
+    (asoc-uniq '((a 1) (b 2) (b 3) (c 4) (a 5)) :keep-last)
+    ;; ((b 3) (c 4) (a 5))"
+  (declare (indent 1))
+  (if (eq keep :keep-last)
+      (nreverse (asoc---uniq (reverse alist)))
+    (asoc---uniq alist)))
+
+(defun asoc-filter (predicate alist)
+  "Return a copy of ALIST with key-value pairs failing PREDICATE removed.
+
+PREDICATE should take two arguments, KEY and VALUE.
+
+Example: filter for pairs where KEY > VALUE
+
+    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+      (asoc-filter #'> fib))
+    ;; ((2 . 1) (3 . 2) (4 . 3))"
+  (asoc---list-filter (lambda (pair) (funcall predicate (car pair) (cdr pair))) alist))
+
+(defun asoc-filter-keys (predicate alist)
+  "Return a copy of ALIST with keys failing PREDICATE removed.
+
+Example: filter for pairs where KEY <= 3
+
+    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+      (asoc-filter-keys (lambda (k) (<= k 3)) fib))
+;; ((1 . 1) (2 . 1) (3 . 2))"
+  (asoc---list-filter (lambda (pair) (funcall predicate (car pair))) alist))
+
+(defun asoc-filter-values (predicate alist)
+  "Return a copy of ALIST with pairs whose value fails PREDICATE removed.
+
+Example: filter for pairs where VALUE <= 3
+
+    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+      (asoc-filter-values (lambda (v) (<= v 3)) fib))
+;; ((1 . 1) (2 . 1) (3 . 2) (4 . 3))"
+  (asoc---list-filter (lambda (pair) (funcall predicate (cdr pair))) alist))
+
+(defun asoc-remove (predicate alist)
+  "Return a copy of ALIST with key-value pairs satisfying PREDICATE removed.
+
+PREDICATE should take two arguments, KEY and VALUE.
+
+Alias: `asoc-reject'
+
+Example: filter out pairs where KEY > VALUE
+
+    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+      (asoc-remove #'> fib))
+    ;; ((1 . 1) (5 . 5) (6 . 8) (7 . 13) (8 . 21))"
+  (asoc---list-remove (lambda (pair) (funcall predicate (car pair) (cdr pair))) alist))
+
+(defun asoc-remove-keys (predicate alist)
+  "Return a copy of ALIST with keys satisfying PREDICATE removed.
+
+Alias: `asoc-reject-keys'
+
+Example: filter out pairs where KEY <= 3
+
+    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+      (asoc-remove-keys (lambda (k) (<= k 3)) fib))
+    ;; ((4 . 3) (5 . 5) (6 . 8) (7 . 13) (8 . 21))"
+  (asoc---list-remove (lambda (pair) (funcall predicate (car pair))) alist))
+
+(defun asoc-remove-values (predicate alist)
+  "Return a copy of ALIST with pairs whose value satisfying PREDICATE removed.
+
+Alias: `asoc-reject-values'
+
+Example: filter out pairs where VALUE <= 3
+
+    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+      (asoc-remove-values (lambda (v) (<= v 3)) fib))
+    ;; ((5 . 5) (6 . 8) (7 . 13) (8 . 21))"
+  (asoc---list-remove (lambda (pair) (funcall predicate (cdr pair))) alist))
+
+(defalias 'asoc-reject 'asoc-remove)
+(defalias 'asoc-reject-keys 'asoc-remove-keys)
+(defalias 'asoc-reject-values 'asoc-remove-values)
 
 ;; ,------------,
 ;; | Predicates |
@@ -169,10 +261,6 @@ In the latter case, this is equivalent to `acons'."
                                 ,alist)))
      (setq ,alist (cons (cons ,key ,value) ,alist))))
 
-(defun asoc-find-key (key alist)
-    "Return the first element of ALIST whose `car' matches KEY, or nil if none match."
-    (asoc---assoc key alist asoc-compare-fn))
-
 (defun asoc-delete! (alist key &optional remove-all)
   "Return a modified list excluding the first, or all, pair(s) with KEY.
 
@@ -190,6 +278,10 @@ This may destructively modify ALIST."
           (if remove-all (asoc-delete! tail key t) tail)
         (setcdr alist (asoc-delete! tail key remove-all))
         alist))))
+
+(defun asoc-find-key (key alist)
+    "Return the first element of ALIST whose `car' matches KEY, or nil if none match."
+    (asoc---assoc key alist asoc-compare-fn))
 
 (defun asoc-keys (alist)
   "Return a list of unique keys in ALIST."
@@ -387,102 +479,6 @@ If KEYS is longer than VALUES, the excess keys have value nil."
                (length values)))
          (values (append values (make-list n nil))))
     (mapcar* #'cons keys values)))
-
-;; ,------------------,
-;; | Filter Functions |
-;; '------------------'
-
-(defun asoc-filter (predicate alist)
-  "Return a copy of ALIST with key-value pairs failing PREDICATE removed.
-
-PREDICATE should take two arguments, KEY and VALUE.
-
-Example: filter for pairs where KEY > VALUE
-
-    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
-      (asoc-filter #'> fib))
-    ;; ((2 . 1) (3 . 2) (4 . 3))"
-  (asoc---list-filter (lambda (pair) (funcall predicate (car pair) (cdr pair))) alist))
-
-(defun asoc-filter-keys (predicate alist)
-  "Return a copy of ALIST with keys failing PREDICATE removed.
-
-Example: filter for pairs where KEY <= 3
-
-    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
-      (asoc-filter-keys (lambda (k) (<= k 3)) fib))
-;; ((1 . 1) (2 . 1) (3 . 2))"
-  (asoc---list-filter (lambda (pair) (funcall predicate (car pair))) alist))
-
-(defun asoc-filter-values (predicate alist)
-  "Return a copy of ALIST with pairs whose value fails PREDICATE removed.
-
-Example: filter for pairs where VALUE <= 3
-
-    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
-      (asoc-filter-values (lambda (v) (<= v 3)) fib))
-;; ((1 . 1) (2 . 1) (3 . 2) (4 . 3))"
-  (asoc---list-filter (lambda (pair) (funcall predicate (cdr pair))) alist))
-
-(defun asoc-remove (predicate alist)
-  "Return a copy of ALIST with key-value pairs satisfying PREDICATE removed.
-
-PREDICATE should take two arguments, KEY and VALUE.
-
-Alias: `asoc-reject'
-
-Example: filter out pairs where KEY > VALUE
-
-    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
-      (asoc-remove #'> fib))
-    ;; ((1 . 1) (5 . 5) (6 . 8) (7 . 13) (8 . 21))"
-  (asoc---list-remove (lambda (pair) (funcall predicate (car pair) (cdr pair))) alist))
-
-(defun asoc-remove-keys (predicate alist)
-  "Return a copy of ALIST with keys satisfying PREDICATE removed.
-
-Alias: `asoc-reject-keys'
-
-Example: filter out pairs where KEY <= 3
-
-    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
-      (asoc-remove-keys (lambda (k) (<= k 3)) fib))
-    ;; ((4 . 3) (5 . 5) (6 . 8) (7 . 13) (8 . 21))"
-  (asoc---list-remove (lambda (pair) (funcall predicate (car pair))) alist))
-
-(defun asoc-remove-values (predicate alist)
-  "Return a copy of ALIST with pairs whose value satisfying PREDICATE removed.
-
-Alias: `asoc-reject-values'
-
-Example: filter out pairs where VALUE <= 3
-
-    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
-      (asoc-remove-values (lambda (v) (<= v 3)) fib))
-    ;; ((5 . 5) (6 . 8) (7 . 13) (8 . 21))"
-  (asoc---list-remove (lambda (pair) (funcall predicate (cdr pair))) alist))
-
-(defalias 'asoc-reject 'asoc-remove)
-(defalias 'asoc-reject-keys 'asoc-remove-keys)
-(defalias 'asoc-reject-values 'asoc-remove-values)
-
-(defun asoc-uniq (alist &optional keep)
-  "Return a copy of ALIST with duplicate keys removed.
-
-By default, the first occurrence of each key is retained.
-
-If KEEP is :keep-last, the last occurrence of each key is retained.
-
-Examples:
-
-    (asoc-uniq '((a 1) (b 2) (b 3) (c 4) (a 5)))
-    ;; ((a 1) (b 2) (c 4))
-    (asoc-uniq '((a 1) (b 2) (b 3) (c 4) (a 5)) :keep-last)
-    ;; ((b 3) (c 4) (a 5))"
-  (declare (indent 1))
-  (if (eq keep :keep-last)
-      (nreverse (asoc---uniq (reverse alist)))
-    (asoc---uniq alist)))
 
 ;; ,-------,
 ;; | Folds |
