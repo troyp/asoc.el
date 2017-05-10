@@ -383,6 +383,6 @@ been processed.
 
 ## Other Packages
 
-(`let-alist`)[https://elpa.gnu.org/packages/let-alist.html] provides a macro of
+[`let-alist`](https://elpa.gnu.org/packages/let-alist.html) provides a macro of
 the same name, which allows convenient access to alist values when the keys are
 symbols.
