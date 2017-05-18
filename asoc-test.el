@@ -3,16 +3,11 @@
 (require 'asoc)
 (require 'ert)
 
-(cl-macrolet ((should-equal
-               (expr keyword result)
-               (if (eq keyword :result)
-                   `(should (equal ,expr ,result))
-                 (error "expected :result")))
-              (should-not-equal
-               (expr keyword result)
-               (if (eq keyword :result)
-                   `(should-not (equal ,expr ,result))
-                 (error "expected :result"))))
+(cl-macrolet
+    ((should-equal     (expr &key result)
+                       `(should (equal ,expr ,result)))
+     (should-not-equal (expr &key result)
+                       `(should-not (equal ,expr ,result))))
 
   (ert-deftest test-asoc-unit-tests-asoc---compare ()
     "Unit tests for `asoc---compare'."
