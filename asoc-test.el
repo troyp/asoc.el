@@ -250,6 +250,33 @@
      :result '((a . undefined) (b . undefined) (c . undefined) (d . undefined)))
     )
 
+  (ert-deftest test-asoc-unit-tests-asoc-zip ()
+    "Unit tests for `asoc-zip'."
+    ;; #keys == #values
+    (should-equal
+     (asoc-zip '(1 2 3 4 5) '(1 4 9 16 25))
+     :result '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
+    ;; #keys > #values
+    (should-equal
+     (asoc-zip '(1 2 3 4 5 6 7) '(1 4 9 16 25))
+     :result '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25) (6) (7)))
+    ;; #keys < #values
+    (should-error
+     (asoc-zip '(1 2 3 4 5) '(1 4 9 16 25 36)))
+    ;; empty list
+    (should-equal
+     (asoc-zip nil nil)
+     :result nil)
+    ;; empty values
+    (should-equal
+     (asoc-zip '(1 2 3 4 5) nil)
+     :result '((1) (2) (3) (4) (5)))
+    ;; values sequence is a string
+    (should-equal
+     (asoc-zip '(1 2 3 4 5 6) "qwerty")
+     :result '((1 . ?q) (2 . ?w) (3 . ?e) (4 . ?r) (5 . ?t) (6 . ?y)))
+    )
+
   (ert-deftest test-asoc-unit-tests-asoc-merge ()
     "Unit tests for `asoc-merge'."
     ;; no list
@@ -281,492 +308,102 @@
      :result '((e . 1) (f . 1) (g . 1) (a . 3) (b . 2) (c . 2) (d . 1)))
     )
 
-  (ert-deftest test-asoc-unit-tests-asoc-contains-key? ()
-    "Unit tests for `asoc---contains-key?'."
-    (should-equal
-     (let* (( table  nil    )
-            ( p      '(1 2) )
-            ( a      `((1   . t) (2.0 . t) ("a" . t) (,p  . t) (nil . t)) )
-            (test-items
-             ;; TEST-ITEM ;;    ALIST-ELEM
-             `( 1         ;;    1           | 1  int
-                1.0       ;;    1           | 2  float matches int
-                2.0       ;;    2.0         | 3  float
-                2         ;;    2.0         | 4  int matches float
-                "a"       ;;    "a"         | 5  string
-                "A"       ;;    "a"         | 6  string, other case
-                (1 2)     ;;    p = (1 2)   | 7  list, same structure
-                ,p        ;;    p           | 8  list, same object
-                nil       ;;    nil         | 9  nil
-                )))
-       (dolist (fn (list #'equalp #'equal #'eql #'eq))
-         (let* (( result           (list :: fn) )
-                ( asoc-compare-fn  fn  ))
-           (dolist (test test-items)
-             (push (asoc-contains-key? a test)
-                   result))
-           (push (reverse result) table)))
-       table)
-     :result
-     ;;  FN        1/1  1.0/1  2.0/2.0  2/2.0 "a"/"a" "A"/"a" (1 2)/(1 2) (1 2),same nil
-     `(( eq     ::  t    nil     nil     nil    nil     nil       nil          t      t )
-       ( eql    ::  t    nil      t      nil    nil     nil       nil          t      t )
-       ( equal  ::  t    nil      t      nil     t      nil        t           t      t )
-       ( equalp ::  t    t        t       t      t       t         t           t      t ))
-     )
-    )
-
-  (ert-deftest test-asoc-unit-tests-asoc-contains-pair? ()
-    "Unit tests for `asoc-contains-pair?'"
-    (should-equal
-     (let* (( table  nil     )
-            ( p      '(1 2)  )
-            ( q      '(1 . 2))
-            ( a      `( ,q (1 . 3.0) (1 . "a") (1 . ,p) ,p) )
-            (test-items
-             ;; TEST-ITEM ;;    ALIST-ELEM
-             `( (1 . 2)     ;;    q = (1 . 2)       | 1  ints
-                ,q          ;;    q                 | 2  ints, same cons
-                (1 . 3)     ;;    (1 . 3.0)         | 3  int value matches float
-                (1 . 3.0)   ;;    (1 . 3.0)         | 4  int keys, float values
-                (1 . "a")   ;;    (1 . "a")         | 5  int keys, string values
-                (1 . "A")   ;;    (1 . "a")         | 6  int keys, string value opp case
-                (1 . (1 2)) ;;    (1 . p=(1 2))     | 7  list values
-                (1 . ,p)    ;;    (1 . p=(1 2))     | 8  list values (values are the same object)
-                (1 . (2))   ;;    p=(1 2)=(1 . (2)) | 9  list values
-                ,p          ;;    p                 | 10 list values, same cons
-                )))
-       (dolist (fn (list #'equalp #'equal #'eql #'eq))
-         (let* (( result           (list :: fn) )
-                ( asoc-compare-fn  fn  ))
-           (dolist (test test-items)
-             (push (asoc-contains-pair? a (car test) (cdr test))
-                   result))
-           (push (reverse result) table)))
-       table)
-     :result
-     ;; ALIST ITEM:    q    q  (1 . 3.0) (1 . 3.0)  (1 . "a")  (1 . "a")  (1 .   p)   (1 . p)    p   p
-     ;;  TEST ITEM: (1 . 2) q  (1 . 3)   (1 . 3.0)  (1 . "a")  (1 . "A")  (1 . (1 2)) (1 . p)  (1 2) p
-     '(( eq      ::    t    t    nil       nil        nil        nil        nil          t     nil   t )
-       ( eql     ::    t    t    nil        t         nil        nil        nil          t     nil   t )
-       ( equal   ::    t    t    nil        t          t         nil         t           t      t    t )
-       ( equalp  ::    t    t     t         t          t          t          t           t      t    t ))
-     )
-    )
-
-  (ert-deftest ert-deftest-unit-tests-asoc-get ()
-    "Unit-tests for `asoc-get'."
-    (should-equal
-     (let* (( table  nil    )
-            ( p      '(1 2) )
-            ( a      `((1   . 1) (2.0 . 2) ("a" . 3) (,p  . 4) (nil . 5)) )
-            (test-items
-             ;; TEST-ITEM ;;    ALIST-KEY
-             `( 1         ;;    1           | 1  int
-                1.0       ;;    1           | 2  float matches int
-                2.0       ;;    2.0         | 3  float
-                2         ;;    2.0         | 4  int matches float
-                "a"       ;;    "a"         | 5  string
-                "A"       ;;    "a"         | 6  string, other case
-                (1 2)     ;;    p = (1 2)   | 7  list, same structure
-                ,p        ;;    p           | 8  list, same object
-                nil       ;;    nil         | 9  nil
-                )))
-       (dolist (fn (list #'equalp #'equal #'eql #'eq))
-         (let* (( result           (list :: fn) )
-                ( asoc-compare-fn  fn  ))
-           (dolist (test test-items)
-             (push (asoc-get a test)
-                   result))
-           (push (reverse result) table)))
-       table)
-     :result
-     ;;  FN        1/1  1.0/1  2.0/2.0  2/2.0 "a"/"a" "A"/"a" (1 2)/(1 2) (1 2),same nil
-     '(( eq     ::  1    nil     nil     nil    nil     nil       nil          4      5 )
-       ( eql    ::  1    nil      2      nil    nil     nil       nil          4      5 )
-       ( equal  ::  1    nil      2      nil     3      nil        4           4      5 )
-       ( equalp ::  1     1       2       2      3       3         4           4      5 ))
-     )
-    ;; empty alist
-    (should-equal (asoc-get nil 1) :result nil)
-    (should-equal (asoc-get nil nil) :result nil)
-    )
-
-  (ert-deftest test-asoc-unit-tests-asoc-put! ()
-    "Unit tests for `asoc-put!'."
-    ;; test with replace=nil
-    (should-equal
-     (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
-       (asoc-put! a 3 10))
-     :result '((3 . 10) (1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
-    ;; test with replace=non-nil
-    (should-equal
-     (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
-       (asoc-put! a 3 10 :replace))
-     :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
-    ;; test with replace=non-nil, multiple deletions
-    (should-equal
-     (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (3 . 1) (5 . 25))))
-       (asoc-put! a 3 10 :replace))
-     :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
-    ;; test with replace=non-nil, no deletions
-    (should-equal
-     (let ((a '((1 . 1) (2 . 4) (4 . 16) (5 . 25))))
-       (asoc-put! a 3 10 :replace))
-     :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
-    ;; test with replace=non-nil, deletion at head of list
-    (should-equal
-     (let ((a '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25))))
-       (asoc-put! a 3 10 :replace))
-     :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
-    ;; empty alist
-    (should-equal
-     (let ((a nil)) (asoc-put! a 3 10))
-     :result '((3 . 10)))
-    ;; one-pair alist
-    (should-equal
-     (let ((a '((3 . 10)))) (asoc-put! a 3 10))
-     :result '((3 . 10) (3 . 10)))
-    (should-equal
-     (let ((a '((3 . 10)))) (asoc-put! a 3 10 :replace))
-     :result '((3 . 10)))
-    )
-
-  (ert-deftest test-asoc-unit-tests-asoc-find-key ()
-    "Unit tests for `asoc-find-key'."
-    (should-equal
-     (let* (  table
-              ( p  '(1 2) )
-              ( a  `((1   . t) (2.0 . t) ("a" . t) (,p  . t) (nil . t)) )
-               ;;            TEST-ITEM ;;    ALIST-ELEM
-              (test-items `( 1         ;;    1           | 1  int
-                             1.0       ;;    1           | 2  float matches int
-                             2.0       ;;    2.0         | 3  float
-                             2         ;;    2.0         | 4  int matches float
-                             "a"       ;;    "a"         | 5  string
-                             "A"       ;;    "a"         | 6  string, other case
-                             (1 2)     ;;    p = (1 2)   | 7  list, same structure
-                             ,p        ;;    p           | 8  list, same object
-                             nil       ;;    nil         | 9  nil
-                             )))
-       (dolist (eqfn (list #'equalp #'equal #'eql #'eq))
-         (let ( (asoc-compare-fn  eqfn)
-                (result  (list :: eqfn)) )
-           (dolist (test test-items)
-             (push (asoc-find-key test a)
-                   result))
-           (push (reverse result) table)))
-       table)
-     :result
-     ;;  FN         1/1    1.0/1   2.0/2.0    2/2.0    "a"/"a"   "A"/"a"  (1 2)/(1 2) (1 2),same     nil
-     '((eq     :: (1 . t)   nil      nil       nil       nil       nil        nil     ((1 2) . t) (nil . t))
-       (eql    :: (1 . t)   nil   (2.0 . t)    nil       nil       nil        nil     ((1 2) . t) (nil . t))
-       (equal  :: (1 . t)   nil   (2.0 . t)    nil    ("a" . t)    nil    ((1 2) . t) ((1 2) . t) (nil . t))
-       (equalp :: (1 . t) (1 . t) (2.0 . t) (2.0 . t) ("a" . t) ("a" . t) ((1 2) . t) ((1 2) . t) (nil . t))))
-    )
-
-  (ert-deftest test-asoc-unit-tests-asoc-delete! ()
-    "Unit tests for `asoc-delete!'."
-    ;; test nil, 1-pair (match/non-match), 2-pairs (match/non)
-    (should-equal
-     (let ((a nil))
-       (asoc-delete! a 'x))
-     :result nil)
-    (should-equal
-     (let ((a '((x 1))))
-       (asoc-delete! a 'x))
-     :result nil)
-    (should-equal
-     (let ((a '((y 2))))
-       (asoc-delete! a 'x))
-     :result '((y 2)))
-    (should-equal
-     (let ((a '((x 1) (y 2))))
-       (asoc-delete! a 'x))
-     :result '((y 2)))
-    (should-equal
-     (let ((a '((y 2) (x 1))))
-       (asoc-delete! a 'x))
-     :result '((y 2)))
-    (should-equal
-     (let ((a '((x 1) (x 11))))
-       (asoc-delete! a 'x))
-     :result '((x 11)))
-    (should-equal
-     (let ((a '((x 1) (x 11) (x 111))))
-       (asoc-delete! a 'x))
-     :result '((x 11) (x 111)))
-    )
-
-  (ert-deftest test-asoc-unit-tests-asoc-delete!/remove-all ()
-    "Unit tests for `asoc-delete!' with remove-all set."
-    ;; test nil, 1-pair (match/non-match), 2-pairs (match/non)
-    (should-equal
-     (let ((a nil))
-       (asoc-delete! a 'x :all))
-     :result nil)
-    (should-equal
-     (let ((a '((x 1))))
-       (asoc-delete! a 'x :all))
-     :result nil)
-    (should-equal
-     (let ((a '((y 2))))
-       (asoc-delete! a 'x :all))
-     :result '((y 2)))
-    (should-equal
-     (let ((a '((x 1) (y 2))))
-       (asoc-delete! a 'x :all))
-     :result '((y 2)))
-    (should-equal
-     (let ((a '((y 2) (x 1))))
-       (asoc-delete! a 'x :all))
-     :result '((y 2)))
-    (should-equal
-     (let ((a '((x 1) (x 11))))
-       (asoc-delete! a 'x :all))
-     :result nil)
-    (should-equal
-     (let ((a '((x 1) (x 11) (x 111))))
-       (asoc-delete! a 'x :all))
-     :result nil)
-    (should-equal
-     (let ((a '((x . 1) (y . 2) (x . 11) (z . 3) (x . 111) (x . 1111))))
-       (asoc-delete! a 'x :all))
-     :result '((y . 2) (z . 3)))
-    (should-equal
-     (let ((a '((x . 1) (y . 2) (x . 11) (z . 3) (x . 111) (x . 1111) (z . 33))))
-       (asoc-delete! a 'x :all))
-     :result '((y . 2) (z . 3) (z . 33)))
-    )
-
-
-  (ert-deftest test-asoc-unit-tests-asoc-keys ()
-    "Unit tests for `asoc-keys'."
-    ;; empty alist
-    (should-equal
-     (let ((a nil))
-       (asoc-keys a))
-     :result nil)
-    ;; alist with duplicates
-    (should-equal
-     (let ((a '((1 . 1) (2 . 4) (1 . 1) (3 . 9) (1 . 1) (4 . 16) (5 . 25))))
-       (asoc-keys a))
-     :result '(1 2 3 4 5))
-    ;; test with different choices of asoc-compare-fn
-    (should-equal
-     (let* (( p      '(1 2) )
-            ( a      `((1   . nil) ("a" . nil) (,p  . nil)   (nil . nil)
-                       (1.0 . nil) ("a" . nil) ((1 2) . nil) (nil . nil) ))
-            (result))
-
-       (dolist (fn (list #'equalp #'equal #'eql #'eq))
-         (let* (( asoc-compare-fn  fn  ))
-           (push (list fn :: (asoc-keys a))
-                 result)))
-       result)
-     :result   ;; <-first occurrences->         <-duplicates->
-     '((eq     ::  (1  "a"  (1 2)  nil          1.0  "a" (1 2) ))
-       (eql    ::  (1  "a"  (1 2)  nil          1.0  "a" (1 2) ))
-       (equal  ::  (1  "a"  (1 2)  nil          1.0            ))
-       (equalp ::  (1  "a"  (1 2)  nil                         )))
-     )
-    )
-
-  (ert-deftest test-asoc-unit-tests-asoc-values ()
-    "Unit tests for `asoc-values'."
-    ;; empty alist
-    (should-equal
-     (let ((a nil))
-       (asoc-values a))
-     :result nil)
-    ;; alist with duplicates
-    (should-equal
-     (let ((a '((1 . 1) (2 . 4) (1 . 1) (3 . 9) (1 . 1) (4 . 16) (5 . 25))))
-       (asoc-values a))
-     :result '(1 4 9 16 25))
-    ;; test with different choices of asoc-compare-fn
-    (should-equal
-     (let* ( result
-            ( p  '(1 2) )
-            ( a  `((1   . 1)   ("a" . "a") (,p    . ,p)    (nil . nil)
-                   (1.0 . 1.0) ("a" . "a") ((1 2) . (1 2)) (nil . nil) )))
-
-       (dolist (fn (list #'equalp #'equal #'eql #'eq))
-         (let* (( asoc-compare-fn  fn  ))
-           (push (list fn :: (asoc-values a))
-                 result)))
-       result)
-     :result   ;; <-first occurrences->     <-duplicates->
-     '((eq     ::  (1  "a"  (1 2)  nil      1.0  "a" (1 2) ))
-       (eql    ::  (1  "a"  (1 2)  nil      1.0  "a" (1 2) ))
-       (equal  ::  (1  "a"  (1 2)  nil      1.0            ))
-       (equalp ::  (1  "a"  (1 2)  nil                     ))))
-    )
-
-  (ert-deftest test-asoc-unit-tests-asoc-unzip ()
-    "Unit tests for `asoc-unzip'."
-    ;; #keys == #values
-    (should-equal
-     (asoc-unzip '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
-     :result '((1 2 3 4 5) (1 4 9 16 25)))
-    ;; #keys > #values
-    (should-equal
-     (asoc-unzip '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25) (6) (7)))
-     :result '((1 2 3 4 5 6 7) (1 4 9 16 25 () ())))
+  (ert-deftest test-asoc-unit-tests-asoc-uniq ()
+    "Unit tests for `asoc-uniq'."
     ;; empty list
     (should-equal
-     (asoc-unzip nil)
-     :result '(() ()))
-    ;; empty values
+     (asoc-uniq nil)
+     :result nil)
+    ;; 1-element list
     (should-equal
-     (asoc-unzip '((1) (2) (3) (4) (5)))
-     :result '((1 2 3 4 5) (() () () () ())))
-    )
-
-  (ert-deftest test-asoc-unit-tests-asoc-unzip-zip ()
-    "Tests for `asoc-zip' reversing `asoc-unzip'."
-    (let ((a '((1 . 1) (2 . 4) (1 . 1) (3 . 9) (1 . 1) (4 . 16) (5 . 25)))
-          (b nil)
-          (c '((1 . 1)))
-          (d '((nil . nil))))
-      (and
-       (should-equal
-        (apply #'asoc-zip (asoc-unzip a))
-        :result a)
-       (should-equal
-        (apply #'asoc-zip (asoc-unzip b))
-        :result b)
-       (should-equal
-        (apply #'asoc-zip (asoc-unzip c))
-        :result c)
-       (should-equal
-        (apply #'asoc-zip (asoc-unzip d))
-        :result d)
-       ))
+     (asoc-uniq '((1 . 1)))
+     :result '((1 . 1)))
+    ;; list with multiple repeats
+    (should-equal
+     (asoc-uniq '((1 . 1) (2 . 2) (1 . 3) (1 . 4) (1 . 5) (2 . 3)))
+     :result '((1 . 1) (2 . 2)))
+    (should-equal
+     (let* (( result   nil    )
+            ( p       '(1 2)  )
+            ( a       `( (1 1)   (,p 1)    ("a" 1) ('c 1) (nil 1) (t 1)
+                         (1 2)   (,p 2)    ("a" 2) ('c 2) (nil 2) (t 2)
+                         (1.0 3) ((1 2) 3) ("A" 3)                      )))
+       (dolist (f (list #'equalp #'equal #'eql #'eq))
+         (let (( asoc-compare-fn f ))
+           (push (list f ::: (asoc-uniq a))
+                 result)))
+       (reverse result))
+     :result
+     '((equalp ::: ( (1 1) ((1 2) 1) ("a" 1) ('c 1) (nil 1) (t 1)                                          ) )
+       (equal  ::: ( (1 1) ((1 2) 1) ("a" 1) ('c 1) (nil 1) (t 1)                (1.0 3)           ("A" 3) ) )
+       (eql    ::: ( (1 1) ((1 2) 1) ("a" 1) ('c 1) (nil 1) (t 1) ("a" 2) ('c 2) (1.0 3) ((1 2) 3) ("A" 3) ) )
+       (eq     ::: ( (1 1) ((1 2) 1) ("a" 1) ('c 1) (nil 1) (t 1) ("a" 2) ('c 2) (1.0 3) ((1 2) 3) ("A" 3) ) ))
+     )
+    ;; Duplicate floating point keys are removed with #'equalp, #'equal and #'eql
+    (should-equal
+     (list
+      (append '(equalp :::)
+              (let ((asoc-compare-fn #'equalp))
+                (asoc-uniq '((1.0 . 1) (1.0 . 2)))))
+      (append '(equal :::)
+              (let ((asoc-compare-fn #'equal))
+                (asoc-uniq '((1.0 . 1) (1.0 . 2)))))
+      (append '(eql :::)
+              (let ((asoc-compare-fn #'eql))
+                (asoc-uniq '((1.0 . 1) (1.0 . 2))))))
+     :result
+     '((equalp ::: (1.0 . 1))
+       (equal  ::: (1.0 . 1))
+       (eql    ::: (1.0 . 1))))
     )
 
-  (ert-deftest test-asoc-unit-tests-asoc-zip-unzip ()
-    "Tests for `asoc-unzip' reversing `asoc-zip'."
-    ;; HOLDS
-    (let ((a '((1 2 1 3 1 4 5) (1 4 1 9 1 16 25)))
-          (b '(nil nil))
-          (c '((1) (1)))
-          (d '((nil) (nil))))
-      (should-equal
-       (asoc-unzip (apply #'asoc-zip a))
-       :result a)
-      (should-equal
-       (asoc-unzip (apply #'asoc-zip b))
-       :result b)
-      (should-equal
-       (asoc-unzip (apply #'asoc-zip c))
-       :result c)
-      (should-equal
-       (asoc-unzip (apply #'asoc-zip d))
-       :result d)
-      )
-    ;; DOESN'T HOLD
-    (let (;; #keys > #values
-          (a '((1 2 3 4 5 6 7) '(1 4 9 16 25)))
-          ;; string argument
-          (b '((1 2 3 4 5 6) "qwerty")))
-      (should-not-equal
-       (asoc-unzip (apply #'asoc-zip a))
-       :result a)
-      (should-not-equal
-       (asoc-unzip (apply #'asoc-zip b))
-       :result b))
-    )
-
-
-  (ert-deftest test-asoc-unit-tests-asoc-do ()
-    "Unit tests for `asoc-do'."
-    ;; error if the variable RESULT is not defined
-    (should-error
-     (let ((a '((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36))))
-       (let (sum)
-         (makunbound 'sum)
-         (asoc-do ((key value) a sum)
-           (when (symbolp key)
-             (setf sum (+ sum value)))))))
-    ;; return nil if result variable is not specified
-    (should-equal
-     (let ((a '((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36))))
-       (with-temp-buffer
-         (asoc-do ((k v) a )
-           (insert (format "%S\t%S\n" k v)))))
-     :result nil)
-    )
-
-  (ert-deftest test-asoc-unit-tests-asoc--do ()
-    "Unit tests for `asoc--do'."
-    ;; null alist returns nil
-    (should-equal
-     (asoc--do nil
-       (setq result 'result-set))
-     :result nil)
-    ;; null alist with :initially clause runs init code
-    (should-equal
-     (asoc--do nil
-       (:initially (setq result 'result-set)))
-     :result 'result-set)
-    ;; empty body returns nil
-    (should-equal
-     (asoc--do nil)
-     :result nil)
-    (should-equal
-     (asoc--do '((a . 1) (b . 2) (c . 4)))
-     :result nil)
-    ;; sample code and alists
-    (should-equal
-     (asoc--do '((a . 1) (b . 2) (c . 4))
-       (push value result))
-     :result '(4 2 1))
-    (should-equal
-     (asoc--do '((a . 1) (b . 2) (c . 4))
-       (:initially (setq result 0))
-       (setq result (+ result value)))
-     :result 7)
-    )
-
-  (ert-deftest test-asoc-unit-tests-asoc-map-values ()
-    "Unit tests for `asoc-map-values'."
-    (should-equal
-     (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
-       (asoc-map-values (lambda (x) (* x x)) a))
-     :result '((1 . 1) (2 . 16) (3 . 81) (4 . 256) (5 . 625)))
-    ;; empty alist
-    (should-equal
-     (let ((a nil))
-       (asoc-map-values (lambda (x) (* x x)) a))
-     :result nil)
-    )
-
-  (ert-deftest test-asoc-unit-tests-asoc-zip ()
-    "Unit tests for `asoc-zip'."
-    ;; #keys == #values
-    (should-equal
-     (asoc-zip '(1 2 3 4 5) '(1 4 9 16 25))
-     :result '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
-    ;; #keys > #values
-    (should-equal
-     (asoc-zip '(1 2 3 4 5 6 7) '(1 4 9 16 25))
-     :result '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25) (6) (7)))
-    ;; #keys < #values
-    (should-error
-     (asoc-zip '(1 2 3 4 5) '(1 4 9 16 25 36)))
+  (ert-deftest test-asoc-unit-tests-asoc-uniq-keep-last ()
+    "Unit tests for `asoc-uniq' with :keep-last option."
     ;; empty list
     (should-equal
-     (asoc-zip nil nil)
+     (asoc-uniq nil :keep-last)
      :result nil)
-    ;; empty values
+    ;; 1-element list
     (should-equal
-     (asoc-zip '(1 2 3 4 5) nil)
-     :result '((1) (2) (3) (4) (5)))
-    ;; values sequence is a string
+     (asoc-uniq '((1 . 1)) :keep-last)
+     :result '((1 . 1)))
+    ;; list with multiple repeats
     (should-equal
-     (asoc-zip '(1 2 3 4 5 6) "qwerty")
-     :result '((1 . ?q) (2 . ?w) (3 . ?e) (4 . ?r) (5 . ?t) (6 . ?y)))
+     (asoc-uniq '((1 . 1) (2 . 2) (1 . 3) (1 . 4) (1 . 5) (2 . 3)) :keep-last)
+     :result '((1 . 5) (2 . 3)))
+    (should-equal
+     (let* (( result   nil    )
+            ( p       '(1 2)  )
+            ( a       `( (1 1)   (,p 1)    ("a" 1) ('c 1) (nil 1) (t 1)
+                         (1 2)   (,p 2)    ("a" 2) ('c 2) (nil 2) (t 2)
+                         (1.0 3) ((1 2) 3) ("A" 3)                      )))
+       (dolist (f (list #'equalp #'equal #'eql #'eq))
+         (let (( asoc-compare-fn f ))
+           (push (list f ::: (asoc-uniq a :keep-last))
+                 result)))
+       (reverse result))
+     :result
+     '((equalp ::: (                                       ('c 2) (nil 2) (t 2) (1.0 3) ((1 2) 3) ("A" 3) ))
+       (equal  ::: (               (1 2)           ("a" 2) ('c 2) (nil 2) (t 2) (1.0 3) ((1 2) 3) ("A" 3) ))
+       (eql    ::: (("a" 1) ('c 1) (1 2) ((1 2) 2) ("a" 2) ('c 2) (nil 2) (t 2) (1.0 3) ((1 2) 3) ("A" 3) ))
+       (eq     ::: (("a" 1) ('c 1) (1 2) ((1 2) 2) ("a" 2) ('c 2) (nil 2) (t 2) (1.0 3) ((1 2) 3) ("A" 3) )))
+     )
+    ;; Duplicate floating point keys are removed with #'equalp, #'equal and #'eql
+    (should-equal
+     (list
+      (append '(equalp :::)
+              (let ((asoc-compare-fn #'equalp))
+                (asoc-uniq '((1.0 . 1) (1.0 . 2)) :keep-last)))
+      (append '(equal :::)
+              (let ((asoc-compare-fn #'equal))
+                (asoc-uniq '((1.0 . 1) (1.0 . 2)) :keep-last)))
+      (append '(eql :::)
+              (let ((asoc-compare-fn #'eql))
+                (asoc-uniq '((1.0 . 1) (1.0 . 2)) :keep-last))))
+     :result
+     '((equalp ::: (1.0 . 2))
+       (equal  ::: (1.0 . 2))
+       (eql    ::: (1.0 . 2))))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-sort-keys ()
@@ -1086,102 +723,465 @@
      :result '((b) (nil)))
     )
 
-  (ert-deftest test-asoc-unit-tests-asoc-uniq ()
-    "Unit tests for `asoc-uniq'."
-    ;; empty list
+  (ert-deftest test-asoc-unit-tests-asoc-contains-key? ()
+    "Unit tests for `asoc---contains-key?'."
     (should-equal
-     (asoc-uniq nil)
-     :result nil)
-    ;; 1-element list
-    (should-equal
-     (asoc-uniq '((1 . 1)))
-     :result '((1 . 1)))
-    ;; list with multiple repeats
-    (should-equal
-     (asoc-uniq '((1 . 1) (2 . 2) (1 . 3) (1 . 4) (1 . 5) (2 . 3)))
-     :result '((1 . 1) (2 . 2)))
-    (should-equal
-     (let* (( result   nil    )
-            ( p       '(1 2)  )
-            ( a       `( (1 1)   (,p 1)    ("a" 1) ('c 1) (nil 1) (t 1)
-                         (1 2)   (,p 2)    ("a" 2) ('c 2) (nil 2) (t 2)
-                         (1.0 3) ((1 2) 3) ("A" 3)                      )))
-       (dolist (f (list #'equalp #'equal #'eql #'eq))
-         (let (( asoc-compare-fn f ))
-           (push (list f ::: (asoc-uniq a))
-                 result)))
-       (reverse result))
+     (let* (( table  nil    )
+            ( p      '(1 2) )
+            ( a      `((1   . t) (2.0 . t) ("a" . t) (,p  . t) (nil . t)) )
+            (test-items
+             ;; TEST-ITEM ;;    ALIST-ELEM
+             `( 1         ;;    1           | 1  int
+                1.0       ;;    1           | 2  float matches int
+                2.0       ;;    2.0         | 3  float
+                2         ;;    2.0         | 4  int matches float
+                "a"       ;;    "a"         | 5  string
+                "A"       ;;    "a"         | 6  string, other case
+                (1 2)     ;;    p = (1 2)   | 7  list, same structure
+                ,p        ;;    p           | 8  list, same object
+                nil       ;;    nil         | 9  nil
+                )))
+       (dolist (fn (list #'equalp #'equal #'eql #'eq))
+         (let* (( result           (list :: fn) )
+                ( asoc-compare-fn  fn  ))
+           (dolist (test test-items)
+             (push (asoc-contains-key? a test)
+                   result))
+           (push (reverse result) table)))
+       table)
      :result
-     '((equalp ::: ( (1 1) ((1 2) 1) ("a" 1) ('c 1) (nil 1) (t 1)                                          ) )
-       (equal  ::: ( (1 1) ((1 2) 1) ("a" 1) ('c 1) (nil 1) (t 1)                (1.0 3)           ("A" 3) ) )
-       (eql    ::: ( (1 1) ((1 2) 1) ("a" 1) ('c 1) (nil 1) (t 1) ("a" 2) ('c 2) (1.0 3) ((1 2) 3) ("A" 3) ) )
-       (eq     ::: ( (1 1) ((1 2) 1) ("a" 1) ('c 1) (nil 1) (t 1) ("a" 2) ('c 2) (1.0 3) ((1 2) 3) ("A" 3) ) ))
+     ;;  FN        1/1  1.0/1  2.0/2.0  2/2.0 "a"/"a" "A"/"a" (1 2)/(1 2) (1 2),same nil
+     `(( eq     ::  t    nil     nil     nil    nil     nil       nil          t      t )
+       ( eql    ::  t    nil      t      nil    nil     nil       nil          t      t )
+       ( equal  ::  t    nil      t      nil     t      nil        t           t      t )
+       ( equalp ::  t    t        t       t      t       t         t           t      t ))
      )
-    ;; Duplicate floating point keys are removed with #'equalp, #'equal and #'eql
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-contains-pair? ()
+    "Unit tests for `asoc-contains-pair?'"
     (should-equal
-     (list
-      (append '(equalp :::)
-              (let ((asoc-compare-fn #'equalp))
-                (asoc-uniq '((1.0 . 1) (1.0 . 2)))))
-      (append '(equal :::)
-              (let ((asoc-compare-fn #'equal))
-                (asoc-uniq '((1.0 . 1) (1.0 . 2)))))
-      (append '(eql :::)
-              (let ((asoc-compare-fn #'eql))
-                (asoc-uniq '((1.0 . 1) (1.0 . 2))))))
+     (let* (( table  nil     )
+            ( p      '(1 2)  )
+            ( q      '(1 . 2))
+            ( a      `( ,q (1 . 3.0) (1 . "a") (1 . ,p) ,p) )
+            (test-items
+             ;; TEST-ITEM ;;    ALIST-ELEM
+             `( (1 . 2)     ;;    q = (1 . 2)       | 1  ints
+                ,q          ;;    q                 | 2  ints, same cons
+                (1 . 3)     ;;    (1 . 3.0)         | 3  int value matches float
+                (1 . 3.0)   ;;    (1 . 3.0)         | 4  int keys, float values
+                (1 . "a")   ;;    (1 . "a")         | 5  int keys, string values
+                (1 . "A")   ;;    (1 . "a")         | 6  int keys, string value opp case
+                (1 . (1 2)) ;;    (1 . p=(1 2))     | 7  list values
+                (1 . ,p)    ;;    (1 . p=(1 2))     | 8  list values (values are the same object)
+                (1 . (2))   ;;    p=(1 2)=(1 . (2)) | 9  list values
+                ,p          ;;    p                 | 10 list values, same cons
+                )))
+       (dolist (fn (list #'equalp #'equal #'eql #'eq))
+         (let* (( result           (list :: fn) )
+                ( asoc-compare-fn  fn  ))
+           (dolist (test test-items)
+             (push (asoc-contains-pair? a (car test) (cdr test))
+                   result))
+           (push (reverse result) table)))
+       table)
      :result
-     '((equalp ::: (1.0 . 1))
-       (equal  ::: (1.0 . 1))
-       (eql    ::: (1.0 . 1))))
+     ;; ALIST ITEM:    q    q  (1 . 3.0) (1 . 3.0)  (1 . "a")  (1 . "a")  (1 .   p)   (1 . p)    p   p
+     ;;  TEST ITEM: (1 . 2) q  (1 . 3)   (1 . 3.0)  (1 . "a")  (1 . "A")  (1 . (1 2)) (1 . p)  (1 2) p
+     '(( eq      ::    t    t    nil       nil        nil        nil        nil          t     nil   t )
+       ( eql     ::    t    t    nil        t         nil        nil        nil          t     nil   t )
+       ( equal   ::    t    t    nil        t          t         nil         t           t      t    t )
+       ( equalp  ::    t    t     t         t          t          t          t           t      t    t ))
+     )
+    )
+
+  (ert-deftest ert-deftest-unit-tests-asoc-get ()
+    "Unit-tests for `asoc-get'."
+    (should-equal
+     (let* (( table  nil    )
+            ( p      '(1 2) )
+            ( a      `((1   . 1) (2.0 . 2) ("a" . 3) (,p  . 4) (nil . 5)) )
+            (test-items
+             ;; TEST-ITEM ;;    ALIST-KEY
+             `( 1         ;;    1           | 1  int
+                1.0       ;;    1           | 2  float matches int
+                2.0       ;;    2.0         | 3  float
+                2         ;;    2.0         | 4  int matches float
+                "a"       ;;    "a"         | 5  string
+                "A"       ;;    "a"         | 6  string, other case
+                (1 2)     ;;    p = (1 2)   | 7  list, same structure
+                ,p        ;;    p           | 8  list, same object
+                nil       ;;    nil         | 9  nil
+                )))
+       (dolist (fn (list #'equalp #'equal #'eql #'eq))
+         (let* (( result           (list :: fn) )
+                ( asoc-compare-fn  fn  ))
+           (dolist (test test-items)
+             (push (asoc-get a test)
+                   result))
+           (push (reverse result) table)))
+       table)
+     :result
+     ;;  FN        1/1  1.0/1  2.0/2.0  2/2.0 "a"/"a" "A"/"a" (1 2)/(1 2) (1 2),same nil
+     '(( eq     ::  1    nil     nil     nil    nil     nil       nil          4      5 )
+       ( eql    ::  1    nil      2      nil    nil     nil       nil          4      5 )
+       ( equal  ::  1    nil      2      nil     3      nil        4           4      5 )
+       ( equalp ::  1     1       2       2      3       3         4           4      5 ))
+     )
+    ;; empty alist
+    (should-equal (asoc-get nil 1) :result nil)
+    (should-equal (asoc-get nil nil) :result nil)
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-put! ()
+    "Unit tests for `asoc-put!'."
+    ;; test with replace=nil
+    (should-equal
+     (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
+       (asoc-put! a 3 10))
+     :result '((3 . 10) (1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
+    ;; test with replace=non-nil
+    (should-equal
+     (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
+       (asoc-put! a 3 10 :replace))
+     :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
+    ;; test with replace=non-nil, multiple deletions
+    (should-equal
+     (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (3 . 1) (5 . 25))))
+       (asoc-put! a 3 10 :replace))
+     :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
+    ;; test with replace=non-nil, no deletions
+    (should-equal
+     (let ((a '((1 . 1) (2 . 4) (4 . 16) (5 . 25))))
+       (asoc-put! a 3 10 :replace))
+     :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
+    ;; test with replace=non-nil, deletion at head of list
+    (should-equal
+     (let ((a '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25))))
+       (asoc-put! a 3 10 :replace))
+     :result '((3 . 10) (1 . 1) (2 . 4) (4 . 16) (5 . 25)))
+    ;; empty alist
+    (should-equal
+     (let ((a nil)) (asoc-put! a 3 10))
+     :result '((3 . 10)))
+    ;; one-pair alist
+    (should-equal
+     (let ((a '((3 . 10)))) (asoc-put! a 3 10))
+     :result '((3 . 10) (3 . 10)))
+    (should-equal
+     (let ((a '((3 . 10)))) (asoc-put! a 3 10 :replace))
+     :result '((3 . 10)))
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-delete! ()
+    "Unit tests for `asoc-delete!'."
+    ;; test nil, 1-pair (match/non-match), 2-pairs (match/non)
+    (should-equal
+     (let ((a nil))
+       (asoc-delete! a 'x))
+     :result nil)
+    (should-equal
+     (let ((a '((x 1))))
+       (asoc-delete! a 'x))
+     :result nil)
+    (should-equal
+     (let ((a '((y 2))))
+       (asoc-delete! a 'x))
+     :result '((y 2)))
+    (should-equal
+     (let ((a '((x 1) (y 2))))
+       (asoc-delete! a 'x))
+     :result '((y 2)))
+    (should-equal
+     (let ((a '((y 2) (x 1))))
+       (asoc-delete! a 'x))
+     :result '((y 2)))
+    (should-equal
+     (let ((a '((x 1) (x 11))))
+       (asoc-delete! a 'x))
+     :result '((x 11)))
+    (should-equal
+     (let ((a '((x 1) (x 11) (x 111))))
+       (asoc-delete! a 'x))
+     :result '((x 11) (x 111)))
     )
 
-  (ert-deftest test-asoc-unit-tests-asoc-uniq-keep-last ()
-    "Unit tests for `asoc-uniq' with :keep-last option."
+  (ert-deftest test-asoc-unit-tests-asoc-delete!/remove-all ()
+    "Unit tests for `asoc-delete!' with remove-all set."
+    ;; test nil, 1-pair (match/non-match), 2-pairs (match/non)
+    (should-equal
+     (let ((a nil))
+       (asoc-delete! a 'x :all))
+     :result nil)
+    (should-equal
+     (let ((a '((x 1))))
+       (asoc-delete! a 'x :all))
+     :result nil)
+    (should-equal
+     (let ((a '((y 2))))
+       (asoc-delete! a 'x :all))
+     :result '((y 2)))
+    (should-equal
+     (let ((a '((x 1) (y 2))))
+       (asoc-delete! a 'x :all))
+     :result '((y 2)))
+    (should-equal
+     (let ((a '((y 2) (x 1))))
+       (asoc-delete! a 'x :all))
+     :result '((y 2)))
+    (should-equal
+     (let ((a '((x 1) (x 11))))
+       (asoc-delete! a 'x :all))
+     :result nil)
+    (should-equal
+     (let ((a '((x 1) (x 11) (x 111))))
+       (asoc-delete! a 'x :all))
+     :result nil)
+    (should-equal
+     (let ((a '((x . 1) (y . 2) (x . 11) (z . 3) (x . 111) (x . 1111))))
+       (asoc-delete! a 'x :all))
+     :result '((y . 2) (z . 3)))
+    (should-equal
+     (let ((a '((x . 1) (y . 2) (x . 11) (z . 3) (x . 111) (x . 1111) (z . 33))))
+       (asoc-delete! a 'x :all))
+     :result '((y . 2) (z . 3) (z . 33)))
+    )
+
+
+  (ert-deftest test-asoc-unit-tests-asoc-find-key ()
+    "Unit tests for `asoc-find-key'."
+    (should-equal
+     (let* (  table
+              ( p  '(1 2) )
+              ( a  `((1   . t) (2.0 . t) ("a" . t) (,p  . t) (nil . t)) )
+               ;;            TEST-ITEM ;;    ALIST-ELEM
+              (test-items `( 1         ;;    1           | 1  int
+                             1.0       ;;    1           | 2  float matches int
+                             2.0       ;;    2.0         | 3  float
+                             2         ;;    2.0         | 4  int matches float
+                             "a"       ;;    "a"         | 5  string
+                             "A"       ;;    "a"         | 6  string, other case
+                             (1 2)     ;;    p = (1 2)   | 7  list, same structure
+                             ,p        ;;    p           | 8  list, same object
+                             nil       ;;    nil         | 9  nil
+                             )))
+       (dolist (eqfn (list #'equalp #'equal #'eql #'eq))
+         (let ( (asoc-compare-fn  eqfn)
+                (result  (list :: eqfn)) )
+           (dolist (test test-items)
+             (push (asoc-find-key test a)
+                   result))
+           (push (reverse result) table)))
+       table)
+     :result
+     ;;  FN         1/1    1.0/1   2.0/2.0    2/2.0    "a"/"a"   "A"/"a"  (1 2)/(1 2) (1 2),same     nil
+     '((eq     :: (1 . t)   nil      nil       nil       nil       nil        nil     ((1 2) . t) (nil . t))
+       (eql    :: (1 . t)   nil   (2.0 . t)    nil       nil       nil        nil     ((1 2) . t) (nil . t))
+       (equal  :: (1 . t)   nil   (2.0 . t)    nil    ("a" . t)    nil    ((1 2) . t) ((1 2) . t) (nil . t))
+       (equalp :: (1 . t) (1 . t) (2.0 . t) (2.0 . t) ("a" . t) ("a" . t) ((1 2) . t) ((1 2) . t) (nil . t))))
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-keys ()
+    "Unit tests for `asoc-keys'."
+    ;; empty alist
+    (should-equal
+     (let ((a nil))
+       (asoc-keys a))
+     :result nil)
+    ;; alist with duplicates
+    (should-equal
+     (let ((a '((1 . 1) (2 . 4) (1 . 1) (3 . 9) (1 . 1) (4 . 16) (5 . 25))))
+       (asoc-keys a))
+     :result '(1 2 3 4 5))
+    ;; test with different choices of asoc-compare-fn
+    (should-equal
+     (let* (( p      '(1 2) )
+            ( a      `((1   . nil) ("a" . nil) (,p  . nil)   (nil . nil)
+                       (1.0 . nil) ("a" . nil) ((1 2) . nil) (nil . nil) ))
+            (result))
+
+       (dolist (fn (list #'equalp #'equal #'eql #'eq))
+         (let* (( asoc-compare-fn  fn  ))
+           (push (list fn :: (asoc-keys a))
+                 result)))
+       result)
+     :result   ;; <-first occurrences->         <-duplicates->
+     '((eq     ::  (1  "a"  (1 2)  nil          1.0  "a" (1 2) ))
+       (eql    ::  (1  "a"  (1 2)  nil          1.0  "a" (1 2) ))
+       (equal  ::  (1  "a"  (1 2)  nil          1.0            ))
+       (equalp ::  (1  "a"  (1 2)  nil                         )))
+     )
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-values ()
+    "Unit tests for `asoc-values'."
+    ;; empty alist
+    (should-equal
+     (let ((a nil))
+       (asoc-values a))
+     :result nil)
+    ;; alist with duplicates
+    (should-equal
+     (let ((a '((1 . 1) (2 . 4) (1 . 1) (3 . 9) (1 . 1) (4 . 16) (5 . 25))))
+       (asoc-values a))
+     :result '(1 4 9 16 25))
+    ;; test with different choices of asoc-compare-fn
+    (should-equal
+     (let* ( result
+            ( p  '(1 2) )
+            ( a  `((1   . 1)   ("a" . "a") (,p    . ,p)    (nil . nil)
+                   (1.0 . 1.0) ("a" . "a") ((1 2) . (1 2)) (nil . nil) )))
+
+       (dolist (fn (list #'equalp #'equal #'eql #'eq))
+         (let* (( asoc-compare-fn  fn  ))
+           (push (list fn :: (asoc-values a))
+                 result)))
+       result)
+     :result   ;; <-first occurrences->     <-duplicates->
+     '((eq     ::  (1  "a"  (1 2)  nil      1.0  "a" (1 2) ))
+       (eql    ::  (1  "a"  (1 2)  nil      1.0  "a" (1 2) ))
+       (equal  ::  (1  "a"  (1 2)  nil      1.0            ))
+       (equalp ::  (1  "a"  (1 2)  nil                     ))))
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-unzip ()
+    "Unit tests for `asoc-unzip'."
+    ;; #keys == #values
+    (should-equal
+     (asoc-unzip '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25)))
+     :result '((1 2 3 4 5) (1 4 9 16 25)))
+    ;; #keys > #values
+    (should-equal
+     (asoc-unzip '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25) (6) (7)))
+     :result '((1 2 3 4 5 6 7) (1 4 9 16 25 () ())))
     ;; empty list
     (should-equal
-     (asoc-uniq nil :keep-last)
+     (asoc-unzip nil)
+     :result '(() ()))
+    ;; empty values
+    (should-equal
+     (asoc-unzip '((1) (2) (3) (4) (5)))
+     :result '((1 2 3 4 5) (() () () () ())))
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-unzip-zip ()
+    "Tests for `asoc-zip' reversing `asoc-unzip'."
+    (let ((a '((1 . 1) (2 . 4) (1 . 1) (3 . 9) (1 . 1) (4 . 16) (5 . 25)))
+          (b nil)
+          (c '((1 . 1)))
+          (d '((nil . nil))))
+      (and
+       (should-equal
+        (apply #'asoc-zip (asoc-unzip a))
+        :result a)
+       (should-equal
+        (apply #'asoc-zip (asoc-unzip b))
+        :result b)
+       (should-equal
+        (apply #'asoc-zip (asoc-unzip c))
+        :result c)
+       (should-equal
+        (apply #'asoc-zip (asoc-unzip d))
+        :result d)
+       ))
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-zip-unzip ()
+    "Tests for `asoc-unzip' reversing `asoc-zip'."
+    ;; HOLDS
+    (let ((a '((1 2 1 3 1 4 5) (1 4 1 9 1 16 25)))
+          (b '(nil nil))
+          (c '((1) (1)))
+          (d '((nil) (nil))))
+      (should-equal
+       (asoc-unzip (apply #'asoc-zip a))
+       :result a)
+      (should-equal
+       (asoc-unzip (apply #'asoc-zip b))
+       :result b)
+      (should-equal
+       (asoc-unzip (apply #'asoc-zip c))
+       :result c)
+      (should-equal
+       (asoc-unzip (apply #'asoc-zip d))
+       :result d)
+      )
+    ;; DOESN'T HOLD
+    (let (;; #keys > #values
+          (a '((1 2 3 4 5 6 7) '(1 4 9 16 25)))
+          ;; string argument
+          (b '((1 2 3 4 5 6) "qwerty")))
+      (should-not-equal
+       (asoc-unzip (apply #'asoc-zip a))
+       :result a)
+      (should-not-equal
+       (asoc-unzip (apply #'asoc-zip b))
+       :result b))
+    )
+
+
+  (ert-deftest test-asoc-unit-tests-asoc-do ()
+    "Unit tests for `asoc-do'."
+    ;; error if the variable RESULT is not defined
+    (should-error
+     (let ((a '((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36))))
+       (let (sum)
+         (makunbound 'sum)
+         (asoc-do ((key value) a sum)
+           (when (symbolp key)
+             (setf sum (+ sum value)))))))
+    ;; return nil if result variable is not specified
+    (should-equal
+     (let ((a '((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36))))
+       (with-temp-buffer
+         (asoc-do ((k v) a )
+           (insert (format "%S\t%S\n" k v)))))
      :result nil)
-    ;; 1-element list
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc--do ()
+    "Unit tests for `asoc--do'."
+    ;; null alist returns nil
     (should-equal
-     (asoc-uniq '((1 . 1)) :keep-last)
-     :result '((1 . 1)))
-    ;; list with multiple repeats
+     (asoc--do nil
+       (setq result 'result-set))
+     :result nil)
+    ;; null alist with :initially clause runs init code
     (should-equal
-     (asoc-uniq '((1 . 1) (2 . 2) (1 . 3) (1 . 4) (1 . 5) (2 . 3)) :keep-last)
-     :result '((1 . 5) (2 . 3)))
+     (asoc--do nil
+       (:initially (setq result 'result-set)))
+     :result 'result-set)
+    ;; empty body returns nil
     (should-equal
-     (let* (( result   nil    )
-            ( p       '(1 2)  )
-            ( a       `( (1 1)   (,p 1)    ("a" 1) ('c 1) (nil 1) (t 1)
-                         (1 2)   (,p 2)    ("a" 2) ('c 2) (nil 2) (t 2)
-                         (1.0 3) ((1 2) 3) ("A" 3)                      )))
-       (dolist (f (list #'equalp #'equal #'eql #'eq))
-         (let (( asoc-compare-fn f ))
-           (push (list f ::: (asoc-uniq a :keep-last))
-                 result)))
-       (reverse result))
-     :result
-     '((equalp ::: (                                       ('c 2) (nil 2) (t 2) (1.0 3) ((1 2) 3) ("A" 3) ))
-       (equal  ::: (               (1 2)           ("a" 2) ('c 2) (nil 2) (t 2) (1.0 3) ((1 2) 3) ("A" 3) ))
-       (eql    ::: (("a" 1) ('c 1) (1 2) ((1 2) 2) ("a" 2) ('c 2) (nil 2) (t 2) (1.0 3) ((1 2) 3) ("A" 3) ))
-       (eq     ::: (("a" 1) ('c 1) (1 2) ((1 2) 2) ("a" 2) ('c 2) (nil 2) (t 2) (1.0 3) ((1 2) 3) ("A" 3) )))
-     )
-    ;; Duplicate floating point keys are removed with #'equalp, #'equal and #'eql
+     (asoc--do nil)
+     :result nil)
     (should-equal
-     (list
-      (append '(equalp :::)
-              (let ((asoc-compare-fn #'equalp))
-                (asoc-uniq '((1.0 . 1) (1.0 . 2)) :keep-last)))
-      (append '(equal :::)
-              (let ((asoc-compare-fn #'equal))
-                (asoc-uniq '((1.0 . 1) (1.0 . 2)) :keep-last)))
-      (append '(eql :::)
-              (let ((asoc-compare-fn #'eql))
-                (asoc-uniq '((1.0 . 1) (1.0 . 2)) :keep-last))))
-     :result
-     '((equalp ::: (1.0 . 2))
-       (equal  ::: (1.0 . 2))
-       (eql    ::: (1.0 . 2))))
+     (asoc--do '((a . 1) (b . 2) (c . 4)))
+     :result nil)
+    ;; sample code and alists
+    (should-equal
+     (asoc--do '((a . 1) (b . 2) (c . 4))
+       (push value result))
+     :result '(4 2 1))
+    (should-equal
+     (asoc--do '((a . 1) (b . 2) (c . 4))
+       (:initially (setq result 0))
+       (setq result (+ result value)))
+     :result 7)
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-map-values ()
+    "Unit tests for `asoc-map-values'."
+    (should-equal
+     (let ((a '((1 . 1) (2 . 4) (3 . 9) (4 . 16) (5 . 25))))
+       (asoc-map-values (lambda (x) (* x x)) a))
+     :result '((1 . 1) (2 . 16) (3 . 81) (4 . 256) (5 . 625)))
+    ;; empty alist
+    (should-equal
+     (let ((a nil))
+       (asoc-map-values (lambda (x) (* x x)) a))
+     :result nil)
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-fold ()
@@ -1287,8 +1287,8 @@
            (setf result (+ result value)))))
      :result 30))
 
-  (ert-deftest test-asoc-unit-tests-asoc-map ()
-    "Unit tests for `asoc-map'."
+  (ert-deftest test-asoc-docstring-examples-asoc-map ()
+    "Docstring examples for `asoc-map'."
     (should-equal
      (asoc-map (lambda (k v) (cons k (when (symbolp k) v)))
                '((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36)))
@@ -1298,8 +1298,8 @@
                '((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36)))
      :result '(1 4 nil nil 25 nil)))
 
-  (ert-deftest test-asoc-unit-tests-asoc-map-keys ()
-    "Unit tests for `asoc-map-keys'."
+  (ert-deftest test-asoc-docstring-examples-asoc-map-keys ()
+    "Docstring examples for `asoc-map-keys'."
     (should-equal
      (asoc-map-keys #'symbol-name
                     '((one . 1) (two . 4) (three . 9) (four . 16) (five . 25)))
@@ -1371,8 +1371,8 @@
                   (reverse a) nil))
      :result '(1 2 3 5 10)))
 
-  (ert-deftest test-asoc-unit-tests-asoc--fold ()
-    "Unit tests for `asoc--fold'."
+  (ert-deftest test-asoc-docstring-examples-asoc--fold ()
+    "Docstring examples for `asoc--fold'."
     ;; list of keys with value of 0
     (should-equal
      (let ((a '((1 . 0) (2 . 0) (3 . 0) (4 . 1) (5 . 0)
