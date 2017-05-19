@@ -298,6 +298,7 @@ Example:
 When KEY already exists, if REPLACE is non-nil, previous entries with that key
 are removed. Otherwise, the pair is simply consed on the front of the alist.
 In the latter case, this is equivalent to `acons'."
+  (declare (debug (sexp sexp sexp &optional sexp)))
   `(progn
      (when ,replace
        (setq ,alist (map-filter (lambda (k _) (not (asoc---compare k ,key)))
@@ -393,7 +394,7 @@ Example:
   ;; add values associated with all keys that are symbols.
 
 \(fn ((KEYVAR VALUEVAR) ALIST [RESULT]) BODY...)"
-  (declare (debug (((sexp sexp) form) body))
+  (declare (debug (((sexp sexp) form [&optional sexp]) body))
            (indent 1))
   (let* ((vars    (car spec))
          (kvar    (car vars))
@@ -564,7 +565,7 @@ Example: list of keys with value of 0
       (asoc--fold (if (zerop value) (cons key acc) acc)
         (reverse a) nil))
     ;; (1 2 3 5 10)"
-  (declare (debug (sexp sexp sexp))
+  (declare (debug (form sexp sexp))
            (indent 1))
   `(asoc-fold (lambda (key value acc) ,form)
               ,alist ,init))
