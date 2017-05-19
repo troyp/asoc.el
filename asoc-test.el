@@ -1166,6 +1166,46 @@
      :result 7)
     )
 
+  (ert-deftest test-asoc-unit-tests-asoc-map ()
+    "Unit tests for `asoc-map'."
+    ;; empty list
+    (should-equal
+     (let ((a nil))
+       (asoc-map (lambda (k v) (* k v)) a))
+     :result nil)
+    ;; #'cons is the identity
+    (let ((alists '( nil
+                     ((a . 1) (b . 2) (c . 3) (d . 4) (e . 5))
+                     ((a . 1) (a . 2) (a . nil))
+                     ((1 . 1) (2 . 2) (3 . 3) (4 . 4))         )))
+      (dolist (a alists)
+        (should-equal
+         (asoc-map #'cons a)
+         :result a)))
+    ;; mapping #'list
+    (should-equal
+     (let ((a '((a . 1) (b . 2) (c . 3) (d . 4) (e . 5))))
+       (asoc-map #'list a))
+     :result '((a 1) (b 2) (c 3) (d 4) (e 5)))
+    )
+  (ert-deftest test-asoc-unit-tests-asoc-map-keys ()
+    "Unit tests for `asoc-map-keys'."
+    ;; empty list
+    (should-equal
+     (let ((a nil))
+       (asoc-map-keys (lambda (k) (* k k)) a))
+     :result nil)
+    ;; #'identity
+    (let ((alists '( nil
+                     ((a . 1) (b . 2) (c . 3) (d . 4) (e . 5))
+                     ((a . 1) (a . 2) (a . nil))
+                     ((1 . 1) (2 . 2) (3 . 3) (4 . 4))         )))
+      (dolist (a alists)
+        (should-equal
+         (asoc-map-keys #'identity a)
+         :result a)))
+    )
+
   (ert-deftest test-asoc-unit-tests-asoc-map-values ()
     "Unit tests for `asoc-map-values'."
     (should-equal
@@ -1177,6 +1217,15 @@
      (let ((a nil))
        (asoc-map-values (lambda (x) (* x x)) a))
      :result nil)
+    ;; #'identity
+    (let ((alists '( nil
+                     ((a . 1) (b . 2) (c . 3) (d . 4) (e . 5))
+                     ((a . 1) (a . 2) (a . nil))
+                     ((1 . 1) (2 . 2) (3 . 3) (4 . 4))         )))
+      (dolist (a alists)
+        (should-equal
+         (asoc-map-values #'identity a)
+         :result a)))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-fold ()
