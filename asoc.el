@@ -98,6 +98,19 @@ determined by `asoc-compare-fn'."
         (mapcar (lambda (x) (if (funcall pred x) DELMARKER x))
                 list))))
 
+(defun asoc---list-take (n list)
+  "Return the first N elements of LIST.
+
+If there are insufficient elements, return LIST."
+  (let ( result
+         (i 0)
+         (rest list) )
+    (while (and (< i n)
+                rest)
+      (push (car rest) result)
+      (setq rest (cdr rest))
+      (incf i))
+    (nreverse result)))
 
 ;; ,----------------------------------,
 ;; | Constructor and Filter Functions |

@@ -230,6 +230,27 @@
      :result '(nil nil))
     )
 
+  (ert-deftest test-asoc-unit-tests-asoc---list-take ()
+    "Unit tests for `asoc---list-take'."
+    ;; empty list
+    (should-equal (asoc---list-take 0 nil) :result nil)
+    (should-equal (asoc---list-take 1 nil) :result nil)
+    (should-equal (asoc---list-take 5 nil) :result nil)
+    ;; one element
+    (should-equal (asoc---list-take 0 '(a)) :result nil)
+    (should-equal (asoc---list-take 1 '(a)) :result '(a))
+    (should-equal (asoc---list-take 5 '(a)) :result '(a))
+    ;; many elements
+    (let ((alist (number-sequence 1 10)))
+      (should-equal (asoc---list-take 0 alist) :result nil)
+      (should-equal (asoc---list-take 1 alist) :result '(1))
+      (should-equal (asoc---list-take 5 alist) :result '(1 2 3 4 5)))
+    ;; 1st argument not a number/marker
+    (should-error (asoc---list-take nil nil) :type 'wrong-type-argument)
+    ;; 2nd argument not a list
+    (should-error (asoc---list-take 5 5) :type 'wrong-type-argument)
+    )
+
   (ert-deftest test-asoc-unit-tests-asoc-make ()
     "Unit tests for `asoc-make'."
     ;; no args
