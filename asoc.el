@@ -4,7 +4,7 @@
 
 ;; Author: Troy Pracy
 ;; Keywords: alist data-types
-;; Version: 0.3.1
+;; Version: 0.3.2
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -134,12 +134,12 @@ Example:
     ;; ((a . 4) (c . 5) (b . 2))"
   (asoc---uniq (apply #'append (nreverse alists))))
 
-(defun asoc-uniq (alist &optional keep)
+(defun asoc-uniq (alist &optional keep-last)
   "Return a copy of ALIST with duplicate keys removed.
 
 By default, the first occurrence of each key is retained.
 
-If KEEP is :keep-last, the last occurrence of each key is retained.
+If KEEP-LAST is non-nil, the last occurrence of each key is retained.
 
 Examples:
 
@@ -148,7 +148,7 @@ Examples:
     (asoc-uniq '((a 1) (b 2) (b 3) (c 4) (a 5)) :keep-last)
     ;; ((b 3) (c 4) (a 5))"
   (declare (indent 1))
-  (if (eq keep :keep-last)
+  (if keep-last
       (nreverse (asoc---uniq (reverse alist)))
     (asoc---uniq alist)))
 
