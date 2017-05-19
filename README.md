@@ -62,6 +62,8 @@ disassembling alists.
 
 [Other Packages](#other-packages)
 
+[Handling Alist Variants](#handling-alist-variants)
+
 -------------------------------------------------------------------------------
 
 ## Conventions
@@ -397,6 +399,49 @@ been processed.
       (asoc--fold (if (zerop value) (cons key acc) acc)
         (reverse a) nil))
     ;; (1 2 3 5 10)
+
+-------------------------------------------------------------------------------
+## Handling Alist Variants
+
+### List of duples: ( (key1 value1) (key2 value2) ... )
+
+An alternative format for describing a key-value mapping is a list whose
+elements are 2-element `(key value)` sublists, rather than `(key . value)`
+cons cells.
+
+A list of this form is equivalent to an alist whose values are all wrapped in
+lists.
+
+    ( (key1 . (value1)) (key2 . (value2)) ... )
+
+Although this is pointless, such pseudo-alists are common, perhaps because the
+literals are more concise than those of true alists.
+
+Such lists can be processed with alist functions if you remember to wrap and
+unwrap the value as needed. Alternatively, you can convert the list to an alist
+prior to processing:
+
+    (let (my-alist (asoc-map-values #'car my-duplelist))
+      .... )
+
+When converting such a list, be careful to ensure that it strictly associates
+one key with one value. Sometimes an alist will legitimately have list values
+to allow a key to be associated with multiple values:
+
+    ( (key1 value1) (key2 value2a value2b) ... )
+    ;; or equivalently:
+    ( (key1 . (value1)) (key2 . (value2a value2b)) ... )
+
+This is a true alist whose values simply happen to be lists.
+
+### Flat key-value list: (key1 value 1 key2 value2 ...)
+
+Another form of key-value list is a flat list with alternating keys and values.
+
+Such a list can be converted to an alist with `asoc-partition`
+
+    (let ((my-alist (asoc-partition my-flatlist)))
+      .... )
 
 -------------------------------------------------------------------------------
 
