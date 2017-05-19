@@ -32,6 +32,7 @@ disassembling alists.
 * [asoc-remove](#asoc-remove-predicate-alist) `(predicate alist)`
 * [asoc-remove-keys](#asoc-remove-keys-predicate-alist) `(predicate alist)`
 * [asoc-remove-values](#asoc-remove-values-predicate-alist) `(predicate alist)`
+* [asoc-partition](#asoc-partition-flatlist) `(flatlist)`
 
 ### Predicates
 * [asoc-contains-key?](#asoc-contains-key-alist-key) `(alist key)`
@@ -204,6 +205,13 @@ Return a copy of `alist` with pairs whose value satisfying `predicate` removed.
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-remove-values (lambda (v) (<= v 3)) fib))
     ;; ((5 . 5) (6 . 8) (7 . 13) (8 . 21))
+
+### asoc-partition `(flatlist)`
+
+Return an alist whose keys and values are taken alternately from `flatlist`.
+
+    (asoc-partition `(a 1 b 2 c 3 d 4 e 5 f 6))
+    ;; ((a . 1) (b . 2) (c . 3) (d . 4) (e . 5) (f . 6))
 
 -------------------------------------------------------------------------------
 

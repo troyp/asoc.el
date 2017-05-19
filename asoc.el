@@ -4,7 +4,7 @@
 
 ;; Author: Troy Pracy
 ;; Keywords: alist data-types
-;; Version: 0.3.0
+;; Version: 0.3.1
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -239,6 +239,22 @@ Example: filter out pairs where VALUE <= 3
 (defalias 'asoc-reject 'asoc-remove)
 (defalias 'asoc-reject-keys 'asoc-remove-keys)
 (defalias 'asoc-reject-values 'asoc-remove-values)
+
+(defun asoc-partition (flatlist)
+  "Return an alist whose keys and values are taken alternately from FLATLIST.
+
+Example:
+    (asoc-partition '(a 1 b 2 c 3 d 4 e 5 f 6))
+    ;; ((a . 1) (b . 2) (c . 3) (d . 4) (e . 5) (f . 6))"
+  (let ( alist
+         (rest flatlist) )
+    (while rest
+      (let (key value)
+        (setq key   (car rest))
+        (setq value (cadr rest))
+        (setq rest  (cddr rest))
+        (push (cons key value) alist)))
+    (nreverse alist)))
 
 ;; ,------------,
 ;; | Predicates |

@@ -739,6 +739,37 @@
      :result '((b) (nil)))
     )
 
+  (ert-deftest test-asoc-unit-tests-asoc-partition ()
+    "Unit tests for `asoc-partition'."
+    ;; empty list
+    (should-equal
+     (asoc-partition nil)
+     :result nil)
+    ;; one element list: value is nil
+    (should-equal
+     (asoc-partition '(a))
+     :result '((a . nil)))
+    ;; two element list
+    (should-equal
+     (asoc-partition '(a 1))
+     :result '((a . 1)))
+    ;; three element list: last value is nil
+    (should-equal
+     (asoc-partition '(a 1 b 2 c))
+     :result '((a . 1) (b . 2) (c . nil)))
+    ;; repeats
+    (should-equal
+     (asoc-partition '(a 1 a 1))
+     :result '((a . 1) (a . 1)))
+    ;; non-list
+    (should-error
+     (asoc-partition 1)
+     :type 'wrong-type-argument)
+    (should-error
+     (asoc-partition "string")
+     :type 'wrong-type-argument)
+    )
+
   (ert-deftest test-asoc-unit-tests-asoc-contains-key? ()
     "Unit tests for `asoc---contains-key?'."
     (should-equal
@@ -1425,6 +1456,12 @@
      (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
        (asoc-remove-values (lambda (v) (<= v 3)) fib))
      :result '((5 . 5) (6 . 8) (7 . 13) (8 . 21))))
+
+  (ert-deftest test-asoc-docstring-examples-asoc-partition ()
+    "Docstring examples for `asoc-partition'."
+    (should-equal
+     (asoc-partition '(a 1 b 2 c 3 d 4 e 5 f 6))
+     :result '((a . 1) (b . 2) (c . 3) (d . 4) (e . 5) (f . 6))))
 
   (ert-deftest test-asoc-docstring-examples-asoc-fold ()
     "Docstring examples for `asoc-fold'."
