@@ -489,7 +489,7 @@ Examples:
 (defmacro asoc--map (form alist)
   "Anaphoric variant of `asoc-map'.
 
-Evaluate FORM to each element of ALIST and return the resulting list.
+Evaluate FORM for each element of ALIST and return the resulting list.
 The anaphoric variables 'key and 'value are available for use in FORM.
 
 Examples:

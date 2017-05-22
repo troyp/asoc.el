@@ -350,8 +350,8 @@ Apply `func` to each element of `alist` and return the resulting list.
 
 Anaphoric variant of `asoc-map`.
 
-Evaluate `form` to each element of `alist` and return the resulting list.
-The anaphoric variables `key and 'value are available for use in `form`.
+Evaluate `form` for each element of `alist` and return the resulting list.
+The anaphoric variables `'key` and `'value` are available for use in `form`.
 
     (asoc--map
         (cons (intern (concat (symbol-name key) "-squared"))
