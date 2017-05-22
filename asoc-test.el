@@ -1240,6 +1240,27 @@
        (asoc-map #'list a))
      :result '((a 1) (b 2) (c 3) (d 4) (e 5)))
     )
+
+  (ert-deftest test-asoc-unit-tests-asoc--map ()
+    "Unit tests for `asoc--map'."
+    ;; empty list
+    (should-equal (asoc--map (* key value) nil) :result nil)
+    ;; (cons key value) is the identity
+    (let ((alists '( nil
+                     ((a . 1) (b . 2) (c . 3) (d . 4) (e . 5))
+                     ((a . 1) (a . 2) (a . nil))
+                     ((1 . 1) (2 . 2) (3 . 3) (4 . 4))         )))
+      (dolist (a alists)
+        (should-equal
+         (asoc--map (cons key value) a)
+         :result a)))
+    ;; mapping (list key value)
+    (should-equal
+     (let ((a '((a . 1) (b . 2) (c . 3) (d . 4) (e . 5))))
+       (asoc--map (list key value) a))
+     :result '((a 1) (b 2) (c 3) (d 4) (e 5)))
+    )
+
   (ert-deftest test-asoc-unit-tests-asoc-map-keys ()
     "Unit tests for `asoc-map-keys'."
     ;; empty list
@@ -1394,12 +1415,29 @@
                '((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36)))
      :result '(1 4 nil nil 25 nil)))
 
-  (ert-deftest test-asoc-docstring-examples-asoc-map-keys ()
-    "Docstring examples for `asoc-map-keys'."
+  (ert-deftest test-asoc-docstring-examples-asoc--map ()
+    "Docstring examples for `asoc--map'."
     (should-equal
-     (asoc-map-keys #'symbol-name
-                    '((one . 1) (two . 4) (three . 9) (four . 16) (five . 25)))
-     :result '(("one" . 1) ("two" . 4) ("three" . 9) ("four" . 16) ("five" . 25))))
+     (asoc--map
+         (cons (intern (concat (symbol-name key) "-squared"))
+               (* value value))
+       '((one . 1) (two . 2) (three . 3) (four . 4)))
+     :result '((one-squared . 1) (two-squared . 4) (three-squared . 9) (four-squared . 16)))
+    (should-equal
+     (asoc--map (cons (intern key) value)
+       '(("one" . 1) ("two" . 2) ("three" . 3)))
+     :result '((one . 1) (two . 2) (three . 3)))
+    (should-equal
+     (asoc--map (format "%s=%d;" key value)
+       '((one . 1) (two . 2) (three . 3) (four . 4)))
+     :result '("one=1;" "two=2;" "three=3;" "four=4;")))
+
+    (ert-deftest test-asoc-docstring-examples-asoc-map-keys ()
+      "Docstring examples for `asoc-map-keys'."
+      (should-equal
+       (asoc-map-keys #'symbol-name
+                      '((one . 1) (two . 4) (three . 9) (four . 16) (five . 25)))
+       :result '(("one" . 1) ("two" . 4) ("three" . 9) ("four" . 16) ("five" . 25))))
 
   (ert-deftest test-asoc-docstring-examples-asoc-map-values ()
     "Docstring examples for `asoc-map-values'."

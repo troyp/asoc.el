@@ -53,6 +53,7 @@ disassembling alists.
 
 ### Mapping Functions
 * [asoc-map](#asoc-map-function-alist) `(function alist)`
+* [asoc--map](#asoc--map-form-alist) `(form alist)`
 * [asoc-map-keys](#asoc-map-keys-func-alist) `(func alist)`
 * [asoc-map-values](#asoc-map-values-func-alist) `(func alist)`
 
@@ -344,6 +345,27 @@ Apply `func` to each element of `alist` and return the resulting list.
     (asoc-map (lambda (k v) (when (symbolp k) v))
               '((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36)))
     ;; (1 4 nil nil 25 nil)
+
+### asoc--map `(form alist)`
+
+Anaphoric variant of `asoc-map`.
+
+Evaluate `form` to each element of `alist` and return the resulting list.
+The anaphoric variables `key and 'value are available for use in `form`.
+
+    (asoc--map
+        (cons (intern (concat (symbol-name key) "-squared"))
+              (* value value))
+      `((one . 1) (two . 2) (three . 3) (four . 4)))
+    ;; ((one-squared . 1) (two-squared . 4) (three-squared . 9) (four-squared . 16))
+
+    (asoc--map (cons (intern key) value)
+      '(("one" . 1) ("two" . 2) ("three" . 3)))
+    ((one . 1) (two . 2) (three . 3))
+
+    (asoc--map (format "%s=%d;" key value)
+      '((one . 1) (two . 2) (three . 3) (four . 4)))
+    ("one=1;" "two=2;" "three=3;" "four=4;")
 
 ### asoc-map-keys `(func alist)`
 

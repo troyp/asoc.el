@@ -4,7 +4,7 @@
 
 ;; Author: Troy Pracy
 ;; Keywords: alist data-types
-;; Version: 0.3.2
+;; Version: 0.3.3
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -485,6 +485,31 @@ Examples:
                   (value (cdr k.v)))
               (funcall func key value)))
           alist))
+
+(defmacro asoc--map (form alist)
+  "Anaphoric variant of `asoc-map'.
+
+Evaluate FORM to each element of ALIST and return the resulting list.
+The anaphoric variables 'key and 'value are available for use in FORM.
+
+Examples:
+
+    (asoc--map
+        (cons (intern (concat (symbol-name key) \"-squared\"))
+              (* value value))
+      '((one . 1) (two . 2) (three . 3) (four . 4)))
+    ;; ((one-squared . 1) (two-squared . 4) (three-squared . 9) (four-squared . 16))
+
+    (asoc--map (cons (intern key) value)
+      '((\"one\" . 1) (\"two\" . 2) (\"three\" . 3)))
+    ((one . 1) (two . 2) (three . 3))
+
+    (asoc--map (format \"%s=%d;\" key value)
+      '((one . 1) (two . 2) (three . 3) (four . 4)))
+    (\"one=1;\" \"two=2;\" \"three=3;\" \"four=4;\")"
+  (declare (debug (form sexp))
+           (indent 1))
+  `(asoc-map (lambda (key value) ,form) ,alist))
 
 (defun asoc-map-keys (func alist)
   "Return a modified copy of alist with keys transformed by FUNC.
