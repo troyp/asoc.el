@@ -517,6 +517,38 @@
      :result '((2 . -44) (3 . -90) (4 . -144) (7 . -294) (8 . -320) (9 . -324)))
     )
 
+  (ert-deftest test-asoc-unit-tests-asoc--filter ()
+    "Unit tests for `asoc--filter'."
+    ;; empty list
+    (should-equal (asoc--filter t nil) :result nil)
+    ;; constant true and false forms
+    (should-equal
+     (let ( table t-resultlist nil-resultlist
+            (alists '(nil
+                      ((x . t))
+                      ((x . t) (x . t))
+                      ((x . t) (y . t) (z . t)))))
+       (dolist (alist alists)
+         (push (asoc--filter t alist) t-resultlist)
+         (push (asoc--filter nil alist) nil-resultlist))
+       (push (list 't  ::: (reverse t-resultlist)) table)
+       (push (list nil ::: (reverse nil-resultlist)) table)
+       (reverse table))
+     :result '( (t :::   ( nil  ((x . t))  ((x . t) (x . t))  ((x . t) (y . t) (z . t)) ))
+                (nil ::: ( nil     nil            nil                    nil            )) ))
+    ;; sample forms and alists
+    (should-equal
+     (asoc--filter value    ;; filter non-nil values
+       '((a . 1) (b . nil) (c . 3) (d . 4) (e . nil) (f . nil) (g . 7)))
+     :result '((a . 1) (c . 3) (d . 4) (g . 7)))
+    (let ((f1 (lambda () 'dummy-function))
+          (f2 (lambda () 'dummy-function)))
+      (should-equal
+       (asoc--filter (and (symbolp key) (functionp value))
+         `(("a" . ,f1) (b . x) (c . ,f1) ("d" . y) (e . ,f2) (f . nil)))
+       :result `((c . ,f1) (e . ,f2))))
+    )
+
   (ert-deftest test-asoc-unit-tests-asoc-filter-keys ()
     "Unit tests for `asoc-filter-keys'."
     ;; empty list
@@ -1459,6 +1491,13 @@
      (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
        (asoc-filter #'> fib))
      :result '((2 . 1) (3 . 2) (4 . 3))))
+
+  (ert-deftest test-asoc-docstring-examples-asoc--filter ()
+    "Docstring examples for `asoc--filter'."
+    (should-equal
+     (asoc--filter (not (eq key value))
+       '((a . b) (b . c) (c . c) (d . a) (e . e)))
+     :result '((a . b) (b . c) (d . a))))
 
   (ert-deftest test-asoc-docstring-examples-asoc-filter-keys ()
     "Docstring examples for `asoc-filter-keys'."

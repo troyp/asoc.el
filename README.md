@@ -27,6 +27,7 @@ disassembling alists.
 * [asoc-uniq](#asoc-uniq-alist-optional-keep-last) `(alist &optional keep-last)`
 * [asoc-sort-keys](#asoc-sort-keys-alist-comparator) `(alist comparator)`
 * [asoc-filter](#asoc-filter-predicate-alist) `(predicate alist)`
+* [asoc--filter](#asoc--filter-form-alist) `(form alist)`
 * [asoc-filter-keys](#asoc-filter-keys-predicate-alist) `(predicate alist)`
 * [asoc-filter-values](#asoc-filter-values-predicate-alist) `(predicate alist)`
 * [asoc-remove](#asoc-remove-predicate-alist) `(predicate alist)`
@@ -158,6 +159,20 @@ Return a copy of `alist` with key-value pairs failing `predicate` removed.
     (let ((fib `((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-filter #'> fib))
     ;; ((2 . 1) (3 . 2) (4 . 3))
+
+### asoc--filter `(form alist)`
+
+Anaphoric variant of `asoc-filter`.
+
+Return a list of those `alist` elements for which `form` evaluates t.
+
+The included elements remain in their original order. The anaphoric variables
+`'key` and `'value` are available for use in `form`.
+
+    ;; remove nodes where the key is associated with itself
+    (asoc--filter (not (eq key value))
+      `((a . b) (b . c) (c . c) (d . a) (e . e)))
+    ;; ((a . b) (b . c) (d . a))
 
 ### asoc-filter-keys `(predicate alist)`
 

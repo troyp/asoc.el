@@ -4,7 +4,7 @@
 
 ;; Author: Troy Pracy
 ;; Keywords: alist data-types
-;; Version: 0.3.3
+;; Version: 0.3.4
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -177,6 +177,24 @@ Example: filter for pairs where KEY > VALUE
       (asoc-filter #'> fib))
     ;; ((2 . 1) (3 . 2) (4 . 3))"
   (asoc---list-filter (lambda (pair) (funcall predicate (car pair) (cdr pair))) alist))
+
+(defmacro asoc--filter (form alist)
+  "Anaphoric variant of `asoc-filter'.
+
+Return a list of those ALIST elements for which FORM evaluates t.
+
+The included elements remain in their original order. The anaphoric variables
+'key and 'value are available for use in FORM.
+
+Examples:
+
+    ;; remove nodes where the key is associated with itself
+    (asoc--filter (not (eq key value))
+      '((a . b) (b . c) (c . c) (d . a) (e . e)))
+    ;; ((a . b) (b . c) (d . a))"
+  (declare (debug (form sexp))
+           (indent 1))
+  `(asoc-filter (lambda (key value) ,form) ,alist))
 
 (defun asoc-filter-keys (predicate alist)
   "Return a copy of ALIST with keys failing PREDICATE removed.
