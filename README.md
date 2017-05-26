@@ -1,9 +1,9 @@
-# asoc.el -- Associative List Library for Emacs Lisp.
+# asoc.el -- Association List Library for Emacs Lisp.
 
 Emacs Lisp provides only minimal facilities for dealing with alists, while using
 standard list functions is awkward and requires additional processing.
 
-`asoc` provides a rich API for creating, accessing and manipulating associative
+`asoc` provides a rich API for creating, accessing and manipulating association
 lists.
 
 __note on builtin list functions__: For some operations, no distinction need be made
