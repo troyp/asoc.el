@@ -23,8 +23,8 @@ disassembling alists.
 * [asoc-make](#asoc-make-optional-keys-default) `(&optional keys default)`
 * [asoc-copy](#asoc-copy-alist) `(alist)`
 * [asoc-zip](#asoc-zip-keys-values) `(keys values)`
+* [asoc-uniq](#asoc-uniq-alist) `(alist)`
 * [asoc-merge](#asoc-merge-rest-alists) `(&rest alists)`
-* [asoc-uniq](#asoc-uniq-alist-optional-keep-last) `(alist &optional keep-last)`
 * [asoc-sort-keys](#asoc-sort-keys-alist-comparator) `(alist comparator)`
 * [asoc-filter](#asoc-filter-predicate-alist) `(predicate alist)`
 * [asoc--filter](#asoc--filter-form-alist) `(form alist)`
@@ -122,25 +122,24 @@ Return a shallow copy of ALIST.
 Return an alist associating `keys` with corresponding `values`.
 If `keys` is longer than `values`, the excess `keys` have value nil.
 
+### asoc-uniq `(alist)`
+
+Return a copy of `alist` with duplicate keys removed.
+
+The first occurrence of each key is retained.
+
+    (asoc-uniq `((a 1) (b 2) (b 3) (c 4) (a 5)))
+    ;; ((a 1) (b 2) (c 4))
+
 ### asoc-merge `(&rest alists)`
 
 Return an alist with unique keys resulting from merging `alists`.
 
-When identical keys occur in two alists, the latter takes precedence. When
-identical keys occur within a single alist, the foremost takes precedence.
+When identical keys occur in two alists, the latter alist takes precedence.
+When identical keys occur within a single alist, the foremost takes precedence
+(as usual).
 
-### asoc-uniq `(alist &optional keep-last)`
-
-Return a copy of `alist` with duplicate keys removed.
-
-By default, the first occurrence of each key is retained.
-
-If `keep-last` is non-nil, the last occurrence of each key is retained.
-
-    (asoc-uniq `((a 1) (b 2) (b 3) (c 4) (a 5)))
-    ;; ((a 1) (b 2) (c 4))
-    (asoc-uniq '((a 1) (b 2) (b 3) (c 4) (a 5)) :keep-last)
-    ;; ((b 3) (c 4) (a 5))
+With a single argument, equivalent to `asoc-uniq'.
 
 ### asoc-sort-keys `(alist comparator)`
 

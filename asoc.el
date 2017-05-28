@@ -4,7 +4,7 @@
 
 ;; Author: Troy Pracy
 ;; Keywords: alist data-types
-;; Version: 0.3.5
+;; Version: 0.4.0
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -122,35 +122,33 @@ If there are insufficient elements, return LIST."
 
 (defalias 'asoc-copy 'copy-sequence "Return a shallow copy of ALIST.")
 
+(defun asoc-uniq (alist)
+  "Return a copy of ALIST with duplicate keys removed.
+
+The first occurrence of each key is retained.
+
+Example:
+
+    (asoc-uniq '((a 1) (b 2) (b 3) (c 4) (a 5)))
+    ;; ((a 1) (b 2) (c 4))"
+  (declare (indent 1))
+  (asoc---uniq alist))
+
 (defun asoc-merge (&rest alists)
   "Return an alist with unique keys resulting from merging ALISTS.
 
-When identical keys occur in two alists, the latter takes precedence. When
-identical keys occur within a single alist, the foremost takes precedence.
+When identical keys occur in two alists, the latter alist takes precedence.
+When identical keys occur within a single alist, the foremost takes precedence
+(as usual).
+
+With a single argument, equivalent to `asoc-uniq'.
+
 Example:
 
     (asoc-merge '((a . 1) (b . 2) (a . 4))
                 '((a . 4) (c . 5) (c . 6)))
     ;; ((a . 4) (c . 5) (b . 2))"
   (asoc---uniq (apply #'append (nreverse alists))))
-
-(defun asoc-uniq (alist &optional keep-last)
-  "Return a copy of ALIST with duplicate keys removed.
-
-By default, the first occurrence of each key is retained.
-
-If KEEP-LAST is non-nil, the last occurrence of each key is retained.
-
-Examples:
-
-    (asoc-uniq '((a 1) (b 2) (b 3) (c 4) (a 5)))
-    ;; ((a 1) (b 2) (c 4))
-    (asoc-uniq '((a 1) (b 2) (b 3) (c 4) (a 5)) :keep-last)
-    ;; ((b 3) (c 4) (a 5))"
-  (declare (indent 1))
-  (if keep-last
-      (nreverse (asoc---uniq (reverse alist)))
-    (asoc---uniq alist)))
 
 (defun asoc-sort-keys (alist comparator)
   "Return a copy of ALIST sorted by keys.
