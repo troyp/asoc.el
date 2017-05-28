@@ -65,6 +65,7 @@ disassembling alists.
 ### [Handling Alist Variants](#handling-alist-variants-1)
 * [List of duples](list-of-duples)
 * [Flat key-value list](flat-key-value-list)
+* [Multi-valued alist](#multi-valued-alist)
 
 ### [Other Packages](#other-packages-1)
 
@@ -485,6 +486,21 @@ Such a list can be converted to an alist with `asoc-partition`
 
     (let ((my-alist (asoc-partition my-flatlist)))
       .... )
+
+### Multi-valued alist
+
+__`(... (key1 . value1a) ... (key1 . value1b) ...)`__
+
+Normally, an alist may allow multiple associations with the same key, but only
+considers the first when accessing a value. This allows the value for a key to
+be non-destructively changed ("shadowed") by simply pushing an association onto
+the alist, and the change to be reversed by removing that association.
+
+However, sometimes, a list may contain multiple key-value associations, all of which are
+relevant, ie. a key has multiple values.
+
+Such a multi-valued alist is best converted into a list-valued alist using
+`asoc-merge-values`.
 
 -------------------------------------------------------------------------------
 
