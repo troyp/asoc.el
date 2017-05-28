@@ -321,7 +321,8 @@ In the latter case, this is equivalent to `acons'."
      (when ,replace
        (setq ,alist (map-filter (lambda (k _) (not (asoc---compare k ,key)))
                                 ,alist)))
-     (setq ,alist (cons (cons ,key ,value) ,alist))))
+     (push (cons ,key ,value) ,alist)))
+     ;; (setq ,alist (cons (cons ,key ,value) ,alist))))
 
 (defun asoc-delete! (alist key &optional remove-all)
   "Return a modified list excluding the first, or all, pair(s) with KEY.
