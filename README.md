@@ -61,6 +61,7 @@ disassembling alists.
 ### Folds
 * [asoc-fold](#asoc-fold-func-alist-init) `(func alist init)`
 * [asoc--fold](#asoc--fold-form-alist-init) `(form alist init)`
+* [asoc-merge-values](#asoc-merge-values-rest-alists) `(&rest alists)`
 
 ### [Handling Alist Variants](#handling-alist-variants-1)
 * [List of duples](list-of-duples)
@@ -442,6 +443,17 @@ been processed.
         (reverse a) nil))
     ;; (1 2 3 5 10)
 
+### asoc-merge-values `(&rest alists)`
+
+Return an alist merging multiple occurrences of each key in `alists`.
+
+Each key is associated with a list containing all values in `alists` which were
+associated with the key, in order.
+
+    (let ( (a `((a . 1) (b . 2) (a . 1) (c . 3) (b . 4)))
+           (b '((a . 5))) )
+      (asoc-merge-values a b))
+    ;; ((a 1 1 5) (b 2 4) (c 3))
 -------------------------------------------------------------------------------
 ## Handling Alist Variants
 

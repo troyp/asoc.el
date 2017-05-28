@@ -1400,6 +1400,60 @@
      :result 4)
     )
 
+  (ert-deftest test-asoc-unit-tests-asoc-merge-values ()
+    "Unit tests for `asoc-merge-values'."
+    ;; empty list(s)
+    (should-equal
+     (asoc-merge-values nil)
+     :result nil)
+    (should-equal
+     (asoc-merge-values nil nil nil)
+     :result nil)
+    ;; repeated key, one list
+    (should-equal
+     (asoc-merge-values '((a . 1) (a . 2) (a . 1)))
+     :result '((a 1 2 1)))
+    ;; no repeated keys, one list
+    (should-equal
+     (asoc-merge-values '((a . 1) (b . 2) (c . 3)))
+     :result '((a 1) (b 2) (c 3)))
+    ;; repeated key, multiple lists
+    (should-equal
+     (let ((al1 '((a . 1) (a . 2) (a . 3)))
+           (al2 '((a . 1) (a . 2)))
+           (al3 '((a . 4) (a . 5) (a . 6))))
+     (asoc-merge-values al1 al2 al3))
+     :result '((a 1 2 3 1 2 4 5 6)))
+    ;; repeated key with null values
+    (should-equal
+     (asoc-merge-values '((a . nil) (a . nil) (a . nil)))
+     :result '((a nil nil nil)))
+    ;; multiple lists, multiple distinct repeated keys
+    (should-equal
+     (let ((al1 '((a . 1) (b . 2) (a . 3)))
+           (al2 '((b . 1) (b . 2) (c . 3)))
+           (al3 '((b . 4) (d . 5) (b . 6))))
+       (asoc-merge-values al1 al2 al3))
+     :result '((a 1 3) (b 2 1 2 4 6) (c 3) (d 5)))
+    ;; no repeated keys, multiple lists
+    (should-equal
+     (let ((al1 '((a . 1) (b . 2) (c . 3)))
+           (al2 '((c . 4) (d . 5)))
+           (al3 '((e . 6) (f . 7))))
+       (asoc-merge-values al1 al2 al3))
+     :result '((a 1) (b 2) (c 3 4) (d 5) (e 6) (f 7)))
+    ;; non-destructive
+    (should-equal
+     (let ((al1 '((a . 1) (b . 2) (a . 3)))
+           (al2 '((b . 1) (b . 2) (c . 3)))
+           (al3 '((b . 4) (d . 5) (b . 6))))
+       (asoc-merge-values al1 al2 al3)
+       (list al1 al2 al3))
+     :result '( ((a . 1) (b . 2) (a . 3))
+                ((b . 1) (b . 2) (c . 3))
+                ((b . 4) (d . 5) (b . 6)) ))
+    )
+
   ;; ,-----------------,
   ;; | Docstring Tests |
   ;; '-----------------'
@@ -1574,6 +1628,14 @@
     (should-equal
      (asoc-uniq '((a 1) (b 2) (b 3) (c 4) (a 5)))
      :result '((a 1) (b 2) (c 4))))
+
+  (ert-deftest test-asoc-docstring-examples-asoc-merge-values ()
+    "Docstring examples for `asoc-merge-values'."
+    (should-equal
+     (let ( (a '((a . 1) (b . 2) (a . 1) (c . 3) (b . 4)))
+            (b '((a . 5))) )
+       (asoc-merge-values a b))
+     :result '((a 1 1 5) (b 2 4) (c 3))))
 
   )
 

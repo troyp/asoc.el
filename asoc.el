@@ -4,7 +4,7 @@
 
 ;; Author: Troy Pracy
 ;; Keywords: alist data-types
-;; Version: 0.4.0
+;; Version: 0.4.1
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -623,6 +623,30 @@ Example: list of keys with value of 0
            (indent 1))
   `(asoc-fold (lambda (key value acc) ,form)
               ,alist ,init))
+
+(defun asoc-merge-values (&rest alists)
+  "Return an alist merging multiple occurrences of each key in ALISTS.
+
+Each key is associated with a list containing all values in ALISTS which were
+associated with the key, in order.
+
+Example:
+
+    (let ( (a '((a . 1) (b . 2) (a . 1) (c . 3) (b . 4)))
+           (b '((a . 5))) )
+      (asoc-merge-values a b))
+    ;; ((a 1 1 5) (b 2 4) (c 3))"
+  (let ( result
+         (rest (reverse (apply #'append alists))) )
+    (while rest
+      (let* ((assoc        (car rest))
+             (key          (car assoc))
+             (value        (cdr assoc))
+             (accum-value  (asoc-get result key))
+             (new-value    (cons value accum-value)))
+        (push (cons key new-value) result))
+      (setq rest (cdr rest)))
+    (asoc-uniq result)))
 
 
 (provide 'asoc)
