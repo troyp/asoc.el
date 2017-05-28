@@ -62,9 +62,11 @@ disassembling alists.
 * [asoc-fold](#asoc-fold-func-alist-init) `(func alist init)`
 * [asoc--fold](#asoc--fold-form-alist-init) `(form alist init)`
 
-[Other Packages](#other-packages)
+### [Handling Alist Variants](#handling-alist-variants-1)
+* [List of duples](list-of-duples)
+* [Flat key-value list](flat-key-value-list)
 
-[Handling Alist Variants](#handling-alist-variants)
+### [Other Packages](#other-packages-1)
 
 -------------------------------------------------------------------------------
 
@@ -440,7 +442,9 @@ been processed.
 -------------------------------------------------------------------------------
 ## Handling Alist Variants
 
-### List of duples: ( (key1 value1) (key2 value2) ... )
+### List of duples
+
+__`( (key1 value1) (key2 value2) ... )`__
 
 An alternative format for describing a key-value mapping is a list whose
 elements are 2-element `(key value)` sublists, rather than `(key . value)`
@@ -471,7 +475,9 @@ to allow a key to be associated with multiple values:
 
 This is a true alist whose values simply happen to be lists.
 
-### Flat key-value list: (key1 value 1 key2 value2 ...)
+### Flat key-value list
+
+__`(key1 value 1 key2 value2 ...)`__
 
 Another form of key-value list is a flat list with alternating keys and values.
 
