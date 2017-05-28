@@ -4,7 +4,7 @@
 
 ;; Author: Troy Pracy
 ;; Keywords: alist data-types
-;; Version: 0.3.4
+;; Version: 0.3.5
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -357,15 +357,27 @@ This may destructively modify ALIST."
         (setq rest (cdr rest))))
     (reverse result)))
 
-(defun asoc-values (alist)
-  "Return a list of unique values in ALIST."
+(defun asoc-values (alist &optional ignore-shadowed)
+  "Return a list of unique values in ALIST.
+
+If IGNORE-SHADOWED is non-nil, only show include associated with the first
+occurrence of each key."
   (let ( result
+         keys-seen
          (rest alist) )
-    (while rest
-      (let ((pair (car rest)))
-        (unless (asoc---list-member (cdr pair) result)
-          (push (cdr pair) result))
-        (setq rest (cdr rest))))
+    (if ignore-shadowed
+        (while rest
+          (let ((pair (car rest)))
+            (unless (or (asoc---list-member (car pair) keys-seen)
+                        (asoc---list-member (cdr pair) result))
+              (push (cdr pair) result))
+            (push (car pair) keys-seen))
+          (setq rest (cdr rest)))
+      (while rest
+        (let ((pair (car rest)))
+          (unless (asoc---list-member (cdr pair) result)
+            (push (cdr pair) result))
+          (setq rest (cdr rest)))))
     (reverse result)))
 
 (defun asoc-unzip (alist)

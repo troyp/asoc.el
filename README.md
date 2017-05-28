@@ -45,7 +45,7 @@ disassembling alists.
 * [asoc-delete!](#asoc-delete-alist-key-optional-remove-all) `(alist key &optional remove-all)`
 * [asoc-find-key](#asoc-find-key-key-alist) `(key alist)`
 * [asoc-keys](#asoc-keys-alist) `(alist)`
-* [asoc-values](#asoc-values-alist) `(alist)`
+* [asoc-values](#asoc-values-alist-optional-ignore-shadowed) `(alist &optional ignore-shadowed)`
 * [asoc-unzip](#asoc-unzip-alist) `(alist)`
 
 ### Looping Constructs
@@ -280,9 +280,12 @@ Return the first element of `alist` whose `car` matches `key`, or nil if none ma
 
 Return a list of unique keys in `alist`.
 
-### asoc-values `(alist)`
+### asoc-values `(alist &optional ignore-shadowed)`
 
 Return a list of unique values in `alist`.
+
+If `ignore-shadowed` is non-nil, only show include associated with the first
+occurrence of each key.
 
 ### asoc-unzip `(alist)`
 

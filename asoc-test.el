@@ -1105,6 +1105,19 @@
      (let ((a '((1 . 1) (2 . 4) (1 . 1) (3 . 9) (1 . 1) (4 . 16) (5 . 25))))
        (asoc-values a))
      :result '(1 4 9 16 25))
+    ;; include shadowed values
+    (should-equal
+     (let ((a '((a . 1) (b . 2) (a . 3) (c . 4) (a . 5) (d . 6))))
+       (asoc-values a))
+     :result '(1 2 3 4 5 6))
+    (should-equal
+     (let ((a '((a . 1) (b . 2) (c . 3) (c . 4) (b . 5) (d . 6))))
+       (asoc-values a))
+     :result '(1 2 3 4 5 6))
+    (should-equal
+     (let ((a '((1 . 1) (2 . 4) (1 . one) (3 . 9) (1 . "one") (4 . 16) (5 . 25))))
+       (asoc-values a))
+     :result '(1 4 one 9 "one" 16 25 ))
     ;; test with different choices of asoc-compare-fn
     (should-equal
      (let* ( result
@@ -1115,6 +1128,51 @@
        (dolist (fn (list #'equalp #'equal #'eql #'eq))
          (let* (( asoc-compare-fn  fn  ))
            (push (list fn :: (asoc-values a))
+                 result)))
+       result)
+     :result   ;; <-first occurrences->     <-duplicates->
+     '((eq     ::  (1  "a"  (1 2)  nil      1.0  "a" (1 2) ))
+       (eql    ::  (1  "a"  (1 2)  nil      1.0  "a" (1 2) ))
+       (equal  ::  (1  "a"  (1 2)  nil      1.0            ))
+       (equalp ::  (1  "a"  (1 2)  nil                     ))))
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-values-ignore-values ()
+    "Unit tests for `asoc-values'."
+    ;; empty alist
+    (should-equal
+     (let ((a nil))
+       (asoc-values a :ignore-shadowed))
+     :result nil)
+    ;; alist with duplicates
+    (should-equal
+     (let ((a '((1 . 1) (2 . 4) (1 . 1) (3 . 9) (1 . 1) (4 . 16) (5 . 25))))
+       (asoc-values a :ignore-shadowed))
+     :result '(1 4 9 16 25))
+    ;; exclude shadowed values
+    (should-equal
+     (let ((a '((a . 1) (b . 2) (a . 3) (c . 4) (a . 5) (d . 6))))
+       (asoc-values a :ignore-shadowed))
+     :result '(1 2 4 6))
+    (should-equal
+     (let ((a '((a . 1) (b . 2) (c . 3) (c . 4) (b . 5) (d . 6))))
+       (asoc-values a :ignore-shadowed))
+     :result '(1 2 3 6))
+    ;; value shadowed by nil
+    (should-equal
+     (asoc-values '((a . nil) (a . 1))
+                  :ignore-shadowed)
+     :result '(nil))
+    ;; test with different choices of asoc-compare-fn
+    (should-equal
+     (let* ( result
+            ( p  '(1 2) )
+            ( a  `((1   . 1)   ("a" . "a") (,p    . ,p)    (nil . nil)
+                   (1.0 . 1.0) ("a" . "a") ((1 2) . (1 2)) (nil . nil) )))
+
+       (dolist (fn (list #'equalp #'equal #'eql #'eq))
+         (let* (( asoc-compare-fn  fn  ))
+           (push (list fn :: (asoc-values a :ignore-shadowed))
                  result)))
        result)
      :result   ;; <-first occurrences->     <-duplicates->
