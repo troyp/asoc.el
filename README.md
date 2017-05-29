@@ -64,7 +64,7 @@ disassembling alists.
 * [asoc-merge-values](#asoc-merge-values-rest-alists) `(&rest alists)`
 
 ### [Handling Alist Variants](#handling-alist-variants-1)
-* [List of duples](list-of-duples)
+* [List of duples](#list-of-duples)
 * [Flat key-value list / Property list](#flat-key-value-list--property-list)
 * [Multi-valued alist](#multi-valued-alist)
 
