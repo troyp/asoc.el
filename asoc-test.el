@@ -391,18 +391,23 @@
      :result '((a . t) (b . t) (c . t) (d . t) (e . t)))
     ;; stability
     (should-equal
+     (let ((a '((a . 2) (a . 1) (a . 3))))
+       (asoc-sort-keys a #'string<))
+     :result '((a . 2) (a . 1) (a . 3)))
+    (should-equal
      (let ((a '((1 . a) (2 . c) (1 . b) (2 . b) (1 . c) (2 . a))))
        (asoc-sort-keys a #'<))
      :result '((1 . a) (1 . b) (1 . c) (2 . c) (2 . b) (2 . a)))
-    ;; constant comparators
+    ;; constant comparator: nil - alist unchanged
     (should-equal
-     (let ((a '((1 . a) (2 . c) (1 . b) (2 . b) (1 . c) (2 . a))))
+     (let ((a '((b . 1) (d . 2) (c . 3) (a . 4) (e . 5))))
        (asoc-sort-keys a (lambda (x y) nil)))
-     :result '((1 . a) (2 . c) (1 . b) (2 . b) (1 . c) (2 . a)))
+     :result '((b . 1) (d . 2) (c . 3) (a . 4) (e . 5)))
+    ;; constant comparator: t - alist reversed
     (should-equal
-     (let ((a '((1 . a) (2 . c) (1 . b) (2 . b) (1 . c) (2 . a))))
+     (let ((a '((b . 1) (d . 2) (c . 3) (a . 4) (e . 5))))
        (asoc-sort-keys a (lambda (x y) t)))
-     :result '((2 . a) (1 . c) (2 . b) (1 . b) (2 . c) (1 . a)))
+     :result '((e . 5) (a . 4) (c . 3) (d . 2) (b . 1)))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-filter ()
