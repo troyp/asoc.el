@@ -65,7 +65,7 @@ disassembling alists.
 
 ### [Handling Alist Variants](#handling-alist-variants-1)
 * [List of duples](list-of-duples)
-* [Flat key-value list](flat-key-value-list)
+* [Flat key-value list / Property list](#flat-key-value-list--property-list)
 * [Multi-valued alist](#multi-valued-alist)
 
 ### [Other Packages](#other-packages-1)
@@ -490,11 +490,14 @@ to allow a key to be associated with multiple values:
 
 This is a true alist whose values simply happen to be lists.
 
-### Flat key-value list
+### Flat key-value list / Property list
 
 __`(key1 value 1 key2 value2 ...)`__
 
 Another form of key-value list is a flat list with alternating keys and values.
+
+When keys are distinct symbols, such a list is called a plist (property list).
+In Emacs Lisp, each symbol has an associated plist specifying its properties.
 
 Such a list can be converted to an alist with `asoc-partition`
 
