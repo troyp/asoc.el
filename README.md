@@ -274,11 +274,16 @@ This may destructively modify `alist`.
 
 ### asoc-find-key `(key alist)`
 
-Return the first element of `alist` whose `car` matches `key`, or nil if none match.
+Return the first association of `alist` with `key`, or nil if none match.
+
+For all associations with KEY, use `asoc-filter-keys`.
 
 ### asoc-keys `(alist)`
 
 Return a list of unique keys in `alist`.
+
+For a list of all keys in order, with duplicates, use `mapcar` with `car` over
+ALIST.
 
 ### asoc-values `(alist &optional ignore-shadowed)`
 
@@ -286,6 +291,9 @@ Return a list of unique values in `alist`.
 
 If `ignore-shadowed` is non-nil, only show include associated with the first
 occurrence of each key.
+
+For a list of all values in order, with duplicate values (and values of shadowed
+keys), use `mapcar` with `cdr` over ALIST.
 
 ### asoc-unzip `(alist)`
 

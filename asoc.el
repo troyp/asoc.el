@@ -341,11 +341,16 @@ This may destructively modify ALIST."
         alist))))
 
 (defun asoc-find-key (key alist)
-    "Return the first element of ALIST whose `car' matches KEY, or nil if none match."
+    "Return the first association of ALIST with KEY, or nil if none match.
+
+For all associations with KEY, use `asoc-filter-keys'."
     (asoc---assoc key alist asoc-compare-fn))
 
 (defun asoc-keys (alist)
-  "Return a list of unique keys in ALIST."
+  "Return a list of unique keys in ALIST.
+
+For a list of all keys in order, with duplicates, use `mapcar' with `car' over
+ALIST."
   (let ( result
          (rest alist) )
     (while rest
@@ -359,7 +364,10 @@ This may destructively modify ALIST."
   "Return a list of unique values in ALIST.
 
 If IGNORE-SHADOWED is non-nil, only show include associated with the first
-occurrence of each key."
+occurrence of each key.
+
+For a list of all values in order, with duplicate values (and values of shadowed
+keys), use `mapcar' with `cdr' over ALIST."
   (let ( result
          keys-seen
          (rest alist) )
