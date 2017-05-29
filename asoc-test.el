@@ -270,6 +270,21 @@
     (should-equal
      (asoc-make '(a b c d) 'undefined)
      :result '((a . undefined) (b . undefined) (c . undefined) (d . undefined)))
+    ;; non-destructive
+    (should-equal
+     (let ((keys '(a b c d)))
+       (asoc-make keys 'default)
+       keys)
+     :result '(a b c d))
+    ;; wrong type: non-list first argument
+    (should-error-with
+     (asoc-make 5)
+     :error '(wrong-type-argument sequencep 5))
+    ;; too many args
+    (should-error-with-type
+     (asoc-make '(a b c d) nil nil)
+     :error
+     'wrong-number-of-arguments)
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-zip ()
@@ -328,6 +343,16 @@
            (c '((e . 1) (e . 2) (f . 1) (g . 1))))
        (asoc-merge a b c))
      :result '((e . 1) (f . 1) (g . 1) (a . 3) (b . 2) (c . 2) (d . 1)))
+    ;; non-destructive
+    (should-equal
+     (let ((a '((a . 1) (a . 2) (b . 1) (c . 1)))
+           (b '((a . 3) (b . 2) (c . 2) (d . 1)))
+           (c '((e . 1) (e . 2) (f . 1) (g . 1))))
+       (asoc-merge a b c)
+       (list a b c))
+     :result '( ((a . 1) (a . 2) (b . 1) (c . 1))
+                ((a . 3) (b . 2) (c . 2) (d . 1))
+                ((e . 1) (e . 2) (f . 1) (g . 1)) ))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-uniq ()
@@ -377,6 +402,12 @@
      '((equalp ::: (1.0 . 1))
        (equal  ::: (1.0 . 1))
        (eql    ::: (1.0 . 1))))
+    ;; non-destructive
+    (should-equal
+     (let ((alist '((a . 1) (b . 2) (b . 3) (a . 4) (c . 5) (b . 6))))
+       (asoc-uniq alist)
+       alist)
+     :result '((a . 1) (b . 2) (b . 3) (a . 4) (c . 5) (b . 6)))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-sort-keys ()
@@ -414,6 +445,37 @@
      (let ((a '((b . 1) (d . 2) (c . 3) (a . 4) (e . 5))))
        (asoc-sort-keys a (lambda (x y) t)))
      :result '((e . 5) (a . 4) (c . 3) (d . 2) (b . 1)))
+    ;; non-destructive
+    (should-equal
+     (let ((alist '((b . 2) (a . 1) (e . 5) (d . 4) (c . 3))))
+       (asoc-sort-keys alist #'string<)
+       alist)
+     :result '((b . 2) (a . 1) (e . 5) (d . 4) (c . 3)))
+    ;; too few arguments
+    (should-error-with-type
+     (asoc-sort-keys)
+     :error 'wrong-number-of-arguments)
+    (should-error-with-type
+     (asoc-sort-keys '((a . 1)))
+     :error 'wrong-number-of-arguments)
+    ;; too many arguments
+    (should-error-with-type
+     (asoc-sort-keys '((a . 1)) #'string< nil)
+     :error 'wrong-number-of-arguments)
+    ;; wrong type: non-list first argument
+    (should-error-with
+     (asoc-sort-keys 5 #'<)
+    :error '(wrong-type-argument sequencep 5))
+    ;; wrong type: non-function second argument
+    ;; where:      alist length >= 2
+    ;; note: for null or single-element alists, the COMPARATOR may not
+    ;;       be used, so there may not be an error
+    (should-error-with
+     (asoc-sort-keys '((a . 1) (b . 2)) nil)
+     :error '(void-function nil))
+    (should-error-with
+     (asoc-sort-keys '((a . 1) (b . 2)) 5)
+    :error '(invalid-function 5))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-filter ()
@@ -477,6 +539,18 @@
         (lambda (k v) (> (+ (* 51 k) v -57) 0))
         alist))
      :result '((2 . -44) (3 . -90) (4 . -144) (7 . -294) (8 . -320) (9 . -324)))
+    ;; non-destructive
+    (should-equal
+     (let ((alist '((a . 1) (b . 2) (c . 3) (d . 4) (e . 5))))
+       (asoc-filter (lambda (k v) (zerop (% v 2)))
+                    alist)
+       alist)
+     :result '((a . 1) (b . 2) (c . 3) (d . 4) (e . 5)))
+    ;; null/non-function first argument
+    (should-error-with (asoc-filter nil '((a . 1))) :error '(void-function nil))
+    (should-error-with (asoc-filter 5 '((a . 1))) :error '(invalid-function 5))
+    ;; non-list second argument
+    (should-error-with (asoc-filter (lambda (k v) t) 5) :error '(wrong-type-argument sequencep 5))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc--filter ()
@@ -509,6 +583,14 @@
        (asoc--filter (and (symbolp key) (functionp value))
          `(("a" . ,f1) (b . x) (c . ,f1) ("d" . y) (e . ,f2) (f . nil)))
        :result `((c . ,f1) (e . ,f2))))
+    ;; non-destructive
+    (should-equal
+     (let ((alist '((a . 1) (b . 2) (c . 3) (d . 4) (e . 5))))
+       (asoc--filter (zerop (% value 2)) alist)
+       alist)
+     :result '((a . 1) (b . 2) (c . 3) (d . 4) (e . 5)))
+    ;; non-list second argument
+    (should-error-with (asoc--filter t 5) :error '(wrong-type-argument sequencep 5))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-filter-keys ()
@@ -565,6 +647,17 @@
      (let ((alist '((a . 1) (b . nil) (c . 3) (nil . 4) (nil . nil))))
        (asoc-filter-keys #'identity alist))
      :result '((a . 1) (b . nil) (c . 3)))
+    ;; non-destructive
+    (should-equal
+     (let ((alist '((a . 1) (b . 2) (c . 3) (d . 4) (e . 5))))
+       (asoc-filter-keys (lambda (k) (string> k 'b)) alist)
+       alist)
+     :result '((a . 1) (b . 2) (c . 3) (d . 4) (e . 5)))
+    ;; null/non-function first argument
+    (should-error-with (asoc-filter-keys nil '((a . 1))) :error '(void-function nil))
+    (should-error-with (asoc-filter-keys 5 '((a . 1))) :error '(invalid-function 5))
+    ;; non-list second argument     keys
+    (should-error-with (asoc-filter-keys (lambda (k) t) 5) :error '(wrong-type-argument sequencep 5))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-filter-values ()
@@ -621,6 +714,17 @@
      (let ((alist '((a . 1) (b . nil) (c . 3) (nil . 4) (nil . nil))))
        (asoc-filter-values #'identity alist))
      :result '((a . 1) (c . 3) (nil . 4)))
+    ;; non-destructive
+    (should-equal
+     (let ((alist '((a . 1) (b . 2) (c . 3) (d . 4) (e . 5))))
+       (asoc-filter-values (lambda (v) (zerop (% v 2))) alist)
+       alist)
+     :result '((a . 1) (b . 2) (c . 3) (d . 4) (e . 5)))
+    ;; null/non-function first argument
+    (should-error-with (asoc-filter-values nil '((a . 1))) :error '(void-function nil))
+    (should-error-with (asoc-filter-values 5 '((a . 1))) :error '(invalid-function 5))
+    ;; non-list second argument
+    (should-error-with (asoc-filter-values (lambda (v) t) 5) :error '(wrong-type-argument sequencep 5))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-remove ()
@@ -653,6 +757,18 @@
                result))
        result)
      :result '(nil nil))
+    ;; non-destructive
+    (should-equal
+     (let ((alist '((a . 1) (b . 2) (c . 3) (d . 4) (e . 5))))
+       (asoc-remove (lambda (k v) (zerop (% v 2)))
+                    alist)
+       alist)
+     :result '((a . 1) (b . 2) (c . 3) (d . 4) (e . 5)))
+    ;; null/non-function first argument
+    (should-error-with (asoc-remove nil '((a . 1))) :error '(void-function nil))
+    (should-error-with (asoc-remove 5 '((a . 1))) :error '(invalid-function 5))
+    ;; non-list second argument
+    (should-error-with (asoc-remove (lambda (k v) t) 5) :error '(wrong-type-argument sequencep 5))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-remove-keys ()
@@ -692,6 +808,17 @@
      (let ((alist '((a . 1) (b . nil) (c . 3) (nil . 4) (nil . nil))))
        (asoc-remove-keys #'identity alist))
      :result '((nil . 4) (nil)))
+    ;; non-destructive
+    (should-equal
+     (let ((alist '((a . 1) (b . 2) (c . 3) (d . 4) (e . 5))))
+       (asoc-remove-keys (lambda (k) (string> k 'b)) alist)
+       alist)
+     :result '((a . 1) (b . 2) (c . 3) (d . 4) (e . 5)))
+    ;; null/non-function first argument
+    (should-error-with (asoc-remove-keys nil '((a . 1))) :error '(void-function nil))
+    (should-error-with (asoc-remove-keys 5 '((a . 1))) :error '(invalid-function 5))
+    ;; non-list second argument     keys
+    (should-error-with (asoc-remove-keys (lambda (k) t) 5) :error '(wrong-type-argument sequencep 5))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-remove-values ()
@@ -731,6 +858,17 @@
      (let ((alist '((a . 1) (b . nil) (c . 3) (nil . 4) (nil . nil))))
        (asoc-remove-values #'identity alist))
      :result '((b) (nil)))
+    ;; non-destructive
+    (should-equal
+     (let ((alist '((a . 1) (b . 2) (c . 3) (d . 4) (e . 5))))
+       (asoc-remove-values (lambda (v) (zerop (% v 2))) alist)
+       alist)
+     :result '((a . 1) (b . 2) (c . 3) (d . 4) (e . 5)))
+    ;; null/non-function first argument
+    (should-error-with (asoc-remove-values nil '((a . 1))) :error '(void-function nil))
+    (should-error-with (asoc-remove-values 5 '((a . 1))) :error '(invalid-function 5))
+    ;; non-list second argument
+    (should-error-with (asoc-remove-values (lambda (v) t) 5) :error '(wrong-type-argument sequencep 5))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-partition ()
@@ -755,13 +893,15 @@
     (should-equal
      (asoc-partition '(a 1 a 1))
      :result '((a . 1) (a . 1)))
-    ;; non-list
-    (should-error
-     (asoc-partition 1)
-     :type 'wrong-type-argument)
-    (should-error
-     (asoc-partition "string")
-     :type 'wrong-type-argument)
+    ;; non-destructive
+    (should-equal
+     (let ((flatlist '(a 1 b 2 c 3 d 4)))
+       (asoc-partition flatlist)
+       flatlist)
+     :result '(a 1 b 2 c 3 d 4))
+    ;; wrong type: non-list
+    (should-error (asoc-partition 1) :type 'wrong-type-argument)
+    (should-error (asoc-partition "string") :type 'wrong-type-argument)
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-contains-key? ()
@@ -806,6 +946,12 @@
        ( equal  ::  t    nil      t      nil     t      nil        t           t      t )
        ( equalp ::  t    t        t       t      t       t         t           t      t ))
      )
+    ;; wrong number of arguments
+    (should-error-with-type (asoc-contains-key? nil) :error 'wrong-number-of-arguments)
+    (should-error-with-type (asoc-contains-key?) :error 'wrong-number-of-arguments)
+    (should-error-with-type (asoc-contains-key? nil 'a nil) :error 'wrong-number-of-arguments)
+    ;; wrong type: non-list first argument
+    (should-error-with (asoc-contains-key? 5 'a) :error '(wrong-type-argument listp 5))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-contains-pair? ()
@@ -855,8 +1001,14 @@
      '(( eq      ::    t    t    nil       nil        nil        nil        nil          t     nil   t )
        ( eql     ::    t    t    nil        t         nil        nil        nil          t     nil   t )
        ( equal   ::    t    t    nil        t          t         nil         t           t      t    t )
-       ( equalp  ::    t    t     t         t          t          t          t           t      t    t ))
-     )
+       ( equalp  ::    t    t     t         t          t          t          t           t      t    t )))
+    ;; wrong number of arguments
+    (should-error-with-type (asoc-contains-pair? nil 'a) :error 'wrong-number-of-arguments)
+    (should-error-with-type (asoc-contains-pair? nil) :error 'wrong-number-of-arguments)
+    (should-error-with-type (asoc-contains-pair?) :error 'wrong-number-of-arguments)
+    (should-error-with-type (asoc-contains-pair? nil 'a nil nil) :error 'wrong-number-of-arguments)
+    ;; wrong type: non-list first argument
+    (should-error-with (asoc-contains-pair? 5 'a 1) :error '(wrong-type-argument listp 5))
     )
 
   (ert-deftest ert-deftest-unit-tests-asoc-get ()
