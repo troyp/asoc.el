@@ -766,6 +766,15 @@
 
   (ert-deftest test-asoc-unit-tests-asoc-contains-key? ()
     "Unit tests for `asoc---contains-key?'."
+    ;; empty list
+    (should-equal (asoc-contains-key? nil 'a) :result nil)
+    ;; contains key
+    (should-equal (asoc-contains-key? '((a . 1)) 'a) :result t)
+    (should-equal (asoc-contains-key? '((a . nil)) 'a) :result t)
+    (should-equal (asoc-contains-key? '((a . 1) (b . 2)) 'b) :result t)
+    ;; doesn't contain key
+    (should-equal (asoc-contains-key? '((a . 1)) 'b) :result nil)
+    ;; test values of compare-fn
     (should-equal
      (let* (( table  nil    )
             ( p      '(1 2) )
@@ -801,6 +810,19 @@
 
   (ert-deftest test-asoc-unit-tests-asoc-contains-pair? ()
     "Unit tests for `asoc-contains-pair?'"
+    ;; empty list
+    (should-equal (asoc-contains-pair? nil 'a 1) :result nil)
+    ;; contains pair
+    (should-equal (asoc-contains-pair? '((a . 1)) 'a 1) :result t)
+    (should-equal (asoc-contains-pair? '((a . nil)) 'a nil) :result t)
+    (should-equal (asoc-contains-pair? '((a . 1) (b . 2)) 'b 2) :result t)
+    ;; doesn't contain pair
+    (should-equal (asoc-contains-pair? '((a . 1)) 'b 2) :result nil)
+    ;;  doesn't contain pair - key matches
+    (should-equal (asoc-contains-pair? '((a . 1)) 'a 2) :result nil)
+    ;;  doesn't contain pair - value matches
+    (should-equal (asoc-contains-pair? '((a . 1)) 'b 1) :result nil)
+    ;; test values of compare-fn
     (should-equal
      (let* (( table  nil     )
             ( p      '(1 2)  )
