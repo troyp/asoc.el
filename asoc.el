@@ -4,7 +4,7 @@
 
 ;; Author: Troy Pracy
 ;; Keywords: alist data-types
-;; Version: 0.4.1
+;; Version: 0.4.2
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -339,6 +339,29 @@ This may destructively modify ALIST."
           (if remove-all (asoc-delete! tail key t) tail)
         (setcdr alist (asoc-delete! tail key remove-all))
         alist))))
+
+(defun asoc-find (predicate alist)
+  "Return the first ALIST association satisfying PREDICATE.
+
+PREDICATE should take two arguments, KEY and VALUE.
+
+For all associations satisfying PREDICATE, use `asoc-filter'."
+  (while (and alist
+              (not (funcall predicate (caar alist) (cdar alist))))
+    (setf alist (cdr alist)))
+  (car alist))
+
+(defmacro asoc--find (form alist)
+    "Anaphoric variant of `asoc-find'.
+
+Return the first ALIST association for which FORM evaluates t.
+
+The anaphoric variables 'key and 'value are available for use in FORM.
+
+For all associations satisfying FORM, use `asoc--filter'"
+    (declare (debug (form sexp))
+             (indent 1))
+    `(asoc-find (lambda (key value) ,form) ,alist))
 
 (defun asoc-find-key (key alist)
     "Return the first association of ALIST with KEY, or nil if none match.

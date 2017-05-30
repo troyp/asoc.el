@@ -1094,6 +1094,68 @@
     )
 
 
+  (ert-deftest test-asoc-unit-tests-find ()
+    "Unit tests for `asoc-find'."
+    ;; empty list
+    (should-equal (asoc-find (lambda (k v) t) nil) :result nil)
+    (should-equal (asoc-find (lambda (k v) nil) nil) :result nil)
+    ;; empty list: no error from predicates with wrong number of arguments
+    (should-equal (asoc-find (lambda () t) nil) :result nil)
+    (should-equal (asoc-find (lambda (a b c d) t) nil) :result nil)
+    ;; constant true and false functions
+    (should-equal (asoc-find (lambda (k v) t) '((a . 1) (b . 2))) :result '(a . 1))
+    (should-equal (asoc-find (lambda (k v) nil) '((a . 1) (b . 2))) :result nil)
+    ;; sample functions and alists
+    (should-equal (asoc-find #'eq '((1 . 1) (2 . 4) (3 . 3) (4 . 2)))
+                  :result '(1 . 1))
+    (should-equal (asoc-find #'eq '((1 . 2) (2 . 4) (3 . 3) (4 . 2)))
+                  :result '(3 . 3))
+    (should-equal (asoc-find #'eq '((1 . 2) (2 . 4) (3 . 4) (4 . 2)))
+                  :result nil)
+    (should-equal (asoc-find (lambda (k v) (and k v)) '((a . nil) (nil . nil) (b . 2) (nil . nil)))
+                  :result '(b . 2))
+    (should-equal (asoc-find (lambda (k v) (and k v)) '((a . nil) (nil . nil) (nil . nil)))
+                  :result nil)
+    ;; non-destructive
+    (should-equal
+     (let ((alist '((a . 1) (b . 2) (c . 3) (d . 4))))
+       (asoc-find (lambda (k v) (zerop (% v 2))) alist)
+       alist)
+     :result '((a . 1) (b . 2) (c . 3) (d . 4)))
+    ;; null/non-function first argument
+    (should-error-with (asoc-find nil '((a . 1))) :error '(void-function nil))
+    (should-error-with (asoc-find 5 '((a . 1))) :error '(invalid-function 5))
+    ;; non-list second argument
+    (should-error-with-type (asoc-find (lambda (k v) t) 5) :error 'wrong-type-argument)
+    ;; wrong number of arguments (non-empty list)
+    (should-error-with-type (asoc-find (lambda () t) '((a . 1)))
+                            :error 'wrong-number-of-arguments)
+    (should-error-with-type (asoc-find (lambda (a b c d) t) '((a . 1)))
+                            :error 'wrong-number-of-arguments)
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc--find ()
+    "Unit tests for `asoc--find'."
+    ;; empty list
+    (should-equal (asoc--find t nil) :result nil)
+    (should-equal (asoc--find nil nil) :result nil)
+    ;; constant true and false functions
+    (should-equal (asoc--find t '((a . 1) (b . 2))) :result '(a . 1))
+    (should-equal (asoc--find nil '((a . 1) (b . 2))) :result nil)
+    ;; sample functions and alists
+    (should-equal (asoc--find (and key value) '((a . nil) (nil . nil) (b . 2) (nil . nil)))
+                  :result '(b . 2))
+    (should-equal (asoc--find (and key value) '((a . nil) (nil . nil) (nil . nil)))
+                  :result nil)
+    ;; non-destructive
+    (should-equal (let ((alist '((a . 1) (b . 2) (c . 3) (d . 4))))
+                    (asoc--find (zerop (% value 2)) alist)
+                    alist)
+                  :result '((a . 1) (b . 2) (c . 3) (d . 4)))
+    ;; non-list second argument
+    (should-error-with-type (asoc--find t 5) :error 'wrong-type-argument)
+    )
+
   (ert-deftest test-asoc-unit-tests-asoc-find-key ()
     "Unit tests for `asoc-find-key'."
     ;; empty list

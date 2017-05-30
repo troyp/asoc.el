@@ -43,6 +43,8 @@ disassembling alists.
 * [asoc-get](#asoc-get-alist-key-optional-default) `(alist key &optional default)`
 * [asoc-put!](#asoc-put-alist-key-value-optional-replace) `(alist key value &optional replace)`
 * [asoc-delete!](#asoc-delete-alist-key-optional-remove-all) `(alist key &optional remove-all)`
+* [asoc-find](#asoc-find-predicate-alist) `(predicate alist)`
+* [asoc--find](#asoc--find-form-alist) `(form alist)`
 * [asoc-find-key](#asoc-find-key-key-alist) `(key alist)`
 * [asoc-keys](#asoc-keys-alist) `(alist)`
 * [asoc-values](#asoc-values-alist-optional-ignore-shadowed) `(alist &optional ignore-shadowed)`
@@ -271,6 +273,24 @@ Return a modified list excluding the first, or all, pair(s) with __key__.
 If __remove-all__ is non-nil, remove all elements with __key__.
 
 This may destructively modify __alist__.
+
+### asoc-find `(predicate alist)`
+
+Return the first __alist__ association satisfying __predicate__.
+
+__predicate__ should take two arguments, __key__ and __value__.
+
+For all associations satisfying __predicate__, use `asoc-filter`.
+
+### asoc--find `(form alist)`
+
+Anaphoric variant of `asoc-find`.
+
+Return the first __alist__ association for which __form__ evaluates t.
+
+The anaphoric variables `key` and `value` are available for use in __form__.
+
+For all associations satisfying __form__, use `asoc--filter`
 
 ### asoc-find-key `(key alist)`
 
