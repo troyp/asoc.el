@@ -277,9 +277,7 @@
        keys)
      :result '(a b c d))
     ;; wrong type: non-list first argument
-    (should-error-with
-     (asoc-make 5)
-     :error '(wrong-type-argument sequencep 5))
+    (should-error-with-type (asoc-make 5) :error 'wrong-type-argument)
     ;; too many args
     (should-error-with-type
      (asoc-make '(a b c d) nil nil)
@@ -452,20 +450,15 @@
        alist)
      :result '((b . 2) (a . 1) (e . 5) (d . 4) (c . 3)))
     ;; too few arguments
-    (should-error-with-type
-     (asoc-sort-keys)
-     :error 'wrong-number-of-arguments)
-    (should-error-with-type
-     (asoc-sort-keys '((a . 1)))
-     :error 'wrong-number-of-arguments)
+    (should-error-with-type (asoc-sort-keys)
+                            :error 'wrong-number-of-arguments)
+    (should-error-with-type (asoc-sort-keys '((a . 1)))
+                            :error 'wrong-number-of-arguments)
     ;; too many arguments
-    (should-error-with-type
-     (asoc-sort-keys '((a . 1)) #'string< nil)
-     :error 'wrong-number-of-arguments)
+    (should-error-with-type (asoc-sort-keys '((a . 1)) #'string< nil)
+                            :error 'wrong-number-of-arguments)
     ;; wrong type: non-list first argument
-    (should-error-with
-     (asoc-sort-keys 5 #'<)
-    :error '(wrong-type-argument sequencep 5))
+    (should-error-with-type (asoc-sort-keys 5 #'<) :error 'wrong-type-argument)
     ;; wrong type: non-function second argument
     ;; where:      alist length >= 2
     ;; note: for null or single-element alists, the COMPARATOR may not
@@ -550,7 +543,7 @@
     (should-error-with (asoc-filter nil '((a . 1))) :error '(void-function nil))
     (should-error-with (asoc-filter 5 '((a . 1))) :error '(invalid-function 5))
     ;; non-list second argument
-    (should-error-with (asoc-filter (lambda (k v) t) 5) :error '(wrong-type-argument sequencep 5))
+    (should-error-with-type (asoc-filter (lambda (k v) t) 5) :error 'wrong-type-argument)
     )
 
   (ert-deftest test-asoc-unit-tests-asoc--filter ()
@@ -590,7 +583,7 @@
        alist)
      :result '((a . 1) (b . 2) (c . 3) (d . 4) (e . 5)))
     ;; non-list second argument
-    (should-error-with (asoc--filter t 5) :error '(wrong-type-argument sequencep 5))
+    (should-error-with-type (asoc--filter t 5) :error 'wrong-type-argument)
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-filter-keys ()
@@ -657,7 +650,7 @@
     (should-error-with (asoc-filter-keys nil '((a . 1))) :error '(void-function nil))
     (should-error-with (asoc-filter-keys 5 '((a . 1))) :error '(invalid-function 5))
     ;; non-list second argument     keys
-    (should-error-with (asoc-filter-keys (lambda (k) t) 5) :error '(wrong-type-argument sequencep 5))
+    (should-error-with-type (asoc-filter-keys (lambda (k) t) 5) :error 'wrong-type-argument)
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-filter-values ()
@@ -724,7 +717,7 @@
     (should-error-with (asoc-filter-values nil '((a . 1))) :error '(void-function nil))
     (should-error-with (asoc-filter-values 5 '((a . 1))) :error '(invalid-function 5))
     ;; non-list second argument
-    (should-error-with (asoc-filter-values (lambda (v) t) 5) :error '(wrong-type-argument sequencep 5))
+    (should-error-with-type (asoc-filter-values (lambda (v) t) 5) :error 'wrong-type-argument)
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-remove ()
@@ -768,7 +761,7 @@
     (should-error-with (asoc-remove nil '((a . 1))) :error '(void-function nil))
     (should-error-with (asoc-remove 5 '((a . 1))) :error '(invalid-function 5))
     ;; non-list second argument
-    (should-error-with (asoc-remove (lambda (k v) t) 5) :error '(wrong-type-argument sequencep 5))
+    (should-error-with-type (asoc-remove (lambda (k v) t) 5) :error 'wrong-type-argument)
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-remove-keys ()
@@ -818,7 +811,7 @@
     (should-error-with (asoc-remove-keys nil '((a . 1))) :error '(void-function nil))
     (should-error-with (asoc-remove-keys 5 '((a . 1))) :error '(invalid-function 5))
     ;; non-list second argument     keys
-    (should-error-with (asoc-remove-keys (lambda (k) t) 5) :error '(wrong-type-argument sequencep 5))
+    (should-error-with-type (asoc-remove-keys (lambda (k) t) 5) :error 'wrong-type-argument)
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-remove-values ()
@@ -868,7 +861,7 @@
     (should-error-with (asoc-remove-values nil '((a . 1))) :error '(void-function nil))
     (should-error-with (asoc-remove-values 5 '((a . 1))) :error '(invalid-function 5))
     ;; non-list second argument
-    (should-error-with (asoc-remove-values (lambda (v) t) 5) :error '(wrong-type-argument sequencep 5))
+    (should-error-with-type (asoc-remove-values (lambda (v) t) 5) :error 'wrong-type-argument)
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-partition ()
