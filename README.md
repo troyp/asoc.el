@@ -170,7 +170,7 @@ Anaphoric variant of `asoc-filter`.
 Return a list of those `alist` elements for which `form` evaluates t.
 
 The included elements remain in their original order. The anaphoric variables
-`'key` and `'value` are available for use in `form`.
+`key` and `value` are available for use in `form`.
 
     ;; remove nodes where the key is associated with itself
     (asoc--filter (not (eq key value))
@@ -335,8 +335,8 @@ The return value is obtained by evaluating `result`.
 Anaphoric variant of `asoc-do`.
 
 Iterate through `alist`, executing `body` for each key-value pair. For each
-iteration, the anaphoric variables `key and 'value are bound to they current
-key and value. The macro returns the value of the anaphoric variable 'result,
+iteration, the anaphoric variables `key` and `value` are bound to they current
+key and value. The macro returns the value of the anaphoric variable `result`,
 which is initially nil.
 
 Optionally, initialization code can be included prior to the main body using
@@ -380,7 +380,7 @@ Apply `func` to each element of `alist` and return the resulting list.
 Anaphoric variant of `asoc-map`.
 
 Evaluate `form` for each element of `alist` and return the resulting list.
-The anaphoric variables `'key` and `'value` are available for use in `form`.
+The anaphoric variables `key` and `value` are available for use in `form`.
 
     (asoc--map
         (cons (intern (concat (symbol-name key) "-squared"))
@@ -438,10 +438,10 @@ Anaphoric variant of `asoc-fold`.
 
   Reduce `alist` using `form` on each value, starting from `init`.
 
-The anaphoric variables `key, 'value and 'acc represent the current
+The anaphoric variables `key`, `value` and `acc` represent the current
 key, value and accumulated value, respectively.
 
-The return value is the value of 'acc after the last element has
+The return value is the value of `acc` after the last element has
 been processed.
 
     ;; list of keys with value of 0
