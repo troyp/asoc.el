@@ -64,6 +64,7 @@ disassembling alists.
 * [asoc-fold](#asoc-fold-func-alist-init) `(func alist init)`
 * [asoc--fold](#asoc--fold-form-alist-init) `(form alist init)`
 * [asoc-merge-values](#asoc-merge-values-rest-alists) `(&rest alists)`
+* [asoc-merge-values-no-dups](#asoc-merge-values-no-dups-rest-alists) `(&rest alists)`
 
 ### [Handling Alist Variants](#handling-alist-variants-1)
 * [List of duples](#list-of-duples)
@@ -478,10 +479,22 @@ Return an alist merging multiple occurrences of each key in __alists__.
 Each key is associated with a list containing all values in __alists__ which were
 associated with the key, in order.
 
-    (let ( (a `((a . 1) (b . 2) (a . 1) (c . 3) (b . 4)))
-           (b '((a . 5))) )
+    (let ( (a `((a . 1) (b . 2) (a . 3) (a . 1)))
+           (b '((a . 5) (b . 2) (c . 3))) )
       (asoc-merge-values a b))
-    ;; ((a 1 1 5) (b 2 4) (c 3))
+    ;; ((a 1 3 1 5) (b 2 2) (c 3))
+
+### asoc-merge-values-no-dups `(&rest alists)`
+
+Return an alist merging multiple unique values for each key in __alists__.
+
+Each key is associated with a list containing all unique values in __alists__ which
+were associated with the key, in order.
+
+    (let ( (a `((a . 1) (b . 2) (a . 3) (a . 1)))
+           (b '((a . 5) (b . 2) (c . 3))) )
+      (asoc-merge-values-no-dups a b))
+      ;; ((a 1 3 5) (b 2) (c 3))
 -------------------------------------------------------------------------------
 ## Handling Alist Variants
 

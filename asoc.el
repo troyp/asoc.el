@@ -4,7 +4,7 @@
 
 ;; Author: Troy Pracy
 ;; Keywords: alist data-types
-;; Version: 0.4.2
+;; Version: 0.4.3
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -663,10 +663,10 @@ associated with the key, in order.
 
 Example:
 
-    (let ( (a '((a . 1) (b . 2) (a . 1) (c . 3) (b . 4)))
-           (b '((a . 5))) )
+    (let ( (a '((a . 1) (b . 2) (a . 3) (a . 1)))
+           (b '((a . 5) (b . 2) (c . 3))) )
       (asoc-merge-values a b))
-    ;; ((a 1 1 5) (b 2 4) (c 3))"
+    ;; ((a 1 3 1 5) (b 2 2) (c 3))"
   (let ( result
          (rest (reverse (apply #'append alists))) )
     (while rest
@@ -678,6 +678,20 @@ Example:
         (push (cons key new-value) result))
       (setq rest (cdr rest)))
     (asoc-uniq result)))
+
+(defun asoc-merge-values-no-dups (&rest alists)
+  "Return an alist merging multiple unique values for each key in ALISTS.
+
+Each key is associated with a list containing all unique values in ALISTS which
+were associated with the key, in order.
+
+Example:
+
+    (let ( (a '((a . 1) (b . 2) (a . 3) (a . 1)))
+           (b '((a . 5) (b . 2) (c . 3))) )
+      (asoc-merge-values-no-dups a b))
+      ;; ((a 1 3 5) (b 2) (c 3))"
+  (asoc-map-values #'delete-dups (apply #'asoc-merge-values alists)))
 
 
 (provide 'asoc)

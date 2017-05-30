@@ -1637,6 +1637,47 @@
                 ((b . 4) (d . 5) (b . 6)) ))
     )
 
+  (ert-deftest test-asoc-unit-tests-asoc-merge-values-no-dups ()
+    "Unit tests for `asoc-merge-values-no-dups'."
+    ;; no duplicated values for a key
+    (should-equal (asoc-merge-values-no-dups nil) :result nil)
+    (should-equal (asoc-merge-values-no-dups nil nil nil) :result nil)
+    (should-equal (asoc-merge-values-no-dups '((a . 1) (b . 2) (c . 3)))
+                  :result '((a 1) (b 2) (c 3)))
+    ;; duplicate value, one list
+    (should-equal
+     (asoc-merge-values-no-dups '((a . 1) (a . 2) (a . 1)))
+     :result '((a 1 2)))
+    ;; duplicate key, multiple lists
+    (should-equal
+     (let ((al1 '((a . 1) (a . 2) (a . 3)))
+           (al2 '((a . 1) (a . 2)))
+           (al3 '((a . 4) (a . 5) (a . 6))))
+     (asoc-merge-values-no-dups al1 al2 al3))
+     :result '((a 1 2 3 4 5 6)))
+    ;; multiple lists, multiple distinct duplicate values
+    (should-equal
+     (let ((al1 '((a . 1) (b . 2) (a . 1)))
+           (al2 '((b . 1) (b . 2) (c . 3)))
+           (al3 '((b . 4) (c . 3) (b . 6))))
+       (asoc-merge-values-no-dups al1 al2 al3))
+     :result '((a 1) (b 2 1 4 6) (c 3)))
+    ;; duplicated null values
+    (should-equal (asoc-merge-values-no-dups
+                   '((a . nil) (a . nil) (a . nil)))
+                  :result '((a nil)))
+    ;; non-destructive
+    (should-equal
+     (let ((al1 '((a . 1) (b . 2) (a . 3)))
+           (al2 '((b . 1) (b . 2) (c . 3)))
+           (al3 '((b . 4) (d . 5) (b . 6))))
+       (asoc-merge-values-no-dups al1 al2 al3)
+       (list al1 al2 al3))
+     :result '( ((a . 1) (b . 2) (a . 3))
+                ((b . 1) (b . 2) (c . 3))
+                ((b . 4) (d . 5) (b . 6)) ))
+    )
+
   ;; ,-----------------,
   ;; | Docstring Tests |
   ;; '-----------------'
@@ -1815,10 +1856,18 @@
   (ert-deftest test-asoc-docstring-examples-asoc-merge-values ()
     "Docstring examples for `asoc-merge-values'."
     (should-equal
-     (let ( (a '((a . 1) (b . 2) (a . 1) (c . 3) (b . 4)))
-            (b '((a . 5))) )
+     (let ( (a '((a . 1) (b . 2) (a . 3) (a . 1)))
+            (b '((a . 5) (b . 2) (c . 3))) )
        (asoc-merge-values a b))
-     :result '((a 1 1 5) (b 2 4) (c 3))))
+     :result '((a 1 3 1 5) (b 2 2) (c 3))))
+
+  (ert-deftest test-asoc-docstring-examples-asoc-merge-values-no-dups ()
+    "Docstring examples for `asoc-merge-values-no-dups'."
+    (should-equal
+     (let ( (a '((a . 1) (b . 2) (a . 3) (a . 1)))
+            (b '((a . 5) (b . 2) (c . 3))) )
+       (asoc-merge-values-no-dups a b))
+     :result '((a 1 3 5) (b 2) (c 3))))
 
   )
 
