@@ -474,25 +474,11 @@
   (ert-deftest test-asoc-unit-tests-asoc-filter ()
     "Unit tests for `asoc-filter'."
     ;; empty list
-    (should-equal
-     (let ( result
-            (preds '( (lambda (k v) t)
-                      (lambda (k v) nil) )) )
-       (dolist (pred preds)
-         (push (asoc-filter pred nil)
-               result))
-       result)
-     :result '(nil nil))
+    (should-equal (asoc-filter (lambda (k v) t) nil) :result nil)
+    (should-equal (asoc-filter (lambda (k v) nil) nil) :result nil)
     ;; empty list, predicates with wrong number of arguments
-    (should-equal
-     (let ( result
-            (preds '( symbolp
-                      (lambda (a b c d e) t) )) )
-       (dolist (pred preds)
-         (push (asoc-filter pred nil)
-               result))
-       result)
-     :result '(nil nil))
+    (should-equal (asoc-filter (lambda () t) nil) :result nil)
+    (should-equal (asoc-filter (lambda (a b c d) t) nil) :result nil)
     ;; constant true and false functions
     (should-equal
      (let ( table
@@ -589,25 +575,11 @@
   (ert-deftest test-asoc-unit-tests-asoc-filter-keys ()
     "Unit tests for `asoc-filter-keys'."
     ;; empty list
-    (should-equal
-     (let ( result
-            (preds  '((lambda (k) t)
-                      (lambda (k) nil))) )
-       (dolist (pred preds)
-         (push (asoc-filter-keys pred nil)
-               result))
-       result)
-     :result '(nil nil))
+    (should-equal (asoc-filter-keys (lambda (k) t) nil) :result nil)
+    (should-equal (asoc-filter-keys (lambda (k) nil) nil) :result nil)
     ;; empty list, predicates with wrong number of arguments
-    (should-equal
-     (let ( result
-            (preds   '(<
-                       (lambda (a b c d e) t))) )
-       (dolist (pred preds)
-         (push (asoc-filter pred nil)
-               result))
-       result)
-     :result '(nil nil))
+    (should-equal (asoc-filter-keys (lambda () t) nil) :result nil)
+    (should-equal (asoc-filter-keys (lambda (a b c d) t) nil) :result nil)
     ;; constant true and false functions
     (should-equal
      (let ( table
@@ -656,25 +628,11 @@
   (ert-deftest test-asoc-unit-tests-asoc-filter-values ()
     "Unit tests for `asoc-filter-values'."
     ;; empty list
-    (should-equal
-     (let ( result
-            (preds '( (lambda (v) t)
-                      (lambda (v) nil) )) )
-       (dolist (pred preds)
-         (push (asoc-filter-values pred nil)
-               result))
-       result)
-     :result '(nil nil))
+    (should-equal (asoc-filter-values (lambda (v) t) nil) :result nil)
+    (should-equal (asoc-filter-values (lambda (v) nil) nil) :result nil)
     ;; empty list, predicates with wrong number of arguments
-    (should-equal
-     (let ( result
-            (preds '( >
-                      (lambda (a b c d e) t) )) )
-       (dolist (pred preds)
-         (push (asoc-filter-values pred nil)
-               result))
-       result)
-     :result '(nil nil))
+    (should-equal (asoc-filter-values (lambda () t) nil) :result nil)
+    (should-equal (asoc-filter-values (lambda (a b c d) t) nil) :result nil)
     ;; constant true and false functions
     (should-equal
      (let ( table
@@ -741,15 +699,8 @@
            (asoc-filter (lambda (k v) (not (funcall pred k v)))
                         alist)))))
     ;; empty list, predicates with wrong number of arguments
-    (should-equal
-     (let ( result
-            (preds-wrong-arity '( symbolp
-                                  (lambda (a b c d e) t) )) )
-       (dolist (pred preds-wrong-arity)
-         (push (asoc-filter pred nil)
-               result))
-       result)
-     :result '(nil nil))
+    (should-equal (asoc-remove (lambda () t) nil) :result nil)
+    (should-equal (asoc-remove (lambda (a b c d) t) nil) :result nil)
     ;; non-destructive
     (should-equal
      (let ((alist '((a . 1) (b . 2) (c . 3) (d . 4) (e . 5))))
@@ -782,15 +733,8 @@
            (asoc-filter-keys (lambda (k) (not (funcall pred k)))
                              alist)))))
     ;; empty list, predicates with wrong number of arguments
-    (should-equal
-     (let ( result
-            (preds '( <
-                      (lambda (a b c d e) t))) )
-       (dolist (pred preds)
-         (push (asoc-remove-keys pred nil)
-               result))
-       result)
-     :result '(nil nil))
+    (should-equal (asoc-remove-keys (lambda () t) nil) :result nil)
+    (should-equal (asoc-remove-keys (lambda (a b c d) t) nil) :result nil)
     ;; sample functions and alists
     (should-equal
      (let ((alist '((1 . 1) (2 . 4) (3 . 3) (4 . 2) (5 . 1) (6 . 7))))
@@ -832,15 +776,8 @@
            (asoc-filter-values (lambda (k) (not (funcall pred k)))
                                alist)))))
     ;; empty list, predicates with wrong number of arguments
-    (should-equal
-     (let ( result
-            (preds '( <
-                      (lambda (a b c d e) t))) )
-       (dolist (pred preds)
-         (push (asoc-remove-values pred nil)
-               result))
-       result)
-     :result '(nil nil))
+    (should-equal (asoc-remove-values (lambda () t) nil) :result nil)
+    (should-equal (asoc-remove-values (lambda (a b c d) t) nil) :result nil)
     ;; sample functions and alists
     (should-equal
      (let ((alist '((1 . 1) (2 . 4) (3 . 3) (4 . 2) (5 . 1) (6 . 7))))
@@ -1159,6 +1096,12 @@
 
   (ert-deftest test-asoc-unit-tests-asoc-find-key ()
     "Unit tests for `asoc-find-key'."
+    ;; empty list
+    (should-equal (asoc-find-key (lambda (k) t) nil) :result nil)
+    (should-equal (asoc-find-key (lambda (k) nil) nil) :result nil)
+    ;; empty list: no error from predicates with wrong number of arguments
+    (should-equal (asoc-find-key (lambda () t) nil) :result nil)
+    (should-equal (asoc-find-key (lambda (a b c d) t) nil) :result nil)
     (should-equal
      (let* (  table
               ( p  '(1 2) )
