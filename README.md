@@ -71,6 +71,11 @@ disassembling alists.
 * [Flat key-value list / Property list](#flat-key-value-list--property-list)
 * [Multi-valued alist](#multi-valued-alist)
 
+### [Representation of Alists](#representation-of-alists)
+* [List-valued alists](#list-valued-alists)
+* [Cons-valued alist](#cons-valued-alist)
+* [Null values](#null-values)
+
 ### [Other Packages](#other-packages-1)
 
 -------------------------------------------------------------------------------
@@ -559,6 +564,61 @@ relevant, ie. a key has multiple values.
 
 Such a multi-valued alist is best converted into a list-valued alist using
 `asoc-merge-values`.
+
+-------------------------------------------------------------------------------
+
+## Representation of Alists
+
+### List-valued alists
+
+As mentioned above, alists will sometimes have lists as values.
+
+    ( (key1 value1) (key2 value2a value2b) ... )
+
+... is the standard representation of:
+
+    ( ( key1 . (value1) )
+      ( key2 . (value2a value2b) )
+      ...
+
+Similarly, with an improper-list-valued alist:
+
+    ( (key1 value1a . value1b) (key2 value2a value2b . value2c) ... )
+
+... is the standard representation of:
+
+    ( ( key1 . (value1a . value1b) )
+      ( key2 . (value2a value2b . value2c))
+      ...
+
+### Cons-valued alist
+
+A special case (or special interpretation) of improper-list-valued alists is a
+cons-valued alist.
+
+For instance, consider an alist where values may be either individual atoms or
+cons cells:
+
+    ( (key1 . value1) (key2 value2a . value2b) ... )
+
+... is the standard representation of:
+
+    ( ( key1 . value1 )
+      ( key2 . (value2a . value2b) )
+      ...
+
+### Null values
+
+When a value is `nil`, the key-value pair is represented as a list containing
+only the key:
+
+    ( (key1 . value1) (key2) ... )
+
+is the standard representation of:
+
+    ( ( key1 . value1 )
+      ( key2 . nil )
+      ...
 
 -------------------------------------------------------------------------------
 
