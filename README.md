@@ -624,6 +624,10 @@ is the standard representation of:
 
 ## Other Packages
 
-[`let-alist`](https://elpa.gnu.org/packages/let-alist.html) provides a macro of
+* [`let-alist`](https://elpa.gnu.org/packages/let-alist.html) provides a macro of
 the same name, which allows convenient access to alist values when the keys are
 symbols.
+* [`map`](https://github.com/emacs-mirror/emacs/blob/master/lisp/emacs-lisp/map.el)
+provides functions for alists, hash tables and arrays.
+* [`kv`](https://github.com/nicferrier/emacs-kv) provides tools for plists,
+alists and hash tables.
