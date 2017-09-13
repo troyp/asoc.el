@@ -108,8 +108,8 @@ the function call.
 
 Special variable holding the equality predicate used in asoc functions.
 
-May take the values `equalp`, `equal`, `eql`, `eq`. When unset, functions
-default to using `equal`.
+May take the values `equalp` (or `cl-equalp`), `equal`, `eql`, `eq`. When unset,
+functions default to using `equal`.
 
 This variable may be passed to asoc functions dynamically in a let binding.
 

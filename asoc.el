@@ -24,6 +24,7 @@
 ;;
 
 ;;; Code:
+(require 'cl-macs)
 
 
 ;; ,-----------,
@@ -33,8 +34,8 @@
 (defvar asoc-compare-fn nil
   "Special variable holding the equality predicate used in asoc functions.
 
-May take the values `equalp', `equal', `eql', `eq'. When unset, functions
-default to using `equal'.
+May take the values `equalp' (or `cl-equalp'), `equal', `eql', `eq'. When unset,
+functions default to using `equal'.
 
 This variable may be passed to asoc functions dynamically in a let binding.")
 
@@ -51,7 +52,7 @@ This variable may be passed to asoc functions dynamically in a let binding.")
 
 The optional argument TEST specifies the equality test to be used, and defaults
 to `equal'. Possible values include `eq', `eql', `equal', `equalp'."
-  (case test
+  (cl-case test
     ('eq          (assq  key alist))
     ((equal nil)  (assoc key alist))
     (t (progn
@@ -278,11 +279,12 @@ Example:
 
 (defun asoc-contains-key? (alist key)
   "Return t if ALIST contains an item with key KEY, nil otherwise."
-  (case asoc-compare-fn
-    ('equalp (and (asoc---assoc key alist #'equalp) t))
-    ('eql    (and (asoc---assoc key alist #'eql) t))
-    ('eq     (and (assq  key alist) t))
-    (t       (and (assoc key alist) t))))
+  (cl-case asoc-compare-fn
+    (cl-equalp (and (asoc---assoc key alist #'cl-equalp) t))
+    (equalp    (and (asoc---assoc key alist #'cl-equalp) t))
+    ('eql      (and (asoc---assoc key alist #'eql) t))
+    ('eq       (and (assq  key alist) t))
+    (t         (and (assoc key alist) t))))
 
 (defun asoc-contains-pair? (alist key value)
   "Return t if ALIST contains an item (KEY . VALUE), nil otherwise."
