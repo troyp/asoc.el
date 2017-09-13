@@ -319,8 +319,10 @@ In the latter case, this is equivalent to `acons'."
   (declare (debug (sexp sexp sexp &optional sexp)))
   `(progn
      (when ,replace
-       (setq ,alist (map-filter (lambda (k _) (not (asoc---compare k ,key)))
-                                ,alist)))
+       (setq ,alist (asoc---list-filter
+                     (lambda (pair)
+                       (not (asoc---compare (car pair) ,key)))
+                     ,alist)))
      (push (cons ,key ,value) ,alist)))
      ;; (setq ,alist (cons (cons ,key ,value) ,alist))))
 
