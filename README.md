@@ -353,7 +353,7 @@ The return value is obtained by evaluating __result__.
     (let ((sum 0))
       (asoc-do ((key value) a sum)
         (when (symbolp key)
-          (setf sum (+ sum value))))))
+          (setf sum (+ sum value)))))
     ;; add values associated with all keys that are symbols.
 
 ### asoc--do `(alist &rest body)`
