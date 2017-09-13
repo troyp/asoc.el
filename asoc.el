@@ -110,7 +110,7 @@ If there are insufficient elements, return LIST."
                 rest)
       (push (car rest) result)
       (setq rest (cdr rest))
-      (incf i))
+      (setq i (1+ i)))
     (nreverse result)))
 
 ;; ,----------------------------------,
@@ -462,7 +462,7 @@ Example:
          (kvar    (car vars))
          (vvar    (cadr vars))
          (alist   (cadr spec))
-         (result  (caddr spec))
+         (result  (car (cddr spec)))
          (pairsym (make-symbol "pair")))
     (if result
         `(progn
@@ -608,8 +608,13 @@ If KEYS is longer than VALUES, the excess keys have value nil."
     (error "More keys than values."))
   (let* ((n (- (length keys)
                (length values)))
-         (values (append values (make-list n nil))))
-    (mapcar* #'cons keys values)))
+         (values (append values (make-list n nil)))
+         (result nil))
+    (while keys
+      (let ((key   (pop keys))
+            (value (pop values)))
+        (push (cons key value) result)))
+    (reverse result)))
 
 ;; ,-------,
 ;; | Folds |
