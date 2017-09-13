@@ -20,7 +20,7 @@
     (should-equal
      (let ( table )
        (dolist (fn
-                (list #'equalp #'equal #'eql #'eq)
+                (list #'cl-equalp #'equal #'eql #'eq)
                 table)
          (let* ( (result (list :: fn))
                  (p  '(1 2))
@@ -38,11 +38,11 @@
                    result))
            (push (reverse result) table))))
      :result
-     '( ;  FN        3~3  3~3.0  "a"~"a"  "a"~"A"  x~x (1 2)~(1 2) p~p
-       (  eq      ::  t    nil     nil      nil     t      nil      t  )
-       (  eql     ::  t    nil     nil      nil     t      nil      t  )
-       (  equal   ::  t    nil     t        nil     t      t        t  )
-       (  equalp  ::  t    t       t        t       t      t        t  )))
+     '( ;  FN          3~3  3~3.0  "a"~"a"  "a"~"A"  x~x (1 2)~(1 2) p~p
+       (  eq        ::  t    nil     nil      nil     t      nil      t  )
+       (  eql       ::  t    nil     nil      nil     t      nil      t  )
+       (  equal     ::  t    nil     t        nil     t      t        t  )
+       (  cl-equalp ::  t    t       t        t       t      t        t  )))
     ;; float equality under #'eql
     (should-equal
      (let ((asoc-compare-fn #'eql))
@@ -68,7 +68,7 @@
                   ,p        ;;    p           | 8  list, same object
                   nil       ;;    nil         | 9  nil
                   )))
-       (dolist (eqfn (list #'equalp #'equal #'eql #'eq))
+       (dolist (eqfn (list #'cl-equalp #'equal #'eql #'eq))
          (let* (( result  (list :: eqfn) ))
            (dolist (test test-items)
              (push (asoc---assoc test a eqfn)
@@ -76,11 +76,11 @@
            (push (reverse result) table)))
        table)
      :result
-     ;;  FN         1/1    1.0/1   2.0/2.0    2/2.0    "a"/"a"   "A"/"a"  (1 2)/(1 2) (1 2),same     nil
-     '((eq     :: (1 . t)   nil      nil       nil       nil       nil        nil     ((1 2) . t) (nil . t))
-       (eql    :: (1 . t)   nil   (2.0 . t)    nil       nil       nil        nil     ((1 2) . t) (nil . t))
-       (equal  :: (1 . t)   nil   (2.0 . t)    nil    ("a" . t)    nil    ((1 2) . t) ((1 2) . t) (nil . t))
-       (equalp :: (1 . t) (1 . t) (2.0 . t) (2.0 . t) ("a" . t) ("a" . t) ((1 2) . t) ((1 2) . t) (nil . t)))
+     ;;  FN            1/1    1.0/1   2.0/2.0    2/2.0    "a"/"a"   "A"/"a"  (1 2)/(1 2) (1 2),same     nil
+     '((eq        :: (1 . t)   nil      nil       nil       nil       nil        nil     ((1 2) . t) (nil . t))
+       (eql       :: (1 . t)   nil   (2.0 . t)    nil       nil       nil        nil     ((1 2) . t) (nil . t))
+       (equal     :: (1 . t)   nil   (2.0 . t)    nil    ("a" . t)    nil    ((1 2) . t) ((1 2) . t) (nil . t))
+       (cl-equalp :: (1 . t) (1 . t) (2.0 . t) (2.0 . t) ("a" . t) ("a" . t) ((1 2) . t) ((1 2) . t) (nil . t)))
      )
     )
 
@@ -107,16 +107,16 @@
                        (1.0 . 2) ("A" . 2) ((1 2) . 2) (nil . 2)
                                  ("a" . 3)                      ))
             (result))
-       (dolist (fn (list #'equalp #'equal #'eql #'eq))
+       (dolist (fn (list #'cl-equalp #'equal #'eql #'eq))
          (let* (( asoc-compare-fn  fn  ))
            (push (list fn :: (asoc---uniq a))
                  result)))
        result)
-     :result    ;; <-----------first occurrences----------> <---------------duplicates--------------->
-     '( (eq     :: ((1 . 1) ("a" . 1) ((1 2) . 1) (nil . 1) (1.0 . 2) ("A" . 2) ((1 2) . 2) ("a" . 3)) )
-        (eql    :: ((1 . 1) ("a" . 1) ((1 2) . 1) (nil . 1) (1.0 . 2) ("A" . 2) ((1 2) . 2) ("a" . 3)) )
-        (equal  :: ((1 . 1) ("a" . 1) ((1 2) . 1) (nil . 1) (1.0 . 2) ("A" . 2)                      ) )
-        (equalp :: ((1 . 1) ("a" . 1) ((1 2) . 1) (nil . 1)                                            ) ))
+     :result       ;; <-----------first occurrences----------> <---------------duplicates--------------->
+     '( (eq        :: ((1 . 1) ("a" . 1) ((1 2) . 1) (nil . 1) (1.0 . 2) ("A" . 2) ((1 2) . 2) ("a" . 3)) )
+        (eql       :: ((1 . 1) ("a" . 1) ((1 2) . 1) (nil . 1) (1.0 . 2) ("A" . 2) ((1 2) . 2) ("a" . 3)) )
+        (equal     :: ((1 . 1) ("a" . 1) ((1 2) . 1) (nil . 1) (1.0 . 2) ("A" . 2)                      ) )
+        (cl-equalp :: ((1 . 1) ("a" . 1) ((1 2) . 1) (nil . 1)                                            ) ))
      )
     )
 
@@ -141,7 +141,7 @@
                   nil         ;;    nil     | 10  nil
                   t           ;;    t       | 11  t
                   )))
-       (dolist (f (list #'equalp #'equal #'eql #'eq))
+       (dolist (f (list #'cl-equalp #'equal #'eql #'eq))
          (let* (( result           (list :: f) )
                 ( asoc-compare-fn       f       ) )
            (dolist (test test-items)
@@ -152,12 +152,12 @@
        table)
      :result
      ;;  Integers represent the length of the tail starting with TEST-ITEM
-     ;;  LIST ITEM:  2  2    3.0  3.0  ,p   ,p      "a"  "a" 'c   nil  t
-     ;;  TEST ITEM:  2  2.0  3    3.0  ,p   (1  2)  "a"  "A"  c   nil  t
+     ;;  LIST ITEM:   2  2    3.0  3.0  ,p   ,p      "a"  "a" 'c   nil  t
+     ;;  TEST ITEM:   2  2.0  3    3.0  ,p   (1  2)  "a"  "A"  c   nil  t
      '((eq        ::  7  nil  nil  nil  5    nil     nil  nil  nil  2   1 )
        (eql       ::  7  nil  nil  6    5    nil     nil  nil  nil  2   1 )
        (equal     ::  7  nil  nil  6    5    5       4    nil  nil  2   1 )
-       (equalp    ::  7  7    6    6    5    5       4    4    nil  2   1 ))
+       (cl-equalp ::  7  7    6    6    5    5       4    4    nil  2   1 ))
      )
     )
 
@@ -373,13 +373,13 @@
             ( a       `( (1 1)   (,p 1)    ("a" 1) ('c 1) (nil 1) (t 1)
                          (1 2)   (,p 2)    ("a" 2) ('c 2) (nil 2) (t 2)
                          (1.0 3) ((1 2) 3) ("A" 3)                      )))
-       (dolist (f (list #'equalp #'equal #'eql #'eq))
+       (dolist (f (list #'cl-equalp #'equal #'eql #'eq))
          (let (( asoc-compare-fn f ))
            (push (list f ::: (asoc-uniq a))
                  result)))
        (reverse result))
      :result
-     '((equalp ::: ( (1 1) ((1 2) 1) ("a" 1) ('c 1) (nil 1) (t 1)                                          ) )
+     '((cl-equalp ::: ( (1 1) ((1 2) 1) ("a" 1) ('c 1) (nil 1) (t 1)                                         ) )
        (equal  ::: ( (1 1) ((1 2) 1) ("a" 1) ('c 1) (nil 1) (t 1)                (1.0 3)           ("A" 3) ) )
        (eql    ::: ( (1 1) ((1 2) 1) ("a" 1) ('c 1) (nil 1) (t 1) ("a" 2) ('c 2) (1.0 3) ((1 2) 3) ("A" 3) ) )
        (eq     ::: ( (1 1) ((1 2) 1) ("a" 1) ('c 1) (nil 1) (t 1) ("a" 2) ('c 2) (1.0 3) ((1 2) 3) ("A" 3) ) ))
@@ -387,8 +387,8 @@
     ;; Duplicate floating point keys are removed with #'equalp, #'equal and #'eql
     (should-equal
      (list
-      (append '(equalp :::)
-              (let ((asoc-compare-fn #'equalp))
+      (append '(cl-equalp :::)
+              (let ((asoc-compare-fn #'cl-equalp))
                 (asoc-uniq '((1.0 . 1) (1.0 . 2)))))
       (append '(equal :::)
               (let ((asoc-compare-fn #'equal))
@@ -397,7 +397,7 @@
               (let ((asoc-compare-fn #'eql))
                 (asoc-uniq '((1.0 . 1) (1.0 . 2))))))
      :result
-     '((equalp ::: (1.0 . 1))
+     '((cl-equalp ::: (1.0 . 1))
        (equal  ::: (1.0 . 1))
        (eql    ::: (1.0 . 1))))
     ;; non-destructive
@@ -861,7 +861,7 @@
                 ,p        ;;    p           | 8  list, same object
                 nil       ;;    nil         | 9  nil
                 )))
-       (dolist (fn (list #'equalp #'equal #'eql #'eq))
+       (dolist (fn (list #'cl-equalp #'equal #'eql #'eq))
          (let* (( result           (list :: fn) )
                 ( asoc-compare-fn  fn  ))
            (dolist (test test-items)
@@ -870,11 +870,11 @@
            (push (reverse result) table)))
        table)
      :result
-     ;;  FN        1/1  1.0/1  2.0/2.0  2/2.0 "a"/"a" "A"/"a" (1 2)/(1 2) (1 2),same nil
-     `(( eq     ::  t    nil     nil     nil    nil     nil       nil          t      t )
-       ( eql    ::  t    nil      t      nil    nil     nil       nil          t      t )
-       ( equal  ::  t    nil      t      nil     t      nil        t           t      t )
-       ( equalp ::  t    t        t       t      t       t         t           t      t ))
+     ;;  FN           1/1  1.0/1  2.0/2.0  2/2.0 "a"/"a" "A"/"a" (1 2)/(1 2) (1 2),same nil
+     `(( eq        ::  t    nil     nil     nil    nil     nil       nil          t      t )
+       ( eql       ::  t    nil      t      nil    nil     nil       nil          t      t )
+       ( equal     ::  t    nil      t      nil     t      nil        t           t      t )
+       ( cl-equalp ::  t    t        t       t      t       t         t           t      t ))
      )
     ;; wrong number of arguments
     (should-error-with-type (asoc-contains-key? nil) :error 'wrong-number-of-arguments)
@@ -917,7 +917,7 @@
                 (1 . (2))   ;;    p=(1 2)=(1 . (2)) | 9  list values
                 ,p          ;;    p                 | 10 list values, same cons
                 )))
-       (dolist (fn (list #'equalp #'equal #'eql #'eq))
+       (dolist (fn (list #'cl-equalp #'equal #'eql #'eq))
          (let* (( result           (list :: fn) )
                 ( asoc-compare-fn  fn  ))
            (dolist (test test-items)
@@ -926,12 +926,12 @@
            (push (reverse result) table)))
        table)
      :result
-     ;; ALIST ITEM:    q    q  (1 . 3.0) (1 . 3.0)  (1 . "a")  (1 . "a")  (1 .   p)   (1 . p)    p   p
-     ;;  TEST ITEM: (1 . 2) q  (1 . 3)   (1 . 3.0)  (1 . "a")  (1 . "A")  (1 . (1 2)) (1 . p)  (1 2) p
-     '(( eq      ::    t    t    nil       nil        nil        nil        nil          t     nil   t )
-       ( eql     ::    t    t    nil        t         nil        nil        nil          t     nil   t )
-       ( equal   ::    t    t    nil        t          t         nil         t           t      t    t )
-       ( equalp  ::    t    t     t         t          t          t          t           t      t    t )))
+     ;; ALIST ITEM:      q    q  (1 . 3.0) (1 . 3.0)  (1 . "a")  (1 . "a")  (1 .   p)   (1 . p)    p   p
+     ;;  TEST ITEM:   (1 . 2) q  (1 . 3)   (1 . 3.0)  (1 . "a")  (1 . "A")  (1 . (1 2)) (1 . p)  (1 2) p
+     '(( eq        ::    t    t    nil       nil        nil        nil        nil          t     nil   t )
+       ( eql       ::    t    t    nil        t         nil        nil        nil          t     nil   t )
+       ( equal     ::    t    t    nil        t          t         nil         t           t      t    t )
+       ( cl-equalp ::    t    t     t         t          t          t          t           t      t    t )))
     ;; wrong number of arguments
     (should-error-with-type (asoc-contains-pair? nil 'a) :error 'wrong-number-of-arguments)
     (should-error-with-type (asoc-contains-pair? nil) :error 'wrong-number-of-arguments)
@@ -959,7 +959,7 @@
                 ,p        ;;    p           | 8  list, same object
                 nil       ;;    nil         | 9  nil
                 )))
-       (dolist (fn (list #'equalp #'equal #'eql #'eq))
+       (dolist (fn (list #'cl-equalp #'equal #'eql #'eq))
          (let* (( result           (list :: fn) )
                 ( asoc-compare-fn  fn  ))
            (dolist (test test-items)
@@ -968,11 +968,11 @@
            (push (reverse result) table)))
        table)
      :result
-     ;;  FN        1/1  1.0/1  2.0/2.0  2/2.0 "a"/"a" "A"/"a" (1 2)/(1 2) (1 2),same nil
-     '(( eq     ::  1    nil     nil     nil    nil     nil       nil          4      5 )
-       ( eql    ::  1    nil      2      nil    nil     nil       nil          4      5 )
-       ( equal  ::  1    nil      2      nil     3      nil        4           4      5 )
-       ( equalp ::  1     1       2       2      3       3         4           4      5 ))
+     ;;  FN           1/1  1.0/1  2.0/2.0  2/2.0 "a"/"a" "A"/"a" (1 2)/(1 2) (1 2),same nil
+     '(( eq        ::  1    nil     nil     nil    nil     nil       nil          4      5 )
+       ( eql       ::  1    nil      2      nil    nil     nil       nil          4      5 )
+       ( equal     ::  1    nil      2      nil     3      nil        4           4      5 )
+       ( cl-equalp ::  1     1       2       2      3       3         4           4      5 ))
      )
     ;; empty alist
     (should-equal (asoc-get nil 1) :result nil)
@@ -1179,7 +1179,7 @@
                              ,p        ;;    p           | 8  list, same object
                              nil       ;;    nil         | 9  nil
                              )))
-       (dolist (eqfn (list #'equalp #'equal #'eql #'eq))
+       (dolist (eqfn (list #'cl-equalp #'equal #'eql #'eq))
          (let ( (asoc-compare-fn  eqfn)
                 (result  (list :: eqfn)) )
            (dolist (test test-items)
@@ -1188,11 +1188,11 @@
            (push (reverse result) table)))
        table)
      :result
-     ;;  FN         1/1    1.0/1   2.0/2.0    2/2.0    "a"/"a"   "A"/"a"  (1 2)/(1 2) (1 2),same     nil
-     '((eq     :: (1 . t)   nil      nil       nil       nil       nil        nil     ((1 2) . t) (nil . t))
-       (eql    :: (1 . t)   nil   (2.0 . t)    nil       nil       nil        nil     ((1 2) . t) (nil . t))
-       (equal  :: (1 . t)   nil   (2.0 . t)    nil    ("a" . t)    nil    ((1 2) . t) ((1 2) . t) (nil . t))
-       (equalp :: (1 . t) (1 . t) (2.0 . t) (2.0 . t) ("a" . t) ("a" . t) ((1 2) . t) ((1 2) . t) (nil . t))))
+     ;;  FN            1/1    1.0/1   2.0/2.0    2/2.0    "a"/"a"   "A"/"a"  (1 2)/(1 2) (1 2),same     nil
+     '((eq        :: (1 . t)   nil      nil       nil       nil       nil        nil     ((1 2) . t) (nil . t))
+       (eql       :: (1 . t)   nil   (2.0 . t)    nil       nil       nil        nil     ((1 2) . t) (nil . t))
+       (equal     :: (1 . t)   nil   (2.0 . t)    nil    ("a" . t)    nil    ((1 2) . t) ((1 2) . t) (nil . t))
+       (cl-equalp :: (1 . t) (1 . t) (2.0 . t) (2.0 . t) ("a" . t) ("a" . t) ((1 2) . t) ((1 2) . t) (nil . t))))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-keys ()
@@ -1214,16 +1214,16 @@
                        (1.0 . nil) ("a" . nil) ((1 2) . nil) (nil . nil) ))
             (result))
 
-       (dolist (fn (list #'equalp #'equal #'eql #'eq))
+       (dolist (fn (list #'cl-equalp #'equal #'eql #'eq))
          (let* (( asoc-compare-fn  fn  ))
            (push (list fn :: (asoc-keys a))
                  result)))
        result)
-     :result   ;; <-first occurrences->         <-duplicates->
-     '((eq     ::  (1  "a"  (1 2)  nil          1.0  "a" (1 2) ))
-       (eql    ::  (1  "a"  (1 2)  nil          1.0  "a" (1 2) ))
-       (equal  ::  (1  "a"  (1 2)  nil          1.0            ))
-       (equalp ::  (1  "a"  (1 2)  nil                         )))
+     :result      ;; <-first occurrences->         <-duplicates->
+     '((eq        ::  (1  "a"  (1 2)  nil          1.0  "a" (1 2) ))
+       (eql       ::  (1  "a"  (1 2)  nil          1.0  "a" (1 2) ))
+       (equal     ::  (1  "a"  (1 2)  nil          1.0            ))
+       (cl-equalp ::  (1  "a"  (1 2)  nil                         )))
      )
     )
 
@@ -1259,16 +1259,16 @@
             ( a  `((1   . 1)   ("a" . "a") (,p    . ,p)    (nil . nil)
                    (1.0 . 1.0) ("a" . "a") ((1 2) . (1 2)) (nil . nil) )))
 
-       (dolist (fn (list #'equalp #'equal #'eql #'eq))
+       (dolist (fn (list #'cl-equalp #'equal #'eql #'eq))
          (let* (( asoc-compare-fn  fn  ))
            (push (list fn :: (asoc-values a))
                  result)))
        result)
-     :result   ;; <-first occurrences->     <-duplicates->
-     '((eq     ::  (1  "a"  (1 2)  nil      1.0  "a" (1 2) ))
-       (eql    ::  (1  "a"  (1 2)  nil      1.0  "a" (1 2) ))
-       (equal  ::  (1  "a"  (1 2)  nil      1.0            ))
-       (equalp ::  (1  "a"  (1 2)  nil                     ))))
+     :result      ;; <-first occurrences->     <-duplicates->
+     '((eq        ::  (1  "a"  (1 2)  nil      1.0  "a" (1 2) ))
+       (eql       ::  (1  "a"  (1 2)  nil      1.0  "a" (1 2) ))
+       (equal     ::  (1  "a"  (1 2)  nil      1.0            ))
+       (cl-equalp ::  (1  "a"  (1 2)  nil                     ))))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-values-ignore-values ()
@@ -1304,16 +1304,16 @@
             ( a  `((1   . 1)   ("a" . "a") (,p    . ,p)    (nil . nil)
                    (1.0 . 1.0) ("a" . "a") ((1 2) . (1 2)) (nil . nil) )))
 
-       (dolist (fn (list #'equalp #'equal #'eql #'eq))
+       (dolist (fn (list #'cl-equalp #'equal #'eql #'eq))
          (let* (( asoc-compare-fn  fn  ))
            (push (list fn :: (asoc-values a :ignore-shadowed))
                  result)))
        result)
-     :result   ;; <-first occurrences->     <-duplicates->
-     '((eq     ::  (1  "a"  (1 2)  nil      1.0  "a" (1 2) ))
-       (eql    ::  (1  "a"  (1 2)  nil      1.0  "a" (1 2) ))
-       (equal  ::  (1  "a"  (1 2)  nil      1.0            ))
-       (equalp ::  (1  "a"  (1 2)  nil                     ))))
+     :result      ;; <-first occurrences->     <-duplicates->
+     '((eq        ::  (1  "a"  (1 2)  nil      1.0  "a" (1 2) ))
+       (eql       ::  (1  "a"  (1 2)  nil      1.0  "a" (1 2) ))
+       (equal     ::  (1  "a"  (1 2)  nil      1.0            ))
+       (cl-equalp ::  (1  "a"  (1 2)  nil                     ))))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-unzip ()
