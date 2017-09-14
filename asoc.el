@@ -48,7 +48,8 @@ This variable may be passed to asoc functions dynamically in a let binding.")
   (funcall (or asoc-compare-fn #'equal) x y))
 
 (defun asoc---assoc (key alist &optional test)
-  "Return the first element of ALIST whose `car' matches KEY, or nil if none match.
+  "Return the first element of ALIST whose `car' matches KEY, or nil if none
+match.
 
 The optional argument TEST specifies the equality test to be used, and defaults
 to `equal'. Possible values include `eq', `eql', `equal', `equalp'."
@@ -172,10 +173,12 @@ PREDICATE should take two arguments, KEY and VALUE.
 
 Example: filter for pairs where KEY > VALUE
 
-    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)
+                 (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-filter #'> fib))
     ;; ((2 . 1) (3 . 2) (4 . 3))"
-  (asoc---list-filter (lambda (pair) (funcall predicate (car pair) (cdr pair))) alist))
+  (asoc---list-filter (lambda (pair) (funcall predicate (car pair) (cdr pair)))
+                      alist))
 
 (defmacro asoc--filter (form alist)
   "Anaphoric variant of `asoc-filter'.
@@ -200,9 +203,10 @@ Examples:
 
 Example: filter for pairs where KEY <= 3
 
-    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)
+                 (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-filter-keys (lambda (k) (<= k 3)) fib))
-;; ((1 . 1) (2 . 1) (3 . 2))"
+    ;; ((1 . 1) (2 . 1) (3 . 2))"
   (asoc---list-filter (lambda (pair) (funcall predicate (car pair))) alist))
 
 (defun asoc-filter-values (predicate alist)
@@ -210,9 +214,10 @@ Example: filter for pairs where KEY <= 3
 
 Example: filter for pairs where VALUE <= 3
 
-    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)
+                 (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-filter-values (lambda (v) (<= v 3)) fib))
-;; ((1 . 1) (2 . 1) (3 . 2) (4 . 3))"
+    ;; ((1 . 1) (2 . 1) (3 . 2) (4 . 3))"
   (asoc---list-filter (lambda (pair) (funcall predicate (cdr pair))) alist))
 
 (defun asoc-remove (predicate alist)
@@ -224,10 +229,12 @@ Alias: `asoc-reject'
 
 Example: filter out pairs where KEY > VALUE
 
-    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)
+                 (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-remove #'> fib))
     ;; ((1 . 1) (5 . 5) (6 . 8) (7 . 13) (8 . 21))"
-  (asoc---list-remove (lambda (pair) (funcall predicate (car pair) (cdr pair))) alist))
+  (asoc---list-remove (lambda (pair) (funcall predicate (car pair) (cdr pair)))
+                      alist))
 
 (defun asoc-remove-keys (predicate alist)
   "Return a copy of ALIST with keys satisfying PREDICATE removed.
@@ -236,7 +243,8 @@ Alias: `asoc-reject-keys'
 
 Example: filter out pairs where KEY <= 3
 
-    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)
+                 (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-remove-keys (lambda (k) (<= k 3)) fib))
     ;; ((4 . 3) (5 . 5) (6 . 8) (7 . 13) (8 . 21))"
   (asoc---list-remove (lambda (pair) (funcall predicate (car pair))) alist))
@@ -248,7 +256,8 @@ Alias: `asoc-reject-values'
 
 Example: filter out pairs where VALUE <= 3
 
-    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)
+                 (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-remove-values (lambda (v) (<= v 3)) fib))
     ;; ((5 . 5) (6 . 8) (7 . 13) (8 . 21))"
   (asoc---list-remove (lambda (pair) (funcall predicate (cdr pair))) alist))
@@ -441,7 +450,8 @@ asoc-unzip will also reverse `asoc-zip' as long as the original arguments of
 (defmacro asoc-do (spec &rest body)
   "Iterate through ALIST, executing BODY for each key-value pair.
 
-For each iteration, KEYVAR is bound to the key and VALUEVAR is bound to the value.
+For each iteration, KEYVAR is bound to the key and VALUEVAR is bound to the
+value.
 
 The return value is obtained by evaluating RESULT.
 
@@ -562,7 +572,8 @@ Examples:
         (cons (intern (concat (symbol-name key) \"-squared\"))
               (* value value))
       '((one . 1) (two . 2) (three . 3) (four . 4)))
-    ;; ((one-squared . 1) (two-squared . 4) (three-squared . 9) (four-squared . 16))
+    ;; ((one-squared . 1) (two-squared . 4)
+    ;;  (three-squared . 9) (four-squared . 16))
 
     (asoc--map (cons (intern key) value)
       '((\"one\" . 1) (\"two\" . 2) (\"three\" . 3)))
@@ -581,8 +592,8 @@ Examples:
 Example: convert symbolic keys to strings
 
     (asoc-map-keys #'symbol-name
-                  '((one . 1) (two . 4) (three . 9) (four . 16) (five . 25)))
-    ;; ((\"one\" . 1) (\"two\" . 4) (\"three\" . 9) (\"four\" . 16) (\"five\" . 25))"
+                  '((one . 1) (two . 4) (three . 9) (four . 16)))
+    ;; ((\"one\" . 1) (\"two\" . 4) (\"three\" . 9) (\"four\" . 16))"
   (mapcar (lambda (k.v)
             (let ((k (car k.v))
                   (v (cdr k.v)))

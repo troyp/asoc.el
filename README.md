@@ -9,10 +9,10 @@ filtering and folding facilities in both regular and anaphoric variants, a
 looping construct analogous to `dolist`, and a special variable for configuring
 the equality predicate used by `asoc` operations.
 
-__note on builtin list functions__: For some operations, no distinction need be made
-between alists and general lists. `asoc` does not provide functions for such
-operations, since regular list functions may be used. For instance,
-`cons`, `car`, `cdr`, `push`, `pop`, `append` should be used for assembling and
+__note on builtin list functions__: For some operations, no distinction need be
+made between alists and general lists. `asoc` does not provide functions for
+such operations, since regular list functions may be used. For instance, `cons`,
+`car`, `cdr`, `push`, `pop`, `append` should be used for assembling and
 disassembling alists.
 
 ## API
@@ -43,14 +43,18 @@ disassembling alists.
 * [asoc-contains-pair?](#asoc-contains-pair-alist-key-value) `(alist key value)`
 
 ### Access Functions
-* [asoc-get](#asoc-get-alist-key-optional-default) `(alist key &optional default)`
-* [asoc-put!](#asoc-put-alist-key-value-optional-replace) `(alist key value &optional replace)`
-* [asoc-delete!](#asoc-delete-alist-key-optional-remove-all) `(alist key &optional remove-all)`
+* [asoc-get](#asoc-get-alist-key-optional-default)
+  `(alist key &optional default)`
+* [asoc-put!](#asoc-put-alist-key-value-optional-replace)
+  `(alist key value &optional replace)`
+* [asoc-delete!](#asoc-delete-alist-key-optional-remove-all)
+  `(alist key &optional remove-all)`
 * [asoc-find](#asoc-find-predicate-alist) `(predicate alist)`
 * [asoc--find](#asoc--find-form-alist) `(form alist)`
 * [asoc-find-key](#asoc-find-key-key-alist) `(key alist)`
 * [asoc-keys](#asoc-keys-alist) `(alist)`
-* [asoc-values](#asoc-values-alist-optional-ignore-shadowed) `(alist &optional ignore-shadowed)`
+* [asoc-values](#asoc-values-alist-optional-ignore-shadowed)
+  `(alist &optional ignore-shadowed)`
 * [asoc-unzip](#asoc-unzip-alist) `(alist)`
 
 ### Looping Constructs
@@ -67,7 +71,8 @@ disassembling alists.
 * [asoc-fold](#asoc-fold-func-alist-init) `(func alist init)`
 * [asoc--fold](#asoc--fold-form-alist-init) `(form alist init)`
 * [asoc-merge-values](#asoc-merge-values-rest-alists) `(&rest alists)`
-* [asoc-merge-values-no-dups](#asoc-merge-values-no-dups-rest-alists) `(&rest alists)`
+* [asoc-merge-values-no-dups](#asoc-merge-values-no-dups-rest-alists)
+  `(&rest alists)`
 
 ### [Handling Alist Variants](#handling-alist-variants-1)
 * [List of duples](#list-of-duples)
@@ -193,7 +198,8 @@ The included elements remain in their original order. The anaphoric variables
 Return a copy of __alist__ with keys failing __predicate__ removed.
 
     ;; filter for pairs where KEY <= 3
-    (let ((fib `((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+    (let ((fib `((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)
+          (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-filter-keys (lambda (k) (<= k 3)) fib))
     ;; ((1 . 1) (2 . 1) (3 . 2))
 
@@ -202,19 +208,22 @@ Return a copy of __alist__ with keys failing __predicate__ removed.
 Return a copy of __alist__ with pairs whose value fails __predicate__ removed.
 
     ;; filter for pairs where VALUE <= 3
-    (let ((fib `((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+    (let ((fib `((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)
+                 (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-filter-values (lambda (v) (<= v 3)) fib))
     ;; ((1 . 1) (2 . 1) (3 . 2) (4 . 3))
 
 ### asoc-remove `(predicate alist)`
 _alias: `asoc-reject`_
 
-Return a copy of __alist__ with key-value pairs satisfying __predicate__ removed.
+Return a copy of __alist__ with key-value pairs satisfying __predicate__
+removed.
 
 __predicate__ should take two arguments, __key__ and __value__.
 
     ;; filter out pairs where KEY > VALUE
-    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)
+                 (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-remove #'> fib))
     ;; ((1 . 1) (5 . 5) (6 . 8) (7 . 13) (8 . 21))
 
@@ -224,17 +233,20 @@ _alias: `asoc-reject-keys`_
 Return a copy of __alist__ with keys satisfying __predicate__ removed.
 
     ;; filter out pairs where KEY <= 3
-    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)
+                 (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-remove-keys (lambda (k) (<= k 3)) fib))
     ;; ((4 . 3) (5 . 5) (6 . 8) (7 . 13) (8 . 21))
 
 ### asoc-remove-values `(predicate alist)`
 _alias: `asoc-reject-values`_
 
-Return a copy of __alist__ with pairs whose value satisfying __predicate__ removed.
+Return a copy of __alist__ with pairs whose value satisfying __predicate__
+removed.
 
     ;; filter out pairs where VALUE <= 3
-    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
+    (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)
+                 (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-remove-values (lambda (v) (<= v 3)) fib))
     ;; ((5 . 5) (6 . 8) (7 . 13) (8 . 21))
 
@@ -257,7 +269,8 @@ Return t if __alist__ contains an item with key __key__, nil otherwise.
 ### asoc-contains-pair\? `(alist key value)`
 _alias: `asoc-contains-pair-p`_
 
-Return t if __alist__ contains an item `(`__`key`__` . `__`value`__`)`, nil otherwise.
+Return t if __alist__ contains an item `(`__`key`__` . `__`value`__`)`, nil
+otherwise.
 
 -------------------------------------------------------------------------------
 
@@ -265,15 +278,17 @@ Return t if __alist__ contains an item `(`__`key`__` . `__`value`__`)`, nil othe
 
 ### asoc-get `(alist key &optional default)`
 
-Return the value associated with __key__ in __alist__, or __default__ if missing.
+Return the value associated with __key__ in __alist__, or __default__ if
+missing.
 
 ### asoc-put! `(alist key value &optional replace)`
 
 Associate __key__ with __value__ in __alist__.
 
-When __key__ already exists, if __replace__ is non-nil, previous entries with that __key__
-are removed. Otherwise, the pair is simply consed on the front of the __alist__.
-In the latter case, this is equivalent to `acons`.
+When __key__ already exists, if __replace__ is non-nil, previous entries with
+that __key__ are removed. Otherwise, the pair is simply consed on the front of
+the __alist__. In the latter case, this is equivalent to `acons`.
+
 
 ### asoc-delete! `(alist key &optional remove-all)`
 
@@ -328,9 +343,10 @@ keys), use `mapcar` with `cdr` over __alist__.
 
 Return a list of all keys and a list of all values in __alist__.
 
-Returns `(`__`keylist`__` `__`valuelist`__`)` where __keylist__ and __valuelist__ contain all the keys
-and values in __alist__ in order, including repeats. The original alist can be
-reconstructed with
+Returns `(`__`keylist`__` `__`valuelist`__`)` where __keylist__ and
+__valuelist__ contain all the keys and values in __alist__ in order, including
+repeats. The original alist can be reconstructed with
+
 
     (asoc-zip KEYLIST VALUELIST).
 
@@ -345,7 +361,8 @@ asoc-unzip will also reverse `asoc-zip` as long as the original arguments of
 
 Iterate through __alist__, executing __body__ for each key-value pair.
 
-For each iteration, __keyvar__ is bound to the key and __valuevar__ is bound to the value.
+For each iteration, __keyvar__ is bound to the key and __valuevar__ is bound to
+the value.
 
 The return value is obtained by evaluating __result__.
 
@@ -415,7 +432,8 @@ The anaphoric variables `key` and `value` are available for use in `form`.
         (cons (intern (concat (symbol-name key) "-squared"))
               (* value value))
       `((one . 1) (two . 2) (three . 3) (four . 4)))
-    ;; ((one-squared . 1) (two-squared . 4) (three-squared . 9) (four-squared . 16))
+    ;; ((one-squared . 1) (two-squared . 4)
+    ;;  (three-squared . 9) (four-squared . 16))
 
     (asoc--map (cons (intern key) value)
       '(("one" . 1) ("two" . 2) ("three" . 3)))
@@ -431,8 +449,8 @@ Return a modified copy of __alist__ with keys transformed by __func__.
 
     ;; convert symbolic keys to strings
     (asoc-map-keys #'symbol-name
-                   '((one . 1) (two . 4) (three . 9) (four . 16) (five . 25)))
-    ;; (("one" . 1) ("two" . 4) ("three" . 9) ("four" . 16) ("five" . 25))
+                   '((one . 1) (two . 4) (three . 9) (four . 16)))
+    ;; (("one" . 1) ("two" . 4) ("three" . 9) ("four" . 16))
 
 ### asoc-map-values `(func alist)`
 
@@ -484,8 +502,8 @@ been processed.
 
 Return an alist merging multiple occurrences of each key in __alists__.
 
-Each key is associated with a list containing all values in __alists__ which were
-associated with the key, in order.
+Each key is associated with a list containing all values in __alists__ which
+were associated with the key, in order.
 
     (let ( (a `((a . 1) (b . 2) (a . 3) (a . 1)))
            (b '((a . 5) (b . 2) (c . 3))) )
@@ -496,8 +514,8 @@ associated with the key, in order.
 
 Return an alist merging multiple unique values for each key in __alists__.
 
-Each key is associated with a list containing all unique values in __alists__ which
-were associated with the key, in order.
+Each key is associated with a list containing all unique values in __alists__
+which were associated with the key, in order.
 
     (let ( (a `((a . 1) (b . 2) (a . 3) (a . 1)))
            (b '((a . 5) (b . 2) (c . 3))) )
@@ -562,8 +580,8 @@ considers the first when accessing a value. This allows the value for a key to
 be non-destructively changed ("shadowed") by simply pushing an association onto
 the alist, and the change to be reversed by removing that association.
 
-However, sometimes, a list may contain multiple key-value associations, all of which are
-relevant, ie. a key has multiple values.
+However, sometimes, a list may contain multiple key-value associations, all of
+which are relevant, ie. a key has multiple values.
 
 Such a multi-valued alist is best converted into a list-valued alist using
 `asoc-merge-values`.
@@ -627,9 +645,9 @@ is the standard representation of:
 
 ## Other Packages
 
-* [`let-alist`](https://elpa.gnu.org/packages/let-alist.html) provides a macro of
-the same name, which allows convenient access to alist values when the keys are
-symbols.
+* [`let-alist`](https://elpa.gnu.org/packages/let-alist.html) provides a macro
+of the same name, which allows convenient access to alist values when the keys
+are symbols.
 * [`map`](https://github.com/emacs-mirror/emacs/blob/master/lisp/emacs-lisp/map.el)
 provides functions for alists, hash tables and arrays.
 * [`kv`](https://github.com/nicferrier/emacs-kv) provides tools for plists,
