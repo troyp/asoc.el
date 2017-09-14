@@ -1,10 +1,13 @@
 # asoc.el -- Association List Library for Emacs Lisp.
 
-Emacs Lisp provides only minimal facilities for dealing with alists, while using
-standard list functions is awkward and requires additional processing.
 
-`asoc` provides a rich API for creating, accessing and manipulating association
-lists.
+Emacs Lisp provides only minimal facilities for dealing with alists, and
+processing them using standard list functions is awkward and tedious. `asoc`
+provides a complete API for handling association lists. In addition to basic
+functions for creating, accessing and modifying alists, it provides mapping,
+filtering and folding facilities in both regular and anaphoric variants, a
+looping construct analogous to `dolist`, and a special variable for configuring
+the equality predicate used by `asoc` operations.
 
 __note on builtin list functions__: For some operations, no distinction need be made
 between alists and general lists. `asoc` does not provide functions for such
