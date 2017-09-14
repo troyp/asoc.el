@@ -28,7 +28,8 @@ disassembling alists.
 * [asoc-zip](#asoc-zip-keys-values) `(keys values)`
 * [asoc-uniq](#asoc-uniq-alist) `(alist)`
 * [asoc-merge](#asoc-merge-rest-alists) `(&rest alists)`
-* [asoc-sort-keys](#asoc-sort-keys-alist-comparator) `(alist comparator)`
+* [asoc-sort-keys](#asoc-sort-keys-alist-optional-comparator)
+  `(alist &optional comparator)`
 * [asoc-filter](#asoc-filter-predicate-alist) `(predicate alist)`
 * [asoc--filter](#asoc--filter-form-alist) `(form alist)`
 * [asoc-filter-keys](#asoc-filter-keys-predicate-alist) `(predicate alist)`
@@ -158,14 +159,16 @@ When identical keys occur within a single alist, the foremost takes precedence
 
 With a single argument, equivalent to __asoc-uniq__.
 
-### asoc-sort-keys `(alist comparator)`
+### asoc-sort-keys `(alist &optional comparator)`
 
 Return a copy of __alist__ sorted by keys.
 
-The keys are sorted stably using __comparator__.
+The keys are sorted stably using __comparator__, or `string<` if none is
+provided. Note that `string<` is only applicable to symbols and strings. For
+other types of key, a comparator argument is mandatory.
 
     (let ((a '((b . 2) (a . 1) (e . 5) (d . 4) (c . 3))))
-      (asoc-sort-keys a #'string<))
+      (asoc-sort-keys a))
     ;; ((a . 1) (b . 2) (c . 3) (d . 4) (e . 5))
 
 ### asoc-filter `(predicate alist)`

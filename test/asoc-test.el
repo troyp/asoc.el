@@ -449,23 +449,36 @@
        (asoc-sort-keys alist #'string<)
        alist)
      :result '((b . 2) (a . 1) (e . 5) (d . 4) (c . 3)))
+    ;; default comparator
+    (should-equal
+     (let ((a '((b . t) (a . t) (e . t) (d . t) (c . t))))
+       (asoc-sort-keys a))
+     :result '((a . t) (b . t) (c . t) (d . t) (e . t)))
+    (should-equal
+     (let ((a '(("b" . t) ("a" . t) ("e" . t) ("d" . t) ("c" . t))))
+       (asoc-sort-keys a))
+     :result '(("a" . t) ("b" . t) ("c" . t) ("d" . t) ("e" . t)))
+    (should-equal
+     (let ((a '((b . t) (a . t) (e . t) (d . t) (c . t))))
+       (asoc-sort-keys a nil))
+     :result '((a . t) (b . t) (c . t) (d . t) (e . t)))
     ;; too few arguments
     (should-error-with-type (asoc-sort-keys)
-                            :error 'wrong-number-of-arguments)
-    (should-error-with-type (asoc-sort-keys '((a . 1)))
                             :error 'wrong-number-of-arguments)
     ;; too many arguments
     (should-error-with-type (asoc-sort-keys '((a . 1)) #'string< nil)
                             :error 'wrong-number-of-arguments)
+    ;; wrong type: default comparator for non-string/symbol keys
+    (should-error-with-type
+     (let ((a '((1 . t) (2 . t) (3 . t) (4 . t) (5 . t))))
+       (asoc-sort-keys a))
+     :error 'wrong-type-argument)
     ;; wrong type: non-list first argument
     (should-error-with-type (asoc-sort-keys 5 #'<) :error 'wrong-type-argument)
     ;; wrong type: non-function second argument
     ;; where:      alist length >= 2
     ;; note: for null or single-element alists, the COMPARATOR may not
     ;;       be used, so there may not be an error
-    (should-error-with
-     (asoc-sort-keys '((a . 1) (b . 2)) nil)
-     :error '(void-function nil))
     (should-error-with
      (asoc-sort-keys '((a . 1) (b . 2)) 5)
     :error '(invalid-function 5))
