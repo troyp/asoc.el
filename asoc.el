@@ -2,9 +2,10 @@
 
 ;; Copyright (C) 2016 Troy Pracy
 
-;; Author: Troy Pracy
+;; Author: Troy Pracy <troyp7@gmail.com>
+;; Maintainer: Troy Pracy <troyp7@gmail.com>
 ;; Keywords: alist data-types
-;; Version: 0.4.4
+;; Version: 0.4.5
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
