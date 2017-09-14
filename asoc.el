@@ -291,8 +291,8 @@ Example:
   (cl-case asoc-compare-fn
     (cl-equalp (and (asoc---assoc key alist #'cl-equalp) t))
     (equalp    (and (asoc---assoc key alist #'cl-equalp) t))
-    ('eql      (and (asoc---assoc key alist #'eql) t))
-    ('eq       (and (assq  key alist) t))
+    (eql       (and (asoc---assoc key alist #'eql) t))
+    (eq        (and (assq  key alist) t))
     (t         (and (assoc key alist) t))))
 
 (defun asoc-contains-pair? (alist key value)
