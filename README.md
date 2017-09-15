@@ -655,3 +655,5 @@ are symbols.
 provides functions for alists, hash tables and arrays.
 * [`kv`](https://github.com/nicferrier/emacs-kv) provides tools for plists,
 alists and hash tables.
+* [`a`](https://github.com/plexus/a.el) provides functions for alists and hash
+tables inspired by Clojure.
