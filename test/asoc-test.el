@@ -69,9 +69,10 @@
                   nil       ;;    nil         | 9  nil
                   )))
        (dolist (eqfn (list #'cl-equalp #'equal #'eql #'eq))
-         (let* (( result  (list :: eqfn) ))
+         (let* (( asoc-compare-fn  eqfn           )
+                ( result           (list :: eqfn) ))
            (dolist (test test-items)
-             (push (asoc---assoc test a eqfn)
+             (push (asoc---assoc test a)
                    result))
            (push (reverse result) table)))
        table)
