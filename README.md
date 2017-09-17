@@ -500,6 +500,7 @@ were associated with the key, in order.
            (b '((a . 5) (b . 2) (c . 3))) )
       (asoc-merge-values a b))
     ;; ((a 1 3 1 5) (b 2 2) (c 3))
+    ;; ie.  ((a . (1 3 1 5)) (b . (2 2)) (c . (3)))
 
 ### asoc-merge-values-no-dups `(&rest alists)`
 
@@ -512,6 +513,7 @@ which were associated with the key, in order.
            (b '((a . 5) (b . 2) (c . 3))) )
       (asoc-merge-values-no-dups a b))
       ;; ((a 1 3 5) (b 2) (c 3))
+    ;; ie.  ((a . (1 3 5)) (b . (2)) (c . (3)))
 -------------------------------------------------------------------------------
 ## Handling Alist Variants
 
