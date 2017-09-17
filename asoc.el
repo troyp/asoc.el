@@ -347,23 +347,29 @@ In the latter case, this is equivalent to `acons'."
      (push (cons ,key ,value) ,alist)))
      ;; (setq ,alist (cons (cons ,key ,value) ,alist))))
 
-(defun asoc-delete! (alist key &optional remove-all)
-  "Return a modified list excluding the first, or all, pair(s) with KEY.
+(defun asoc-dissoc (alist &rest keys)
+  "Return a modified list excluding all pairs with a key in KEYS"
+  (let (result)
+    (dolist (assn alist result)
+      (unless (asoc---list-member (car assn) keys)
+        (push assn result)))
+    (reverse result)))
 
-If REMOVE-ALL is non-nil, remove all elements with KEY.
-
-This may destructively modify ALIST."
-  (if ;; empty list
-      (null alist)  nil
-    ;; nonempty
-    (let* ((head (car alist))
-           (tail (cdr alist))
-           (head-key (car head)))
-      (if (asoc---compare key head-key)
-          ;; recurse to other matches if remove-all==t
-          (if remove-all (asoc-delete! tail key t) tail)
-        (setcdr alist (asoc-delete! tail key remove-all))
-        alist))))
+(defmacro asoc-pop! (alist key)
+  "Return the first association containing KEY and remove it from ALIST."
+  `(let* (preceding
+          (rest ,alist)
+          (assn (car rest)))
+     (while (and rest (not (asoc---compare ,key (car assn))))
+       (push assn preceding)
+       (setq rest (cdr rest))
+       (setq assn (car rest)))
+     ;; we've found the association or the end of the list
+     (setq rest (cdr rest))
+     (dolist (assn preceding rest)
+       (push assn rest))
+     (setq ,alist rest)
+     assn))
 
 (defun asoc-find (predicate alist)
   "Return the first ALIST association satisfying PREDICATE.

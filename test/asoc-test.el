@@ -1032,78 +1032,114 @@
      :result '((3 . 10)))
     )
 
-  (ert-deftest test-asoc-unit-tests-asoc-delete! ()
-    "Unit tests for `asoc-delete!'."
+  (ert-deftest test-asoc-unit-tests-asoc-pop! ()
+    "Unit tests for `asoc-pop!'."
     ;; test nil, 1-pair (match/non-match), 2-pairs (match/non)
     (should-equal
-     (let ((a nil))
-       (asoc-delete! a 'x))
-     :result nil)
+     (let* ((a nil)
+            (result (asoc-pop! a 'x)))
+       (cons result a))
+     :result (cons nil
+                   nil))
     (should-equal
-     (let ((a '((x 1))))
-       (asoc-delete! a 'x))
-     :result nil)
+     (let* ((a '((x . 1)))
+            (result (asoc-pop! a 'x)))
+       (cons result a))
+     :result (cons '(x . 1)
+                   nil))
     (should-equal
-     (let ((a '((y 2))))
-       (asoc-delete! a 'x))
-     :result '((y 2)))
+     (let* ((a '((y . 2)))
+            (result (asoc-pop! a 'x)))
+       (cons result a))
+     :result (cons nil
+                   '((y . 2))))
     (should-equal
-     (let ((a '((x 1) (y 2))))
-       (asoc-delete! a 'x))
-     :result '((y 2)))
+     (let* ((a '((x . 1) (y . 2)))
+            (result (asoc-pop! a 'x)))
+       (cons result a))
+     :result (cons '(x . 1)
+                   '((y . 2))))
     (should-equal
-     (let ((a '((y 2) (x 1))))
-       (asoc-delete! a 'x))
-     :result '((y 2)))
+     (let* ((a '((y . 2) (x . 1)))
+            (result (asoc-pop! a 'x)))
+       (cons result a))
+     :result (cons '(x . 1)
+                   '((y . 2))))
     (should-equal
-     (let ((a '((x 1) (x 11))))
-       (asoc-delete! a 'x))
-     :result '((x 11)))
+     (let* ((a '((x . 1) (x . 11)))
+            (result (asoc-pop! a 'x)))
+       (cons result a))
+     :result (cons '(x . 1)
+                   '((x . 11))))
     (should-equal
-     (let ((a '((x 1) (x 11) (x 111))))
-       (asoc-delete! a 'x))
-     :result '((x 11) (x 111)))
+     (let* ((a '((x . 1) (x . 11) (x . 111)))
+            (result (asoc-pop! a 'x)))
+       (cons result a))
+     :result (cons '(x . 1)
+                   '((x . 11) (x . 111))))
+    (should-equal
+     (let* ((a '((y . 2) (x . 1) (z . 3) (x . 11) (y . 22) (x . 111)))
+            (result (asoc-pop! a 'x)))
+       (cons result a))
+     :result (cons '(x . 1)
+                   '((y . 2) (z . 3) (x . 11) (y . 22) (x . 111))))
     )
 
-  (ert-deftest test-asoc-unit-tests-asoc-delete!/remove-all ()
-    "Unit tests for `asoc-delete!' with remove-all set."
+
+  (ert-deftest test-asoc-unit-tests-asoc-dissoc ()
+    "Unit tests for `asoc-dissoc' with remove-all set."
     ;; test nil, 1-pair (match/non-match), 2-pairs (match/non)
     (should-equal
      (let ((a nil))
-       (asoc-delete! a 'x :all))
+       (asoc-dissoc a 'x))
      :result nil)
     (should-equal
      (let ((a '((x 1))))
-       (asoc-delete! a 'x :all))
+       (asoc-dissoc a 'x))
      :result nil)
     (should-equal
      (let ((a '((y 2))))
-       (asoc-delete! a 'x :all))
+       (asoc-dissoc a 'x))
      :result '((y 2)))
     (should-equal
      (let ((a '((x 1) (y 2))))
-       (asoc-delete! a 'x :all))
+       (asoc-dissoc a 'x))
      :result '((y 2)))
     (should-equal
      (let ((a '((y 2) (x 1))))
-       (asoc-delete! a 'x :all))
+       (asoc-dissoc a 'x))
      :result '((y 2)))
     (should-equal
      (let ((a '((x 1) (x 11))))
-       (asoc-delete! a 'x :all))
+       (asoc-dissoc a 'x))
      :result nil)
     (should-equal
      (let ((a '((x 1) (x 11) (x 111))))
-       (asoc-delete! a 'x :all))
+       (asoc-dissoc a 'x))
      :result nil)
     (should-equal
      (let ((a '((x . 1) (y . 2) (x . 11) (z . 3) (x . 111) (x . 1111))))
-       (asoc-delete! a 'x :all))
+       (asoc-dissoc a 'x))
      :result '((y . 2) (z . 3)))
     (should-equal
      (let ((a '((x . 1) (y . 2) (x . 11) (z . 3) (x . 111) (x . 1111) (z . 33))))
-       (asoc-delete! a 'x :all))
+       (asoc-dissoc a 'x))
      :result '((y . 2) (z . 3) (z . 33)))
+    ;; multiple keys
+    (should-equal
+     (let ((a '((x . 1) (y . 2) (x . 11) (z . 3) (x . 111) (x . 1111) (z . 33))))
+       (asoc-dissoc a 'x 'z))
+     :result '((y . 2)))
+    ;; multiple keys, some matching
+    (should-equal
+     (let ((a '((x . 1) (y . 2) (x . 11) (z . 3) (x . 111) (x . 1111) (z . 33))))
+       (asoc-dissoc a 'x 'r 's 'z 't))
+     :result '((y . 2)))
+    ;; multiple keys, exhaust alist
+    (should-equal
+     (let ((a '((x . 1) (y . 2) (x . 11) (z . 3) (x . 111) (x . 1111) (z . 33))))
+       (asoc-dissoc a 'x 'y 'z))
+     :result nil)
     )
 
 

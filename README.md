@@ -48,8 +48,8 @@ disassembling alists.
   `(alist key &optional default)`
 * [asoc-put!](#asoc-put-alist-key-value-optional-replace)
   `(alist key value &optional replace)`
-* [asoc-delete!](#asoc-delete-alist-key-optional-remove-all)
-  `(alist key &optional remove-all)`
+* [asoc-dissoc](#asoc-dissoc-alist-rest-keys) `(alist &rest keys)`
+* [asoc-pop!](#asoc-pop-alist-key) `(alist key)`
 * [asoc-find](#asoc-find-predicate-alist) `(predicate alist)`
 * [asoc--find](#asoc--find-form-alist) `(form alist)`
 * [asoc-find-key](#asoc-find-key-key-alist) `(key alist)`
@@ -292,14 +292,13 @@ When __key__ already exists, if __replace__ is non-nil, previous entries with
 that __key__ are removed. Otherwise, the pair is simply consed on the front of
 the __alist__. In the latter case, this is equivalent to `acons`.
 
+### asoc-dissoc `(alist &rest keys)`
 
-### asoc-delete! `(alist key &optional remove-all)`
+Return a modified list excluding all pairs with a key in __keys__
 
-Return a modified list excluding the first, or all, pair(s) with __key__.
+### asoc-pop! `(alist key)`
 
-If __remove-all__ is non-nil, remove all elements with __key__.
-
-This may destructively modify __alist__.
+Return the first association containing __key__ and remove it from __alist__.
 
 ### asoc-find `(predicate alist)`
 
