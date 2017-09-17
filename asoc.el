@@ -239,6 +239,8 @@ PREDICATE should take two arguments, KEY and VALUE.
 
 Alias: `asoc-reject'
 
+Equivalent to `asoc-filter' with inverted PREDICATE.
+
 Example: filter out pairs where KEY > VALUE
 
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)
@@ -253,6 +255,8 @@ Example: filter out pairs where KEY > VALUE
 
 Alias: `asoc-reject-keys'
 
+Equivalent to `asoc-filter-keys' with inverted PREDICATE.
+
 Example: filter out pairs where KEY <= 3
 
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)
@@ -265,6 +269,8 @@ Example: filter out pairs where KEY <= 3
   "Return a copy of ALIST with pairs whose value satisfying PREDICATE removed.
 
 Alias: `asoc-reject-values'
+
+Equivalent to `asoc-filter-values' with inverted PREDICATE.
 
 Example: filter out pairs where VALUE <= 3
 

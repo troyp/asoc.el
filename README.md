@@ -221,6 +221,8 @@ Return a copy of __alist__ with pairs whose value fails __predicate__ removed.
 ### asoc-remove-values `(predicate alist)`
 _aliases: `asoc-reject`, `asoc-reject-keys`, `asoc-reject-values`_
 
+These are inverse versions of `asoc-filter`, `asoc-filter-keys` and `asoc-filter-values`.
+They are equivalent to the corresponding functions with inverted predicates.
 
     ;; filter out pairs where KEY > VALUE
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)
