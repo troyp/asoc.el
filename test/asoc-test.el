@@ -1087,7 +1087,7 @@
 
 
   (ert-deftest test-asoc-unit-tests-asoc-dissoc ()
-    "Unit tests for `asoc-dissoc' with remove-all set."
+    "Unit tests for `asoc-dissoc'."
     ;; test nil, 1-pair (match/non-match), 2-pairs (match/non)
     (should-equal
      (let ((a nil))
