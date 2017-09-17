@@ -57,18 +57,16 @@ This variable may be passed to asoc functions dynamically in a let binding.")
   "Compare X and Y using `asoc-compare-fn'."
   (funcall (or asoc-compare-fn #'equal) x y))
 
-(defun asoc---assoc (key alist &optional test)
-  "Return the first element of ALIST whose `car' matches KEY, or nil if none
-match.
+(defun asoc---assoc (key alist)
+  "Return the first association in ALIST matching KEY, or else nil.
 
-The optional argument TEST specifies the equality test to be used, and defaults
-to `equal'. Possible values include `eq', `eql', `equal', `equalp'."
-  (cl-case test
+The equality test to be used is determined by `asoc-compare-fn'."
+  (cl-case asoc-compare-fn
     ('eq          (assq  key alist))
     ((equal nil)  (assoc key alist))
     (t (progn
          (while (and alist
-                     (not (funcall test (caar alist) key)))
+                     (not (funcall asoc-compare-fn (caar alist) key)))
            (setf alist (cdr alist)))
          (car alist)))))
 
@@ -82,7 +80,7 @@ is determined using `asoc-compare-fn'."
     (while rest
       (let* ((pair  (car rest))
              (key   (car pair)))
-        (unless (asoc---assoc key result asoc-compare-fn)
+        (unless (asoc---assoc key result)
           (push pair result)))
       (setq rest (cdr rest)))
     (nreverse result)))
@@ -306,12 +304,7 @@ Example:
 
 (defun asoc-contains-key? (alist key)
   "Return t if ALIST contains an item with key KEY, nil otherwise."
-  (cl-case asoc-compare-fn
-    (cl-equalp (and (asoc---assoc key alist #'cl-equalp) t))
-    (equalp    (and (asoc---assoc key alist #'cl-equalp) t))
-    (eql       (and (asoc---assoc key alist #'eql) t))
-    (eq        (and (assq  key alist) t))
-    (t         (and (assoc key alist) t))))
+  (when (asoc---assoc key alist) t))
 
 (defun asoc-contains-pair? (alist key value)
   "Return t if ALIST contains an item (KEY . VALUE), nil otherwise."
@@ -335,7 +328,7 @@ Example:
 
 (defun asoc-get (alist key &optional default)
   "Return the value associated with KEY in ALIST, or DEFAULT if missing."
-  (or (cdr (asoc---assoc key alist asoc-compare-fn)) default))
+  (or (cdr (asoc---assoc key alist)) default))
 
 (defmacro asoc-put! (alist key value &optional replace)
   "Associate KEY with VALUE in ALIST.
@@ -403,7 +396,7 @@ For all associations satisfying FORM, use `asoc--filter'"
     "Return the first association of ALIST with KEY, or nil if none match.
 
 For all associations with KEY, use `asoc-filter-keys'."
-    (asoc---assoc key alist asoc-compare-fn))
+    (asoc---assoc key alist))
 
 (defun asoc-keys (alist)
   "Return a list of unique keys in ALIST.
