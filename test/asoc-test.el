@@ -1085,9 +1085,121 @@
                    '((y . 2) (z . 3) (x . 11) (y . 22) (x . 111))))
     )
 
+  (ert-deftest test-asoc-unit-tests-asoc-pop!/result-by-equality-fn ()
+    "Unit tests for `asoc-pop!': test return value for each equality function."
+    (should-equal
+     (let* (  table
+            ( p  '(1 2) )
+            ;;            TEST-ITEM ;;    ALIST-ELEM
+            (test-items `( 1         ;;    1           | 1  int
+                           1.0       ;;    1           | 2  float matches int
+                           2.0       ;;    2.0         | 3  float
+                           2         ;;    2.0         | 4  int matches float
+                           "a"       ;;    "a"         | 5  string
+                           "A"       ;;    "a"         | 6  string, other case
+                           (1 2)     ;;    p = (1 2)   | 7  list, same structure
+                           ,p        ;;    p           | 8  list, same object
+                           nil       ;;    nil         | 9  nil
+                           )))
+       (dolist (eqfn (list 'cl-equalp 'equal 'eql 'eq))
+         (let ( results
+               (asoc-compare-fn (symbol-function eqfn)))
+           (dolist (test test-items)
+             (let (( a  `((1   . t) (2.0 . t) ("a" . t) (,p  . t) (nil . t)) ))
+               (push (asoc-pop! a test) results)))
+           (push eqfn table)
+           (push :: table)
+           (push (reverse results) table)))
+       (reverse table))
+     :result
+     ;; test     ::   1       1.0     2.0       2         "a"       "A"       (1 2)       (1 2),same  nil
+     '(cl-equalp :: ((1 . t) (1 . t) (2.0 . t) (2.0 . t) ("a" . t) ("a" . t) ((1 2) . t) ((1 2) . t) (nil . t))
+       equal     :: ((1 . t) nil     (2.0 . t) nil       ("a" . t) nil       ((1 2) . t) ((1 2) . t) (nil . t))
+       eql       :: ((1 . t) nil     (2.0 . t) nil       nil       nil       nil         ((1 2) . t) (nil . t))
+       eq        :: ((1 . t) nil     nil       nil       nil       nil       nil         ((1 2) . t) (nil . t)))
+     )
+    )
 
+  (ert-deftest test-asoc-unit-tests-asoc-pop!/remaining-elts-by-equality-fn ()
+    "Unit tests for `asoc-pop!': test the remaining elements for each equality function."
+    (should-equal
+     (let* (  table
+            ( p  '(1 2) )
+            ;;            TEST-ITEM ;;    ALIST-ELEM
+            (test-items `( 1         ;;    1           | 1  int
+                           1.0       ;;    1           | 2  float matches int
+                           2.0       ;;    2.0         | 3  float
+                           2         ;;    2.0         | 4  int matches float
+                           "a"       ;;    "a"         | 5  string
+                           "A"       ;;    "a"         | 6  string, other case
+                           (1 2)     ;;    p = (1 2)   | 7  list, same structure
+                           ,p        ;;    p           | 8  list, same object
+                           nil       ;;    nil         | 9  nil
+                           )))
+       (dolist (eqfn (list 'cl-equalp 'equal 'eql 'eq))
+         (let ( results
+               (asoc-compare-fn (symbol-function eqfn)))
+           (dolist (test test-items)
+             (let (( a  `((1   . t) (2.0 . t) ("a" . t) (,p  . t) (nil . t)) ))
+               (asoc-pop! a test)
+               (push `(,test :: ,@a) results)))
+           (push eqfn table)
+           (push (reverse results) table)))
+       (reverse table))
+     :result
+     '(cl-equalp
+       ((1     ::         (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        (1.0   ::         (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        (2.0   :: (1 . t)           ("a" . t) ((1 2) . t) (nil . t))
+        (2     :: (1 . t)           ("a" . t) ((1 2) . t) (nil . t))
+        ("a"   :: (1 . t) (2.0 . t)           ((1 2) . t) (nil . t))
+        ("A"   :: (1 . t) (2.0 . t)           ((1 2) . t) (nil . t))
+        ((1 2) :: (1 . t) (2.0 . t) ("a" . t)             (nil . t))
+        ((1 2) :: (1 . t) (2.0 . t) ("a" . t)             (nil . t))
+        (nil   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t)          ))
+       equal
+       ((1     ::         (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        (1.0   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        (2.0   :: (1 . t)           ("a" . t) ((1 2) . t) (nil . t))
+        (2     :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        ("a"   :: (1 . t) (2.0 . t)           ((1 2) . t) (nil . t))
+        ("A"   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        ((1 2) :: (1 . t) (2.0 . t) ("a" . t)             (nil . t))
+        ((1 2) :: (1 . t) (2.0 . t) ("a" . t)             (nil . t))
+        (nil   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t)          ))
+       eql
+       ((1     ::         (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        (1.0   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        (2.0   :: (1 . t)           ("a" . t) ((1 2) . t) (nil . t))
+        (2     :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        ("a"   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        ("A"   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        ((1 2) :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        ((1 2) :: (1 . t) (2.0 . t) ("a" . t)             (nil . t))
+        (nil   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t)          ))
+       eq
+       ((1     ::         (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        (1.0   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        (2.0   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        (2     :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        ("a"   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        ("A"   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        ((1 2) :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        ((1 2) :: (1 . t) (2.0 . t) ("a" . t)             (nil . t))
+        (nil   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t))         )))
+    )
+
   (ert-deftest test-asoc-unit-tests-asoc-dissoc ()
     "Unit tests for `asoc-dissoc'."
+    ;; zero keys
+    (should-equal
+     (let ((a nil))
+       (asoc-dissoc a))
+     :result nil)
+    (should-equal
+     (let ((a '((x . 1) (y . 2) (x . 11) (z . 3))))
+       (asoc-dissoc a))
+     :result '((x . 1) (y . 2) (x . 11) (z . 3)))
     ;; test nil, 1-pair (match/non-match), 2-pairs (match/non)
     (should-equal
      (let ((a nil))
@@ -1140,8 +1252,76 @@
      (let ((a '((x . 1) (y . 2) (x . 11) (z . 3) (x . 111) (x . 1111) (z . 33))))
        (asoc-dissoc a 'x 'y 'z))
      :result nil)
+    ;;
     )
 
+  (ert-deftest test-asoc-unit-tests-asoc-dissoc/result-by-equality-fn ()
+    "Unit tests for `asoc-dissoc'."
+    (should-equal
+     (let* (  table
+            ( p  '(1 2) )
+            ( a  `((1   . t) (2.0 . t) ("a" . t) (,p  . t) (nil . t)) )
+            ;;            TEST-ITEM ;;    ALIST-ELEM
+            (test-items `( 1         ;;    1           | 1  int
+                           1.0       ;;    1           | 2  float matches int
+                           2.0       ;;    2.0         | 3  float
+                           2         ;;    2.0         | 4  int matches float
+                           "a"       ;;    "a"         | 5  string
+                           "A"       ;;    "a"         | 6  string, other case
+                           (1 2)     ;;    p = (1 2)   | 7  list, same structure
+                           ,p        ;;    p           | 8  list, same object
+                           nil       ;;    nil         | 9  nil
+                           )))
+       (dolist (eqfn (list 'cl-equalp 'equal 'eql 'eq))
+         (let ( results
+               (asoc-compare-fn (symbol-function eqfn)))
+           (dolist (test test-items)
+             (push (cons test (cons :: (asoc-dissoc a test))) results))
+           (push eqfn table)
+           (push (reverse results) table)))
+       (reverse table))
+     :result
+     '(cl-equalp
+       ((1     ::         (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        (1.0   ::         (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        (2.0   :: (1 . t)           ("a" . t) ((1 2) . t) (nil . t))
+        (2     :: (1 . t)           ("a" . t) ((1 2) . t) (nil . t))
+        ("a"   :: (1 . t) (2.0 . t)           ((1 2) . t) (nil . t))
+        ("A"   :: (1 . t) (2.0 . t)           ((1 2) . t) (nil . t))
+        ((1 2) :: (1 . t) (2.0 . t) ("a" . t)             (nil . t))
+        ((1 2) :: (1 . t) (2.0 . t) ("a" . t)             (nil . t))
+        (nil   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t)          ))
+       equal
+       ((1     ::         (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        (1.0   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        (2.0   :: (1 . t)           ("a" . t) ((1 2) . t) (nil . t))
+        (2     :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        ("a"   :: (1 . t) (2.0 . t)           ((1 2) . t) (nil . t))
+        ("A"   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        ((1 2) :: (1 . t) (2.0 . t) ("a" . t)             (nil . t))
+        ((1 2) :: (1 . t) (2.0 . t) ("a" . t)             (nil . t))
+        (nil   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t)          ))
+       eql
+       ((1     ::         (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        (1.0   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        (2.0   :: (1 . t)           ("a" . t) ((1 2) . t) (nil . t))
+        (2     :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        ("a"   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        ("A"   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        ((1 2) :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        ((1 2) :: (1 . t) (2.0 . t) ("a" . t)             (nil . t))
+        (nil   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t)          ))
+       eq
+       ((1     ::         (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        (1.0   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        (2.0   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        (2     :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        ("a"   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        ("A"   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        ((1 2) :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t) (nil . t))
+        ((1 2) :: (1 . t) (2.0 . t) ("a" . t)             (nil . t))
+        (nil   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t))         )))
+    )
 
   (ert-deftest test-asoc-unit-tests-find ()
     "Unit tests for `asoc-find'."
