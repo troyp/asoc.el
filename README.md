@@ -8,16 +8,18 @@ variants, a looping construct analogous to `dolist` (also with anaphoric
 variant), and a special variable for configuring the equality predicate used by
 `asoc` operations.
 
-## API
+## Table of Contents
+
+### [API](#api-1)
 
 [A note on builtin list functions](#a-note-on-builtin-list-functions)
 
 [Conventions](#conventions)
 
-### Variables
+#### [Variables](#variables-1)
 * [asoc-compare-fn](#asoc-compare-fn-nil)
 
-### Constructor and Filter Functions
+#### [Constructor and Filter Functions](#constructor-and-filter-functions-1)
 * [asoc-make](#asoc-make-optional-keys-default) `(&optional keys default)`
 * [asoc-copy](#asoc-copy-alist) `(alist)`
 * [asoc-zip](#asoc-zip-keys-values) `(keys values)`
@@ -34,11 +36,11 @@ variant), and a special variable for configuring the equality predicate used by
 * [asoc-remove-values](#asoc-remove-values-predicate-alist) `(predicate alist)`
 * [asoc-partition](#asoc-partition-flatlist) `(flatlist)`
 
-### Predicates
+#### [Predicates](#predicates-1)
 * [asoc-contains-key?](#asoc-contains-key-alist-key) `(alist key)`
 * [asoc-contains-pair?](#asoc-contains-pair-alist-key-value) `(alist key value)`
 
-### Access Functions
+#### [Access Functions](#access-functions-1)
 * [asoc-get](#asoc-get-alist-key-optional-default)
   `(alist key &optional default)`
 * [asoc-put!](#asoc-put-alist-key-value-optional-replace)
@@ -53,34 +55,40 @@ variant), and a special variable for configuring the equality predicate used by
   `(alist &optional ignore-shadowed)`
 * [asoc-unzip](#asoc-unzip-alist) `(alist)`
 
-### Looping Constructs
+#### [Looping Constructs](#looping-constructs-1)
 * [asoc-do](#asoc-do-spec-rest-body) `(spec &rest body)`
 * [asoc--do](#asoc--do-alist-rest-body) `(alist &rest body)`
 
-### Mapping Functions
+#### [Mapping Functions](#mapping-functions-1)
 * [asoc-map](#asoc-map-function-alist) `(function alist)`
 * [asoc--map](#asoc--map-form-alist) `(form alist)`
 * [asoc-map-keys](#asoc-map-keys-func-alist) `(func alist)`
 * [asoc-map-values](#asoc-map-values-func-alist) `(func alist)`
 
-### Folds
+#### [Folds](#folds-1)
 * [asoc-fold](#asoc-fold-func-alist-init) `(func alist init)`
 * [asoc--fold](#asoc--fold-form-alist-init) `(form alist init)`
 * [asoc-merge-values](#asoc-merge-values-rest-alists) `(&rest alists)`
 * [asoc-merge-values-no-dups](#asoc-merge-values-no-dups-rest-alists)
   `(&rest alists)`
+  
+### [Notes](#notes-1)
 
-### [Handling Alist Variants](#handling-alist-variants-1)
+#### [Handling Alist Variants](#handling-alist-variants-1)
 * [List of duples](#list-of-duples)
 * [Flat key-value list / Property list](#flat-key-value-list--property-list)
 * [Multi-valued alist](#multi-valued-alist)
 
-### [Representation of Alists](#representation-of-alists)
+#### [Representation of Alists](#representation-of-alists-1)
 * [List-valued alists](#list-valued-alists)
 * [Cons-valued alist](#cons-valued-alist)
 * [Null values](#null-values)
 
-### [Other Packages](#other-packages-1)
+#### [Other Packages](#other-packages-1)
+
+-------------------------------------------------------------------------------
+
+## API
 
 ### A note on builtin list functions
 
@@ -91,7 +99,7 @@ functions may be used. For instance, `cons`, `car`, `cdr`, `push`, `pop`,
 
 -------------------------------------------------------------------------------
 
-## Conventions
+### Conventions
 
 Where appropriate, the `asoc` API follows established conventions for naming,
 argument order, etc. In particular, it follows the prefix conventions of
@@ -113,9 +121,9 @@ the function call.
 
 -------------------------------------------------------------------------------
 
-## Variables
+### Variables
 
-### asoc-compare-fn `nil`
+#### asoc-compare-fn `nil`
 
 Special variable holding the equality predicate used in asoc functions.
 
@@ -126,23 +134,23 @@ This variable may be passed to asoc functions dynamically in a let binding.
 
 -------------------------------------------------------------------------------
 
-## Constructor and Filter Functions
+### Constructor and Filter Functions
 
-### asoc-make `(&optional keys default)`
+#### asoc-make `(&optional keys default)`
 
 Return an alist with __keys__ each initialized to value nil.
 
-### asoc-copy `(alist)`
+#### asoc-copy `(alist)`
 _alias of `copy-sequence`._
 
 Return a shallow copy of __alist__.
 
-### asoc-zip `(keys values)`
+#### asoc-zip `(keys values)`
 
 Return an alist associating __keys__ with corresponding __values__.
 If __keys__ is longer than __values__, the excess __keys__ have value nil.
 
-### asoc-uniq `(alist)`
+#### asoc-uniq `(alist)`
 
 Return a copy of __alist__ with duplicate keys removed.
 
@@ -151,7 +159,7 @@ The first occurrence of each key is retained.
     (asoc-uniq `((a 1) (b 2) (b 3) (c 4) (a 5)))
     ;; ((a 1) (b 2) (c 4))
 
-### asoc-merge `(&rest alists)`
+#### asoc-merge `(&rest alists)`
 
 Return an alist with unique keys resulting from merging __alists__.
 
@@ -161,7 +169,7 @@ When identical keys occur within a single alist, the foremost takes precedence
 
 With a single argument, equivalent to __asoc-uniq__.
 
-### asoc-sort-keys `(alist &optional comparator)`
+#### asoc-sort-keys `(alist &optional comparator)`
 
 Return a copy of __alist__ sorted by keys.
 
@@ -173,7 +181,7 @@ other types of key, a comparator argument is mandatory.
       (asoc-sort-keys a))
     ;; ((a . 1) (b . 2) (c . 3) (d . 4) (e . 5))
 
-### asoc-filter `(predicate alist)`
+#### asoc-filter `(predicate alist)`
 
 Return a copy of __alist__ with key-value pairs failing __predicate__ removed.
 
@@ -184,7 +192,7 @@ __predicate__ should take two arguments, __key__ and __value__.
       (asoc-filter #'> fib))
     ;; ((2 . 1) (3 . 2) (4 . 3))
 
-### asoc--filter `(form alist)`
+#### asoc--filter `(form alist)`
 
 Anaphoric variant of `asoc-filter`.
 
@@ -198,7 +206,7 @@ The included elements remain in their original order. The anaphoric variables
       `((a . b) (b . c) (c . c) (d . a) (e . e)))
     ;; ((a . b) (b . c) (d . a))
 
-### asoc-filter-keys `(predicate alist)`
+#### asoc-filter-keys `(predicate alist)`
 
 Return a copy of __alist__ with keys failing __predicate__ removed.
 
@@ -208,7 +216,7 @@ Return a copy of __alist__ with keys failing __predicate__ removed.
       (asoc-filter-keys (lambda (k) (<= k 3)) fib))
     ;; ((1 . 1) (2 . 1) (3 . 2))
 
-### asoc-filter-values `(predicate alist)`
+#### asoc-filter-values `(predicate alist)`
 
 Return a copy of __alist__ with pairs whose value fails __predicate__ removed.
 
@@ -218,9 +226,9 @@ Return a copy of __alist__ with pairs whose value fails __predicate__ removed.
       (asoc-filter-values (lambda (v) (<= v 3)) fib))
     ;; ((1 . 1) (2 . 1) (3 . 2) (4 . 3))
 
-### asoc-remove `(predicate alist)`
-### asoc-remove-keys `(predicate alist)`
-### asoc-remove-values `(predicate alist)`
+#### asoc-remove `(predicate alist)`
+#### asoc-remove-keys `(predicate alist)`
+#### asoc-remove-values `(predicate alist)`
 _aliases: `asoc-reject`, `asoc-reject-keys`, `asoc-reject-values`_
 
 These are inverse versions of `asoc-filter`, `asoc-filter-keys` and `asoc-filter-values`.
@@ -244,7 +252,7 @@ They are equivalent to the corresponding functions with inverted predicates.
       (asoc-remove-values (lambda (v) (<= v 3)) fib))
     ;; ((5 . 5) (6 . 8) (7 . 13) (8 . 21))
 
-### asoc-partition `(flatlist)`
+#### asoc-partition `(flatlist)`
 
 Return an alist whose keys and values are taken alternately from __flatlist__.
 
@@ -253,14 +261,14 @@ Return an alist whose keys and values are taken alternately from __flatlist__.
 
 -------------------------------------------------------------------------------
 
-## Predicates
+### Predicates
 
-### asoc-contains-key\? `(alist key)`
+#### asoc-contains-key\? `(alist key)`
 _alias: `asoc-contains-key-p`_
 
 Return t if __alist__ contains an item with key __key__, nil otherwise.
 
-### asoc-contains-pair\? `(alist key value)`
+#### asoc-contains-pair\? `(alist key value)`
 _alias: `asoc-contains-pair-p`_
 
 Return t if __alist__ contains an item `(`__`key`__` . `__`value`__`)`, nil
@@ -268,14 +276,14 @@ otherwise.
 
 -------------------------------------------------------------------------------
 
-## Access Functions
+### Access Functions
 
-### asoc-get `(alist key &optional default)`
+#### asoc-get `(alist key &optional default)`
 
 Return the value associated with __key__ in __alist__, or __default__ if
 missing.
 
-### asoc-put! `(alist key value &optional replace)`
+#### asoc-put! `(alist key value &optional replace)`
 
 Associate __key__ with __value__ in __alist__.
 
@@ -283,15 +291,15 @@ When __key__ already exists, if __replace__ is non-nil, previous entries with
 that __key__ are removed. Otherwise, the pair is simply consed on the front of
 the __alist__. In the latter case, this is equivalent to `acons`.
 
-### asoc-dissoc `(alist &rest keys)`
+#### asoc-dissoc `(alist &rest keys)`
 
 Return a modified list excluding all pairs with a key in __keys__
 
-### asoc-pop! `(alist key)`
+#### asoc-pop! `(alist key)`
 
 Return the first association containing __key__ and remove it from __alist__.
 
-### asoc-find `(predicate alist)`
+#### asoc-find `(predicate alist)`
 
 Return the first __alist__ association satisfying __predicate__.
 
@@ -299,7 +307,7 @@ __predicate__ should take two arguments, __key__ and __value__.
 
 For all associations satisfying __predicate__, use `asoc-filter`.
 
-### asoc--find `(form alist)`
+#### asoc--find `(form alist)`
 
 Anaphoric variant of `asoc-find`.
 
@@ -309,20 +317,20 @@ The anaphoric variables `key` and `value` are available for use in __form__.
 
 For all associations satisfying __form__, use `asoc--filter`
 
-### asoc-find-key `(key alist)`
+#### asoc-find-key `(key alist)`
 
 Return the first association of __alist__ with __key__, or nil if none match.
 
 For all associations with __key__, use `asoc-filter-keys`.
 
-### asoc-keys `(alist)`
+#### asoc-keys `(alist)`
 
 Return a list of unique keys in __alist__.
 
 For a list of all keys in order, with duplicates, use `mapcar` with `car` over
 __alist__.
 
-### asoc-values `(alist &optional ignore-shadowed)`
+#### asoc-values `(alist &optional ignore-shadowed)`
 
 Return a list of unique values in __alist__.
 
@@ -332,7 +340,7 @@ occurrence of each key.
 For a list of all values in order, with duplicate values (and values of shadowed
 keys), use `mapcar` with `cdr` over __alist__.
 
-### asoc-unzip `(alist)`
+#### asoc-unzip `(alist)`
 
 Return a list of all keys and a list of all values in __alist__.
 
@@ -348,9 +356,9 @@ asoc-unzip will also reverse `asoc-zip` as long as the original arguments of
 
 -------------------------------------------------------------------------------
 
-## Looping Constructs
+### Looping Constructs
 
-### asoc-do `((keyvar valuevar) alist [result] body...)`
+#### asoc-do `((keyvar valuevar) alist [result] body...)`
 
 Iterate through __alist__, executing __body__ for each key-value pair.
 
@@ -369,7 +377,7 @@ The return value is obtained by evaluating __result__.
           (setf sum (+ sum value)))))
     ;; add values associated with all keys that are symbols.
 
-### asoc--do `(alist &rest body)`
+#### asoc--do `(alist &rest body)`
 
 Anaphoric variant of `asoc-do`.
 
@@ -396,9 +404,9 @@ the syntax `(:initially ...)`.
 
 -------------------------------------------------------------------------------
 
-## Mapping Functions
+### Mapping Functions
 
-### asoc-map `(function alist)`
+#### asoc-map `(function alist)`
 
 Apply __func__ to each element of __alist__ and return the resulting list.
 
@@ -414,7 +422,7 @@ __func__ should be a function of two arguments (__key__ __value__).
               '((one . 1) (two . 4) (3 . 9) (4 . 16) (five . 25) (6 . 36)))
     ;; (1 4 nil nil 25 nil)
 
-### asoc--map `(form alist)`
+#### asoc--map `(form alist)`
 
 Anaphoric variant of `asoc-map`.
 
@@ -436,7 +444,7 @@ The anaphoric variables `key` and `value` are available for use in `form`.
       '((one . 1) (two . 2) (three . 3) (four . 4)))
     ("one=1;" "two=2;" "three=3;" "four=4;")
 
-### asoc-map-keys `(func alist)`
+#### asoc-map-keys `(func alist)`
 
 Return a modified copy of __alist__ with keys transformed by __func__.
 
@@ -445,7 +453,7 @@ Return a modified copy of __alist__ with keys transformed by __func__.
                    '((one . 1) (two . 4) (three . 9) (four . 16)))
     ;; (("one" . 1) ("two" . 4) ("three" . 9) ("four" . 16))
 
-### asoc-map-values `(func alist)`
+#### asoc-map-values `(func alist)`
 
 Return a modified copy of alist with values transformed by __func__.
 
@@ -456,9 +464,9 @@ Return a modified copy of alist with values transformed by __func__.
 
 -------------------------------------------------------------------------------
 
-## Folds
+### Folds
 
-### asoc-fold `(func alist init)`
+#### asoc-fold `(func alist init)`
 
 Reduce __alist__ using __func__ on the values, starting with value __init__.
 
@@ -472,7 +480,7 @@ an updated result.
                  (reverse a) nil))
     ;; (1 2 3 5 10)
 
-### asoc--fold `(form alist init)`
+#### asoc--fold `(form alist init)`
 
 Anaphoric variant of `asoc-fold`.
 
@@ -491,7 +499,7 @@ been processed.
         (reverse a) nil))
     ;; (1 2 3 5 10)
 
-### asoc-merge-values `(&rest alists)`
+#### asoc-merge-values `(&rest alists)`
 
 Return an alist merging multiple occurrences of each key in __alists__.
 
@@ -504,7 +512,7 @@ were associated with the key, in order.
     ;; ((a 1 3 1 5) (b 2 2) (c 3))
     ;; ie.  ((a . (1 3 1 5)) (b . (2 2)) (c . (3)))
 
-### asoc-merge-values-no-dups `(&rest alists)`
+#### asoc-merge-values-no-dups `(&rest alists)`
 
 Return an alist merging multiple unique values for each key in __alists__.
 
@@ -516,10 +524,14 @@ which were associated with the key, in order.
       (asoc-merge-values-no-dups a b))
       ;; ((a 1 3 5) (b 2) (c 3))
     ;; ie.  ((a . (1 3 5)) (b . (2)) (c . (3)))
--------------------------------------------------------------------------------
-## Handling Alist Variants
 
-### List of duples
+-------------------------------------------------------------------------------
+
+## Notes
+
+### Handling Alist Variants
+
+#### List of duples
 
 __`( (key1 value1) (key2 value2) ... )`__
 
@@ -552,7 +564,7 @@ to allow a key to be associated with multiple values:
 
 This is a true alist whose values simply happen to be lists.
 
-### Flat key-value list / Property list
+#### Flat key-value list / Property list
 
 __`(key1 value 1 key2 value2 ...)`__
 
@@ -566,7 +578,7 @@ Such a list can be converted to an alist with `asoc-partition`
     (let ((my-alist (asoc-partition my-flatlist)))
       .... )
 
-### Multi-valued alist
+#### Multi-valued alist
 
 __`(... (key1 . value1a) ... (key1 . value1b) ...)`__
 
@@ -583,9 +595,9 @@ Such a multi-valued alist is best converted into a list-valued alist using
 
 -------------------------------------------------------------------------------
 
-## Representation of Alists
+### Representation of Alists
 
-### List-valued alists
+#### List-valued alists
 
 As mentioned above, alists will sometimes have lists as values.
 
@@ -607,7 +619,7 @@ Similarly, with an improper-list-valued alist:
       ( key2 . (value2a value2b . value2c))
       ...
 
-### Cons-valued alist
+#### Cons-valued alist
 
 A special case (or special interpretation) of improper-list-valued alists is a
 cons-valued alist.
@@ -623,7 +635,7 @@ cons cells:
       ( key2 . (value2a . value2b) )
       ...
 
-### Null values
+#### Null values
 
 When a value is `nil`, the key-value pair is represented as a list containing
 only the key:
@@ -638,7 +650,7 @@ is the standard representation of:
 
 -------------------------------------------------------------------------------
 
-## Other Packages
+### Other Packages
 
 * [`let-alist`](https://elpa.gnu.org/packages/let-alist.html) provides a macro
 of the same name, which allows convenient access to alist values when the keys
