@@ -217,12 +217,10 @@ Return a copy of __alist__ with pairs whose value fails __predicate__ removed.
     ;; ((1 . 1) (2 . 1) (3 . 2) (4 . 3))
 
 ### asoc-remove `(predicate alist)`
-_alias: `asoc-reject`_
+### asoc-remove-keys `(predicate alist)`
+### asoc-remove-values `(predicate alist)`
+_aliases: `asoc-reject`, `asoc-reject-keys`, `asoc-reject-values`_
 
-Return a copy of __alist__ with key-value pairs satisfying __predicate__
-removed.
-
-__predicate__ should take two arguments, __key__ and __value__.
 
     ;; filter out pairs where KEY > VALUE
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)
@@ -230,22 +228,11 @@ __predicate__ should take two arguments, __key__ and __value__.
       (asoc-remove #'> fib))
     ;; ((1 . 1) (5 . 5) (6 . 8) (7 . 13) (8 . 21))
 
-### asoc-remove-keys `(predicate alist)`
-_alias: `asoc-reject-keys`_
-
-Return a copy of __alist__ with keys satisfying __predicate__ removed.
-
     ;; filter out pairs where KEY <= 3
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)
                  (5 . 5)  (6 . 8)  (7 . 13)  (8 . 21))))
       (asoc-remove-keys (lambda (k) (<= k 3)) fib))
     ;; ((4 . 3) (5 . 5) (6 . 8) (7 . 13) (8 . 21))
-
-### asoc-remove-values `(predicate alist)`
-_alias: `asoc-reject-values`_
-
-Return a copy of __alist__ with pairs whose value satisfying __predicate__
-removed.
 
     ;; filter out pairs where VALUE <= 3
     (let ((fib '((1 . 1)  (2 . 1)  (3 . 2)  (4 . 3)
