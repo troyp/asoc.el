@@ -335,8 +335,7 @@ Example:
   "Associate KEY with VALUE in ALIST.
 
 When KEY already exists, if REPLACE is non-nil, previous entries with that key
-are removed. Otherwise, the pair is simply consed on the front of the alist.
-In the latter case, this is equivalent to `acons'."
+are removed. Otherwise, the pair is simply consed on the front of the alist."
   (declare (debug (sexp sexp sexp &optional sexp)))
   `(progn
      (when ,replace
