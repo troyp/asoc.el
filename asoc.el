@@ -5,7 +5,7 @@
 ;; Author: Troy Pracy <troyp7@gmail.com>
 ;; Maintainer: Troy Pracy <troyp7@gmail.com>
 ;; Keywords: alist data-types
-;; Version: 0.5.0
+;; Version: 0.6.0
 ;; URL: https://github.com/troyp/asoc.el
 
 ;; This program is free software; you can redistribute it and/or modify
