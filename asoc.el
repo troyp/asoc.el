@@ -135,8 +135,10 @@ If there are insufficient elements, return LIST."
 (defalias 'asoc-copy 'copy-sequence "Return a shallow copy of ALIST.")
 
 (defun asoc-zip (keys values)
-  "Return an alist associating KEYS with corresponding VALUES.
-If KEYS is longer than VALUES, the excess keys have value nil."
+  "Return an alist associating a list of KEYS with corresponding VALUES.
+
+VALUES may a list, vector or string. If KEYS is longer than VALUES, the excess
+keys have value nil."
   (when (> (length values) (length keys))
     (error "More keys than values."))
   (let* ((n (- (length keys)

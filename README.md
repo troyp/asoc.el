@@ -147,8 +147,10 @@ Return a shallow copy of __alist__.
 
 #### asoc-zip `(keys values)`
 
-Return an alist associating __keys__ with corresponding __values__.
-If __keys__ is longer than __values__, the excess __keys__ have value nil.
+Return an alist associating a list of __keys__ with corresponding __values__.
+
+__values__ may a list, vector or string. If __keys__ is longer than __values__,
+the excess keys have value nil.
 
 #### asoc-uniq `(alist)`
 
