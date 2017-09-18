@@ -95,6 +95,45 @@
     (should-error (asoc---assoc)                      :type 'wrong-number-of-arguments)
     (should-error (asoc---assoc 'x)                   :type 'wrong-number-of-arguments)
     (should-error (asoc---assoc 'x '((x . 1)) 'extra) :type 'wrong-number-of-arguments)
+    ;; arg2 is an alist (proper list of conses)
+    (should-error (asoc---assoc 2 'x)        :type 'wrong-type-argument)
+    (should-error (asoc---assoc 'x "1")      :type 'wrong-type-argument)
+    (should-error (asoc---assoc 'x [1])      :type 'wrong-type-argument)
+    (should-error (asoc---assoc 'x '(x . y)) :type 'wrong-type-argument)
+    ;; ignore atomic elements (as for `assoc', etc)
+    (should-equal (asoc---assoc 'x '(x y))         :result nil)
+    (should-equal (asoc---assoc 'x '(1 2))         :result nil)
+    (should-equal (asoc---assoc 'z '(x y (z . 3))) :result '(z . 3))
+    ;; improper alist: error if end is reached (key is not present of is in last cdr)
+    (should-equal (asoc---assoc 'x '((x . 1) (y . 1) . (z . 1))) :result '(x . 1))
+    (should-error (asoc---assoc 'z '((x . 1) (y . 1) . (z . 1))) :type 'wrong-type-argument)
+    (should-error (asoc---assoc 'a '((x . 1) (y . 1) . (z . 1))) :type 'wrong-type-argument)
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc---assoc/atomic-elements-equalp ()
+    ;; ignore atomic elements
+    ;; regression test: see commit 7807f49
+    (let ((asoc-compare-fn 'cl-equalp))
+      (should-equal (asoc---assoc 'x '(x y))         :result nil)
+      (should-equal (asoc---assoc 'x '(1 2))         :result nil)
+      (should-equal (asoc---assoc 'z '(x y (z . 3))) :result '(z . 3)))
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc---assoc/atomic-elements-eql ()
+    ;; ignore atomic elements
+    ;; regression test: see commit 7807f49
+    (let ((asoc-compare-fn 'eql))
+      (should-equal (asoc---assoc 'x '(x y))         :result nil)
+      (should-equal (asoc---assoc 'x '(1 2))         :result nil)
+      (should-equal (asoc---assoc 'z '(x y (z . 3))) :result '(z . 3)))
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc---assoc/atomic-elements-eq ()
+    ;; ignore atomic elements
+    (let ((asoc-compare-fn 'eq))
+      (should-equal (asoc---assoc 'x '(x y))         :result nil)
+      (should-equal (asoc---assoc 'x '(1 2))         :result nil)
+      (should-equal (asoc---assoc 'z '(x y (z . 3))) :result '(z . 3)))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc---uniq ()
@@ -1203,6 +1242,52 @@
     ;; wrong type: non-list first argument
     (should-error-with (asoc-contains-key? 5 'a) :error '(wrong-type-argument listp 5))
     )
+
+  (ert-deftest test-asoc-unit-tests-asoc-contains-key?/wrong-arguments ()
+    "Unit tests for `asoc-contains-key?' with incorrect arguments."
+    (should-error (asoc-contains-key?)                   :type 'wrong-number-of-arguments)
+    (should-error (asoc-contains-key? '((x . 1)))        :type 'wrong-number-of-arguments)
+    (should-error (asoc-contains-key? '((x . 1)) 'x nil) :type 'wrong-number-of-arguments)
+    ;; arg1 is an alist (proper list of conses)
+    (should-error (asoc-contains-key? 2 'x)        :type 'wrong-type-argument)
+    (should-error (asoc-contains-key? "1" 'x)      :type 'wrong-type-argument)
+    (should-error (asoc-contains-key? [1] 'x)      :type 'wrong-type-argument)
+    (should-error (asoc-contains-key? '(1 . 2) 'x) :type 'wrong-type-argument)
+    ;; ignore atomic elements
+    (should-equal (asoc-contains-key? '(x y) 'x)         :result nil)
+    (should-equal (asoc-contains-key? '(1 2) 'x)         :result nil)
+    (should-equal (asoc-contains-key? '(x y (z . 3)) 'z) :result t)
+    ;; improper alist: error if end is reached (key is not present of is in last cdr)
+    (should-equal (asoc-contains-key? '((x . 1) (y . 1) . (z . 1)) 'x) :result t)
+    (should-error (asoc-contains-key? '((x . 1) (y . 1) . (z . 1)) 'z) :type 'wrong-type-argument)
+    (should-error (asoc-contains-key? '((x . 1) (y . 1) . (z . 1)) 'a) :type 'wrong-type-argument)
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-contains-key?/atomic-elements-equalp ()
+    ;; ignore atomic elements (as for `assoc', etc)
+    ;; regression test: see commit 7807f49
+    (let ((asoc-compare-fn 'cl-equalp))
+      (should-equal (asoc-contains-key? '(x y) 'x)         :result nil)
+      (should-equal (asoc-contains-key? '(1 2) 'x)         :result nil)
+      (should-equal (asoc-contains-key? '(x y (z . 3)) 'z) :result t))
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-contains-key?/atomic-elements-eql ()
+    ;; ignore atomic elements (as for `assoc', etc)
+    ;; regression test: see commit 7807f49
+    (let ((asoc-compare-fn 'eql))
+      (should-equal (asoc-contains-key? '(x y) 'x)         :result nil)
+      (should-equal (asoc-contains-key? '(1 2) 'x)         :result nil)
+      (should-equal (asoc-contains-key? '(x y (z . 3)) 'z) :result t))
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-contains-key?/atomic-elements-eq ()
+    ;; ignore atomic elements (as for `assoc', etc)
+    (let ((asoc-compare-fn 'eq))
+      (should-equal (asoc-contains-key? '(x y) 'x)         :result nil)
+      (should-equal (asoc-contains-key? '(1 2) 'x)         :result nil)
+      (should-equal (asoc-contains-key? '(x y (z . 3)) 'z) :result t))
+    )
 
   (ert-deftest test-asoc-unit-tests-asoc-contains-pair? ()
     "Unit tests for `asoc-contains-pair?'"
@@ -1260,6 +1345,28 @@
     ;; wrong type: non-list first argument
     (should-error-with (asoc-contains-pair? 5 'a 1) :error '(wrong-type-argument listp 5))
     )
+
+  (ert-deftest test-asoc-unit-tests-asoc-contains-pair?/wrong-arguments ()
+    "Unit tests for `asoc-contains-pair?' with incorrect arguments."
+    (should-error (asoc-contains-pair?)                      :type 'wrong-number-of-arguments)
+    (should-error (asoc-contains-pair? '((x . 1)))           :type 'wrong-number-of-arguments)
+    (should-error (asoc-contains-pair? '((x . 1)) 'x)        :type 'wrong-number-of-arguments)
+    (should-error (asoc-contains-pair? '((x . 1)) 'x 'y nil) :type 'wrong-number-of-arguments)
+    ;; arg1 is an alist (proper list of conses)
+    (should-error (asoc-contains-pair? 2 'x 'y)        :type 'wrong-type-argument)
+    (should-error (asoc-contains-pair? "1" 'x 'y)      :type 'wrong-type-argument)
+    (should-error (asoc-contains-pair? [1] 'x 'y)      :type 'wrong-type-argument)
+    (should-error (asoc-contains-pair? '(1 . 2) 'x 'y) :type 'wrong-type-argument)
+    (should-error (asoc-contains-pair? '(x y) 'x 'y)   :type 'wrong-type-argument)
+    (should-error (asoc-contains-pair? '(1 2) 'x 'y)   :type 'wrong-type-argument)
+    (should-error (asoc-contains-pair? '(x y) 'x nil)       :type 'wrong-type-argument)
+    (should-error (asoc-contains-pair? '(1 2) 'x nil)       :type 'wrong-type-argument)
+    (should-error (asoc-contains-pair? '(x y (z . 3)) 'z 3) :type 'wrong-type-argument)
+    ;; improper alist: error if end is reached (key is not present of is in last cdr)
+    (should-equal (asoc-contains-pair? '((x . 1) (y . 1) . (z . 1)) 'x 1) :result t)
+    (should-error (asoc-contains-pair? '((x . 1) (y . 1) . (z . 1)) 'z 1) :type 'wrong-type-argument)
+    (should-error (asoc-contains-pair? '((x . 1) (y . 1) . (z . 1)) 'a 1) :type 'wrong-type-argument)
+    )
 
   (ert-deftest ert-deftest-unit-tests-asoc-get ()
     "Unit-tests for `asoc-get'."
@@ -1297,6 +1404,52 @@
     ;; empty alist
     (should-equal (asoc-get nil 1) :result nil)
     (should-equal (asoc-get nil nil) :result nil)
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-get/wrong-arguments ()
+    "Unit tests for `asoc-get' with incorrect arguments."
+    (should-error (asoc-get)                     :type 'wrong-number-of-arguments)
+    (should-error (asoc-get '((x . 1)))          :type 'wrong-number-of-arguments)
+    (should-error (asoc-get '((x . 1)) 'x t nil) :type 'wrong-number-of-arguments)
+    ;; arg1 is an alist (proper list of conses)
+    (should-error (asoc-get 2 'x)        :type 'wrong-type-argument)
+    (should-error (asoc-get "1" 'x)      :type 'wrong-type-argument)
+    (should-error (asoc-get [1] 'x)      :type 'wrong-type-argument)
+    (should-error (asoc-get '(1 . 2) 'x) :type 'wrong-type-argument)
+    ;; ignore atomic elements
+    (should-equal (asoc-get '(x y) 'x)         :result nil)
+    (should-equal (asoc-get '(1 2) 'x)         :result nil)
+    (should-equal (asoc-get '(x y (z . 3)) 'z) :result 3)
+    ;; improper alist: error if end is reached (key is not present of is in last cdr)
+    (should-equal (asoc-get '((x . 1) (y . 1) . (z . 1)) 'x) :result 1)
+    (should-error (asoc-get '((x . 1) (y . 1) . (z . 1)) 'z) :type 'wrong-type-argument)
+    (should-error (asoc-get '((x . 1) (y . 1) . (z . 1)) 'a) :type 'wrong-type-argument)
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-get/atomic-elements-equalp ()
+    ;; ignore atomic elements (as for `assoc', etc)
+    ;; regression test: see commit 7807f49
+    (let ((asoc-compare-fn 'cl-equalp))
+      (should-equal (asoc-get '(x y) 'x)         :result nil)
+      (should-equal (asoc-get '(1 2) 'x)         :result nil)
+      (should-equal (asoc-get '(x y (z . 3)) 'z) :result 3))
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-get/atomic-elements-eql ()
+    ;; ignore atomic elements (as for `assoc', etc)
+    ;; regression test: see commit 7807f49
+    (let ((asoc-compare-fn 'eql))
+      (should-equal (asoc-get '(x y) 'x)         :result nil)
+      (should-equal (asoc-get '(1 2) 'x)         :result nil)
+      (should-equal (asoc-get '(x y (z . 3)) 'z) :result 3))
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-get/atomic-elements-eq ()
+    ;; ignore atomic elements (as for `assoc', etc)
+    (let ((asoc-compare-fn 'eq))
+      (should-equal (asoc-get '(x y) 'x)         :result nil)
+      (should-equal (asoc-get '(1 2) 'x)         :result nil)
+      (should-equal (asoc-get '(x y (z . 3)) 'z) :result 3))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-put! ()
