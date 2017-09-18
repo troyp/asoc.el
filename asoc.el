@@ -102,11 +102,11 @@ determined by `asoc-compare-fn'."
              list))))
 
 (defun asoc---list-remove (pred list)
-      (let ((DELMARKER (make-symbol "DEL")))
-        (delq
-        DELMARKER
-        (mapcar (lambda (x) (if (funcall pred x) DELMARKER x))
-                list))))
+  (let ((DELMARKER (make-symbol "DEL")))
+    (delq
+     DELMARKER
+     (mapcar (lambda (x) (if (funcall pred x) DELMARKER x))
+             list))))
 
 (defun asoc---list-take (n list)
   "Return the first N elements of LIST.
