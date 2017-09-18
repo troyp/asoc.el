@@ -3,6 +3,8 @@
 (require 'asoc)
 (require 'ert)
 
+(defconst asoc---test-dir (file-name-directory load-file-name))
+
 (cl-macrolet
     ((should-equal            (expr &key result)
                               `(should (equal ,expr ,result)))
@@ -2214,6 +2216,6 @@
 
 (defun asoc---test-all ()
   (interactive)
-  (load-file "asoc-test.el")
-  (load-file "asoc-test-docstrings.el")
+  (load-file (expand-file-name "asoc-test.el" asoc---test-dir))
+  (load-file (expand-file-name "asoc-test-docstrings.el" asoc---test-dir))
   (ert-run-tests-batch "^test-asoc" ))
