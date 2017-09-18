@@ -134,6 +134,21 @@ If there are insufficient elements, return LIST."
 
 (defalias 'asoc-copy 'copy-sequence "Return a shallow copy of ALIST.")
 
+(defun asoc-zip (keys values)
+  "Return an alist associating KEYS with corresponding VALUES.
+If KEYS is longer than VALUES, the excess keys have value nil."
+  (when (> (length values) (length keys))
+    (error "More keys than values."))
+  (let* ((n (- (length keys)
+               (length values)))
+         (values (append values (make-list n nil)))
+         (result nil))
+    (while keys
+      (let ((key   (pop keys))
+            (value (pop values)))
+        (push (cons key value) result)))
+    (reverse result)))
+
 (defun asoc-uniq (alist)
   "Return a copy of ALIST with duplicate keys removed.
 
@@ -631,21 +646,6 @@ Example: convert alist to nested list
                   (v (cdr k.v)))
               (cons k (funcall func v))))
           alist))
-
-(defun asoc-zip (keys values)
-  "Return an alist associating KEYS with corresponding VALUES.
-If KEYS is longer than VALUES, the excess keys have value nil."
-  (when (> (length values) (length keys))
-    (error "More keys than values."))
-  (let* ((n (- (length keys)
-               (length values)))
-         (values (append values (make-list n nil)))
-         (result nil))
-    (while keys
-      (let ((key   (pop keys))
-            (value (pop values)))
-        (push (cons key value) result)))
-    (reverse result)))
 
 ;; ,-------,
 ;; | Folds |
