@@ -66,7 +66,7 @@ The equality test to be used is determined by `asoc-compare-fn'."
     ((equal nil)  (assoc key alist))
     (t (progn
          (while (and alist
-                     (not (funcall asoc-compare-fn (caar alist) key)))
+                     (not (funcall asoc-compare-fn (car-safe (car alist)) key)))
            (setf alist (cdr alist)))
          (car alist)))))
 
