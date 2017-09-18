@@ -330,7 +330,7 @@ Example:
   "Return t if ALIST contains an item (KEY . VALUE), nil otherwise."
   (let ( result
          (rest alist) )
-    (while rest
+    (while (and rest (not result))
       (let ((pair (car rest)))
         (if (and (asoc---compare (car pair) key)
                  (asoc---compare (cdr pair) value))
