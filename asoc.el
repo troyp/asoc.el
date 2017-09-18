@@ -5,7 +5,7 @@
 ;; Author: Troy Pracy <troyp7@gmail.com>
 ;; Maintainer: Troy Pracy <troyp7@gmail.com>
 ;; Keywords: alist data-types
-;; Version: 0.6.1
+;; Version: 0.6.2
 ;; URL: https://github.com/troyp/asoc.el
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -95,6 +95,7 @@ determined by `asoc-compare-fn'."
         ((asoc---list-member key (cdr list)))))
 
 (defun asoc---list-filter (pred list)
+  (unless (listp list) (signal 'wrong-type-argument (list 'listp list)))
   (let ((DELMARKER (make-symbol "DEL")))
     (delq
      DELMARKER
@@ -102,6 +103,7 @@ determined by `asoc-compare-fn'."
              list))))
 
 (defun asoc---list-remove (pred list)
+  (unless (listp list) (signal 'wrong-type-argument (list 'listp list)))
   (let ((DELMARKER (make-symbol "DEL")))
     (delq
      DELMARKER
