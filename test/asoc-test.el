@@ -351,11 +351,13 @@
     ;; no args
     (should-equal (asoc-make) :result nil)
     ;; with keys
+    (should-equal (asoc-make nil) :result nil)
     (should-equal (asoc-make '(a b c d))
                   :result '((a) (b) (c) (d)))
     (should-equal (asoc-make '(a b c d) nil)
                   :result '((a) (b) (c) (d)))
     ;; with default
+    (should-equal (asoc-make nil 'undefined) :result nil)
     (should-equal
      (asoc-make '(a b c d) 'undefined)
      :result '((a . undefined) (b . undefined) (c . undefined) (d . undefined)))
@@ -397,20 +399,24 @@
      :result '((1) (2) (3) (4) (5)))
     ;; values sequence is a string
     (should-equal
-     (asoc-zip '(1 2 3 4 5 6) "qwerty")
-     :result '((1 . ?q) (2 . ?w) (3 . ?e) (4 . ?r) (5 . ?t) (6 . ?y)))
+     (asoc-zip '(1 2 3 4 5 6 7) "qwerty")
+     :result '((1 . ?q) (2 . ?w) (3 . ?e) (4 . ?r) (5 . ?t) (6 . ?y) (7 . nil)))
+    ;; values sequence is a vector
+    (should-equal
+     (asoc-zip '(1 2 3 4 5 6 7) [?q ?w ?e ?r ?t ?y])
+     :result '((1 . ?q) (2 . ?w) (3 . ?e) (4 . ?r) (5 . ?t) (6 . ?y) (7 . nil)))
+    )
+
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-merge ()
     "Unit tests for `asoc-merge'."
     ;; no list
-    (should-equal
-     (asoc-merge)
-     :result nil)
+    (should-equal (asoc-merge) :result nil)
     ;; null lists
-    (should-equal
-     (asoc-merge nil nil nil)
-     :result nil)
+    (should-equal (asoc-merge nil) :result nil)
+    (should-equal (asoc-merge nil nil) :result nil)
+    (should-equal (asoc-merge nil nil nil nil nil) :result nil)
     ;; last alist takes precedence
     (should-equal
      (let ((a1 '((x . 1)        ))
@@ -636,9 +642,9 @@
 
   (ert-deftest test-asoc-unit-tests-asoc--filter ()
     "Unit tests for `asoc--filter'."
-    ;; empty list
+    ;; empty ALIST
     (should-equal (asoc--filter t nil) :result nil)
-    ;; constant true and false forms
+    ;; FORM is nil or t
     (should-equal
      (let ( table t-resultlist nil-resultlist
             (alists '(nil
@@ -651,9 +657,9 @@
        (push (list 't  ::: (reverse t-resultlist)) table)
        (push (list nil ::: (reverse nil-resultlist)) table)
        (reverse table))
-     :result '( (t :::   ( nil  ((x . t))  ((x . t) (x . t))  ((x . t) (y . t) (z . t)) ))
+     :result '( (t   ::: ( nil  ((x . t))  ((x . t) (x . t))  ((x . t) (y . t) (z . t)) ))
                 (nil ::: ( nil     nil            nil                    nil            )) ))
-    ;; sample forms and alists
+    ;; sample FORMS and ALISTs
     (should-equal
      (asoc--filter value    ;; filter non-nil values
        '((a . 1) (b . nil) (c . 3) (d . 4) (e . nil) (f . nil) (g . 7)))
@@ -730,10 +736,10 @@
   (ert-deftest test-asoc-unit-tests-asoc-filter-values ()
     "Unit tests for `asoc-filter-values'."
     ;; empty list
-    (should-equal (asoc-filter-values (lambda (v) t) nil) :result nil)
-    (should-equal (asoc-filter-values (lambda (v) nil) nil) :result nil)
+    (should-equal (asoc-filter-values (lambda (v) t) nil)       :result nil)
+    (should-equal (asoc-filter-values (lambda (v) nil) nil)     :result nil)
     ;; empty list, predicates with wrong number of arguments
-    (should-equal (asoc-filter-values (lambda () t) nil) :result nil)
+    (should-equal (asoc-filter-values (lambda () t) nil)        :result nil)
     (should-equal (asoc-filter-values (lambda (a b c d) t) nil) :result nil)
     ;; constant true and false functions
     (should-equal
