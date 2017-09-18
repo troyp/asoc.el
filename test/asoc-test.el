@@ -10,10 +10,7 @@
                               `(should-not (equal ,expr ,result)))
      (should-error-with       (expr &key error)
                               `(should (equal (should-error ,expr)
-                                              ,error)))
-     (should-error-with-type  (expr &key error)
-                              `(should (equal (car (should-error ,expr))
-                                              ,error))) )
+                                              ,error))))
 
   (ert-deftest test-asoc-unit-tests-asoc---compare/result-by-equality-fn ()
     "Unit tests for `asoc---compare' with different choices of equality function."
@@ -749,9 +746,9 @@
 
   (ert-deftest test-asoc-unit-tests-asoc--filter/wrong-arguments ()
     "Unit tests for `asoc--filter' with incorrect arguments."
-    (should-error-with-type (macroexpand '(asoc--filter))                    :error 'wrong-number-of-arguments)
-    (should-error-with-type (macroexpand '(asoc--filter nil))                :error 'wrong-number-of-arguments)
-    (should-error-with-type (macroexpand '(asoc--filter nil '((x . 1)) nil)) :error 'wrong-number-of-arguments)
+    (should-error (macroexpand '(asoc--filter))                    :type 'wrong-number-of-arguments)
+    (should-error (macroexpand '(asoc--filter nil))                :type 'wrong-number-of-arguments)
+    (should-error (macroexpand '(asoc--filter nil '((x . 1)) nil)) :type 'wrong-number-of-arguments)
     ;; FORM is a (non-nil) atom: returns input ALIST
     (should-equal (asoc--filter 2 '((x . 1)))          :result '((x . 1)))
     (should-equal (asoc--filter "1" '((x . 1)))        :result '((x . 1)))
@@ -1015,7 +1012,7 @@
     (should-error-with (asoc-remove-keys nil '((a . 1))) :error '(void-function nil))
     (should-error-with (asoc-remove-keys 5 '((a . 1))) :error '(invalid-function 5))
     ;; non-list second argument     keys
-    (should-error-with-type (asoc-remove-keys (lambda (k) t) 5) :error 'wrong-type-argument)
+    (should-error (asoc-remove-keys (lambda (k) t) 5) :type 'wrong-type-argument)
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-remove-keys/wrong-arguments ()
@@ -1084,7 +1081,7 @@
     (should-error-with (asoc-remove-values nil '((a . 1))) :error '(void-function nil))
     (should-error-with (asoc-remove-values 5 '((a . 1))) :error '(invalid-function 5))
     ;; non-list second argument
-    (should-error-with-type (asoc-remove-values (lambda (v) t) 5) :error 'wrong-type-argument)
+    (should-error (asoc-remove-values (lambda (v) t) 5) :type 'wrong-type-argument)
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-remove-values/wrong-arguments ()
@@ -1198,9 +1195,9 @@
        ( cl-equalp ::  t    t        t       t      t       t         t           t      t ))
      )
     ;; wrong number of arguments
-    (should-error-with-type (asoc-contains-key? nil) :error 'wrong-number-of-arguments)
-    (should-error-with-type (asoc-contains-key?) :error 'wrong-number-of-arguments)
-    (should-error-with-type (asoc-contains-key? nil 'a nil) :error 'wrong-number-of-arguments)
+    (should-error (asoc-contains-key? nil)        :type 'wrong-number-of-arguments)
+    (should-error (asoc-contains-key?)            :type 'wrong-number-of-arguments)
+    (should-error (asoc-contains-key? nil 'a nil) :type 'wrong-number-of-arguments)
     ;; wrong type: non-list first argument
     (should-error-with (asoc-contains-key? 5 'a) :error '(wrong-type-argument listp 5))
     )
@@ -1254,10 +1251,10 @@
        ( equal     ::    t    t    nil        t          t         nil         t           t      t    t )
        ( cl-equalp ::    t    t     t         t          t          t          t           t      t    t )))
     ;; wrong number of arguments
-    (should-error-with-type (asoc-contains-pair? nil 'a) :error 'wrong-number-of-arguments)
-    (should-error-with-type (asoc-contains-pair? nil) :error 'wrong-number-of-arguments)
-    (should-error-with-type (asoc-contains-pair?) :error 'wrong-number-of-arguments)
-    (should-error-with-type (asoc-contains-pair? nil 'a nil nil) :error 'wrong-number-of-arguments)
+    (should-error (asoc-contains-pair? nil 'a)         :type 'wrong-number-of-arguments)
+    (should-error (asoc-contains-pair? nil)            :type 'wrong-number-of-arguments)
+    (should-error (asoc-contains-pair?)                :type 'wrong-number-of-arguments)
+    (should-error (asoc-contains-pair? nil 'a nil nil) :type 'wrong-number-of-arguments)
     ;; wrong type: non-list first argument
     (should-error-with (asoc-contains-pair? 5 'a 1) :error '(wrong-type-argument listp 5))
     )
@@ -1663,12 +1660,10 @@
     (should-error-with (asoc-find nil '((a . 1))) :error '(void-function nil))
     (should-error-with (asoc-find 5 '((a . 1))) :error '(invalid-function 5))
     ;; non-list second argument
-    (should-error-with-type (asoc-find (lambda (k v) t) 5) :error 'wrong-type-argument)
+    (should-error (asoc-find (lambda (k v) t) 5) :type 'wrong-type-argument)
     ;; wrong number of arguments (non-empty list)
-    (should-error-with-type (asoc-find (lambda () t) '((a . 1)))
-                            :error 'wrong-number-of-arguments)
-    (should-error-with-type (asoc-find (lambda (a b c d) t) '((a . 1)))
-                            :error 'wrong-number-of-arguments)
+    (should-error (asoc-find (lambda () t) '((a . 1)))        :type 'wrong-number-of-arguments)
+    (should-error (asoc-find (lambda (a b c d) t) '((a . 1))) :type 'wrong-number-of-arguments)
     )
 
   (ert-deftest test-asoc-unit-tests-asoc--find ()
@@ -1690,7 +1685,7 @@
                     alist)
                   :result '((a . 1) (b . 2) (c . 3) (d . 4)))
     ;; non-list second argument
-    (should-error-with-type (asoc--find t 5) :error 'wrong-type-argument)
+    (should-error (asoc--find t 5) :type 'wrong-type-argument)
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-find-key ()
