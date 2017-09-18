@@ -191,6 +191,7 @@ Example:
     (let ((a '((b . 2) (a . 1) (e . 5) (d . 4) (c . 3))))
       (asoc-sort-keys a))
     ;; ((a . 1) (b . 2) (c . 3) (d . 4) (e . 5))"
+  (unless (listp alist) (signal 'wrong-type-argument (list 'listp alist)))
   (sort (copy-sequence alist)
         (lambda (pair1 pair2)
           (funcall (or comparator #'string<) (car pair1) (car pair2)))))
