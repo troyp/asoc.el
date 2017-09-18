@@ -327,10 +327,6 @@
       (should-equal (asoc---list-take 0 alist) :result nil)
       (should-equal (asoc---list-take 1 alist) :result '(1))
       (should-equal (asoc---list-take 5 alist) :result '(1 2 3 4 5)))
-    ;; 1st argument not a number/marker
-    (should-error (asoc---list-take nil nil) :type 'wrong-type-argument)
-    ;; 2nd argument not a list
-    (should-error (asoc---list-take 5 5) :type 'wrong-type-argument)
     )
 
   (ert-deftest test-asoc-unit-tests-asoc---list-take/wrong-arguments ()
