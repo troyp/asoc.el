@@ -15,8 +15,8 @@
                               `(should (equal (car (should-error ,expr))
                                               ,error))) )
 
-  (ert-deftest test-asoc-unit-tests-asoc---compare ()
-    "Unit tests for `asoc---compare'."
+  (ert-deftest test-asoc-unit-tests-asoc---compare/result-by-equality-fn ()
+    "Unit tests for `asoc---compare' with different choices of equality function."
     (should-equal
      (let ( table )
        (dolist (fn
@@ -49,9 +49,22 @@
        (asoc---compare 3.0 3.0))
      :result t)
     )
+
+  (ert-deftest test-asoc-unit-tests-asoc---compare/wrong-arguments ()
+    "Unit tests for `asoc---compare' with incorrect arguments supplied."
+    (should-error-with-type
+     (asoc---compare)
+     :error 'wrong-number-of-arguments)
+    (should-error-with-type
+     (asoc---compare 'x)
+     :error 'wrong-number-of-arguments)
+    (should-error-with-type
+     (asoc---compare 'x 'y 'extra)
+     :error 'wrong-number-of-arguments)
+    )
 
-  (ert-deftest test-asoc-unit-tests-asoc---assoc ()
-    "Unit tests for `asoc---assoc'."
+  (ert-deftest test-asoc-unit-tests-asoc---assoc/result-by-equality-fn ()
+    "Unit tests for `asoc---assoc' with different choices of equality function."
     (should-equal
      (let* (  table
               ( p      '(1 2) )
@@ -82,7 +95,13 @@
        (eql       :: (1 . t)   nil   (2.0 . t)    nil       nil       nil        nil     ((1 2) . t) (nil . t))
        (equal     :: (1 . t)   nil   (2.0 . t)    nil    ("a" . t)    nil    ((1 2) . t) ((1 2) . t) (nil . t))
        (cl-equalp :: (1 . t) (1 . t) (2.0 . t) (2.0 . t) ("a" . t) ("a" . t) ((1 2) . t) ((1 2) . t) (nil . t)))
-     )
+     ))
+
+  (ert-deftest test-asoc-unit-tests-asoc---assoc/wrong-arguments ()
+    "Unit tests for `asoc---assoc' with incorrect arguments supplied."
+    (should-error-with-type (asoc---assoc)                      :error 'wrong-number-of-arguments)
+    (should-error-with-type (asoc---assoc 'x)                   :error 'wrong-number-of-arguments)
+    (should-error-with-type (asoc---assoc 'x '((x . 1)) 'extra) :error 'wrong-number-of-arguments)
     )
 
   (ert-deftest test-asoc-unit-tests-asoc---uniq ()
@@ -101,7 +120,10 @@
      (let ((alist '((a . 1) (a . 2) (a . 3) (a . 4))))
        (asoc---uniq alist))
      :result '((a . 1)))
-    ;; choice of asoc-compare-fn
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc---uniq/result-by-equality-fn ()
+    "Unit tests for `asoc---uniq' with different choices of equality function."
     (should-equal
      (let* (( p      '(1 2) )
             ( a      `((1   . 1) ("a" . 1) (,p    . 1) (nil . 1)
@@ -118,11 +140,22 @@
         (eql       :: ((1 . 1) ("a" . 1) ((1 2) . 1) (nil . 1) (1.0 . 2) ("A" . 2) ((1 2) . 2) ("a" . 3)) )
         (equal     :: ((1 . 1) ("a" . 1) ((1 2) . 1) (nil . 1) (1.0 . 2) ("A" . 2)                      ) )
         (cl-equalp :: ((1 . 1) ("a" . 1) ((1 2) . 1) (nil . 1)                                            ) ))
-     )
+     ))
+
+  (ert-deftest test-asoc-unit-tests-asoc---uniq/wrong-arguments ()
+    "Unit tests for `asoc---uniq' with incorrect arguments."
+    (should-error-with-type (asoc---uniq)                   :error 'wrong-number-of-arguments)
+    (should-error-with-type (asoc---uniq '((x . 1)) 'extra) :error 'wrong-number-of-arguments)
+    (should-error-with-type (asoc---uniq 2)                    :error 'wrong-type-argument)
+    (should-error-with-type (asoc---uniq '(x . 1))             :error 'wrong-type-argument)
+    ;; alist is improper
+    (should-error-with-type (asoc---uniq '((x . 1) . (x . 1))) :error 'wrong-type-argument)
+    (should-error-with-type (asoc---uniq "1")                  :error 'wrong-type-argument)
+    (should-error-with-type (asoc---uniq [1])                  :error 'wrong-type-argument)
     )
 
-  (ert-deftest test-asoc-unit-tests-asoc---list-member ()
-    "Unit tests for `asoc---list-member'."
+  (ert-deftest test-asoc-unit-tests-asoc---list-member/result-by-equality-fn ()
+    "Unit tests for `asoc---list-member' with different choices of equality function."
     (should-equal
      (let* (  table
               ( p      '(1 2)  )
@@ -161,6 +194,17 @@
        (cl-equalp ::  7  7    6    6    5    5       4    4    nil  2   1 ))
      )
     )
+
+  (ert-deftest test-asoc-unit-tests-asoc---list-member/wrong-arguments ()
+    "Unit tests for `asoc---list-member' with incorrect arguments."
+    (should-error-with-type (asoc---list-member)                :error 'wrong-number-of-arguments)
+    (should-error-with-type (asoc---list-member 'x)             :error 'wrong-number-of-arguments)
+    (should-error-with-type (asoc---list-member 'x '(x) 'extra) :error 'wrong-number-of-arguments)
+    (should-error-with-type (asoc---list-member 'x 2)        :error 'wrong-type-argument)
+    (should-error-with-type (asoc---list-member 'x "1")      :error 'wrong-type-argument)
+    (should-error-with-type (asoc---list-member 'x [1])      :error 'wrong-type-argument)
+    (should-error-with-type (asoc---list-member 'x '(1 . 2)) :error 'wrong-type-argument)
+    )
 
   (ert-deftest test-asoc-unit-tests-asoc---list-filter ()
     "Unit tests for `asoc---list-filter'."
@@ -196,6 +240,26 @@
      (let ((list '(nil nil)))
        (asoc---list-filter #'symbolp list))
      :result '(nil nil))
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc---list-filter/wrong-arguments ()
+    "Unit tests for `asoc---list-filter' with incorrect arguments."
+    (should-error-with-type (asoc---list-filter)
+                            :error 'wrong-number-of-arguments)
+    (should-error-with-type (asoc---list-filter #'symbolp)
+                            :error 'wrong-number-of-arguments)
+    (should-error-with-type (asoc---list-filter #'symbolp '((x . 1)) 'extra)
+                            :error 'wrong-number-of-arguments)
+
+    ;; arg1
+    (should-error-with-type (asoc---list-filter 2 '(x))    :error 'invalid-function)
+    (should-error-with-type (asoc---list-filter "2" '(x))  :error 'invalid-function)
+    (should-error-with-type (asoc---list-filter '(x) '(x)) :error 'invalid-function)
+    ;; arg2
+    (should-error-with-type (asoc---list-filter #'symbolp 2)        :error 'wrong-type-argument)
+    (should-error-with-type (asoc---list-filter #'symbolp "1")      :error 'wrong-type-argument)
+    (should-error-with-type (asoc---list-filter #'symbolp [1])      :error 'wrong-type-argument)
+    (should-error-with-type (asoc---list-filter #'symbolp '(1 . 2)) :error 'wrong-type-argument)
     )
 
   (ert-deftest test-asoc-unit-tests-asoc---list-remove ()
@@ -236,6 +300,17 @@
        (asoc---list-remove #'integerp list))
      :result '(nil nil))
     )
+
+  (ert-deftest test-asoc-unit-tests-asoc---list-remove/wrong-arguments ()
+    "Unit tests for `asoc---list-remove' with incorrect arguments."
+    (should-error-with-type (asoc---list-remove)                             :error 'wrong-number-of-arguments)
+    (should-error-with-type (asoc---list-remove #'symbolp)                   :error 'wrong-number-of-arguments)
+    (should-error-with-type (asoc---list-remove #'symbolp '((x . 1)) 'extra) :error 'wrong-number-of-arguments)
+    (should-error-with-type (asoc---list-remove #'symbolp 2)        :error 'wrong-type-argument)
+    (should-error-with-type (asoc---list-remove #'symbolp "1")      :error 'wrong-type-argument)
+    (should-error-with-type (asoc---list-remove #'symbolp [1])      :error 'wrong-type-argument)
+    (should-error-with-type (asoc---list-remove #'symbolp '(1 . 2)) :error 'wrong-type-argument)
+    )
 
   (ert-deftest test-asoc-unit-tests-asoc---list-take ()
     "Unit tests for `asoc---list-take'."
@@ -256,6 +331,23 @@
     (should-error (asoc---list-take nil nil) :type 'wrong-type-argument)
     ;; 2nd argument not a list
     (should-error (asoc---list-take 5 5) :type 'wrong-type-argument)
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc---list-take/wrong-arguments ()
+    "Unit tests for `asoc---list-take' with incorrect arguments."
+    (should-error-with-type (asoc---list-take)                     :error 'wrong-number-of-arguments)
+    (should-error-with-type (asoc---list-take 2)                   :error 'wrong-number-of-arguments)
+    (should-error-with-type (asoc---list-take 2 '((x . 1)) 'extra) :error 'wrong-number-of-arguments)
+    ;; arg1
+    (should-error-with-type (asoc---list-take nil '((x . 1)))        :error 'wrong-type-argument)
+    (should-error-with-type (asoc---list-take '((x . 1)) '((x . 1))) :error 'wrong-type-argument)
+    ;; swapped
+    (should-error-with-type (asoc---list-take '((x . 1)) 2)          :error 'wrong-type-argument)
+    ;; arg2
+    (should-error-with-type (asoc---list-take 2 2)        :error 'wrong-type-argument)
+    (should-error-with-type (asoc---list-take 2 "1")      :error 'wrong-type-argument)
+    (should-error-with-type (asoc---list-take 2 [1])      :error 'wrong-type-argument)
+    (should-error-with-type (asoc---list-take 2 '(1 . 2)) :error 'wrong-type-argument)
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-make ()
