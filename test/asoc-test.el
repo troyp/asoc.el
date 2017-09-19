@@ -1491,6 +1491,58 @@
      (let ((a '((3 . 10)))) (asoc-put! a 3 10 :replace))
      :result '((3 . 10)))
     )
+
+  (ert-deftest test-asoc-unit-tests-asoc-put!/wrong-arguments ()
+    "Unit tests for `asoc-put!' with incorrect arguments."
+    (should-error (macroexpand '(asoc-put!))                :type 'wrong-number-of-arguments)
+    (should-error (macroexpand '(asoc-put! a))              :type 'wrong-number-of-arguments)
+    (should-error (macroexpand '(asoc-put! a 'x))           :type 'wrong-number-of-arguments)
+    (should-error (macroexpand '(asoc-put! a 'x nil t nil)) :type 'wrong-number-of-arguments)
+    ;; atomic elements are ignored
+    (should-equal (eval '(let ((a 2)) (asoc-put! a 'x t))) :result '((x . t) . 2))
+    (should-equal (eval '(let ((a "1")) (asoc-put! a 'x t))) :result '((x . t) . "1"))
+    (should-equal (eval '(let ((a [1])) (asoc-put! a 'x t))) :result '((x . t) . [1]))
+    (should-equal (eval '(let ((a '(1 . 2))) (asoc-put! a 'x t))) :result '((x . t) 1 . 2))
+    (should-equal (let ((a '(x y))) (asoc-put! a 'x t)) :result '((x . t) x y))
+    (should-equal (let ((a '(1 2))) (asoc-put! a 'x t)) :result '((x . t) 1 2))
+    (should-equal (let ((a '(x y (z . 3)))) (asoc-put! a 'z t)) :result '((z . t) x y (z . 3)))
+    ;; improper alist: never error (just append to front of list)
+    (should-equal (let ((a '((x . 1) (y . 1) . (z . 1)))) (asoc-put! a 'x t))
+                  :result '((x . t) (x . 1) (y . 1) z . 1))
+    (should-equal (let ((a '((x . 1) (y . 1) . (z . 1)))) (asoc-put! a 'z t))
+                  :result '((z . t) (x . 1) (y . 1) z . 1))
+    (should-equal (let ((a '((x . 1) (y . 1) . (z . 1)))) (asoc-put! a 'a t))
+                  :result '((a . t) (x . 1) (y . 1) z . 1))
+    ;; arg1 should not be a literal
+    (should-error (asoc-put! '((x . 1) (y . 2) (z . 3)) 'x 4) :type 'error)    ;; invalid-function
+    (should-error (asoc-put! '((x . 1) (y . 2) (z . 3)) 'a 4) :type 'error)    ;; invalid-function
+    (should-error (eval '(asoc-put! 2 'x t))                  :type 'error)    ;; gv-invalid-place
+    (should-error (eval '(asoc-put! "1" 'x t))                :type 'error)    ;; gv-invalid-place
+    (should-error (eval '(asoc-put! [1] 'x t))                :type 'error)    ;; gv-invalid-place
+    (should-error (eval '(asoc-put! '(1 . 2) 'x t))           :type 'error)    ;; invalid-function
+    (should-error (asoc-put! '(x y) 'x t)                     :type 'error)    ;; void-function
+    (should-error (asoc-put! '(1 2) 'x t)                     :type 'error)    ;; invalid-function
+    (should-error (asoc-put! '(x y (z . 3)) 'z t)             :type 'error)    ;; void-function
+    )
+
+  (ert-deftest test-asoc-unit-tests-asoc-put!/replace/wrong-arguments ()
+    "Unit tests for `asoc-put!' with incorrect arguments."
+    ;; improper alist: always error (checks to the end of the list)
+    (should-error (let ((a '((x . 1) (y . 1) . (z . 1)))) (asoc-put! a 'x t t))
+                  :type 'wrong-type-argument)
+    (should-error (let ((a '((x . 1) (y . 1) . (z . 1)))) (asoc-put! a 'z t t))
+                  :type 'wrong-type-argument)
+    (should-error (let ((a '((x . 1) (y . 1) . (z . 1)))) (asoc-put! a 'a t t))
+                  :type 'wrong-type-argument)
+    ;; atomic elements result in error
+    (should-error (eval '(let ((a 2)) (asoc-put! a 'x t t)))        :type 'wrong-type-argument)
+    (should-error (eval '(let ((a "1")) (asoc-put! a 'x t t)))      :type 'wrong-type-argument)
+    (should-error (eval '(let ((a [1])) (asoc-put! a 'x t t)))      :type 'wrong-type-argument)
+    (should-error (eval '(let ((a '(1 . 2))) (asoc-put! a 'x t t))) :type 'wrong-type-argument)
+    (should-error (let ((a '(x y))) (asoc-put! a 'x t t))           :type 'wrong-type-argument)
+    (should-error (let ((a '(1 2))) (asoc-put! a 'x t t))           :type 'wrong-type-argument)
+    (should-error (let ((a '(x y (z . 3)))) (asoc-put! a 'z t t))   :type 'wrong-type-argument)
+    )
 
   (ert-deftest test-asoc-unit-tests-asoc-pop! ()
     "Unit tests for `asoc-pop!'."
