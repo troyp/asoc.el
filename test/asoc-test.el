@@ -56,8 +56,8 @@
     (should-error (asoc---compare 'x 'y 'extra) :type 'wrong-number-of-arguments)
     )
 
-  (ert-deftest test-asoc-unit-tests-asoc---assoc/result-by-equality-fn ()
-    "Unit tests for `asoc---assoc' with different choices of equality function."
+  (ert-deftest test-asoc-unit-tests-asoc-assoc/result-by-equality-fn ()
+    "Unit tests for `asoc-assoc' with different choices of equality function."
     (should-equal
      (let* (  table
               ( p      '(1 2) )
@@ -78,7 +78,7 @@
          (let* (( asoc-compare-fn  eqfn           )
                 ( result           (list :: eqfn) ))
            (dolist (test test-items)
-             (push (asoc---assoc test a)
+             (push (asoc-assoc test a)
                    result))
            (push (reverse result) table)))
        table)
@@ -90,50 +90,50 @@
        (cl-equalp :: (1 . t) (1 . t) (2.0 . t) (2.0 . t) ("a" . t) ("a" . t) ((1 2) . t) ((1 2) . t) (nil . t)))
      ))
 
-  (ert-deftest test-asoc-unit-tests-asoc---assoc/wrong-arguments ()
-    "Unit tests for `asoc---assoc' with incorrect arguments supplied."
-    (should-error (asoc---assoc)                      :type 'wrong-number-of-arguments)
-    (should-error (asoc---assoc 'x)                   :type 'wrong-number-of-arguments)
-    (should-error (asoc---assoc 'x '((x . 1)) 'extra) :type 'wrong-number-of-arguments)
+  (ert-deftest test-asoc-unit-tests-asoc-assoc/wrong-arguments ()
+    "Unit tests for `asoc-assoc' with incorrect arguments supplied."
+    (should-error (asoc-assoc)                      :type 'wrong-number-of-arguments)
+    (should-error (asoc-assoc 'x)                   :type 'wrong-number-of-arguments)
+    (should-error (asoc-assoc 'x '((x . 1)) 'extra) :type 'wrong-number-of-arguments)
     ;; arg2 is an alist (proper list of conses)
-    (should-error (asoc---assoc 2 'x)        :type 'wrong-type-argument)
-    (should-error (asoc---assoc 'x "1")      :type 'wrong-type-argument)
-    (should-error (asoc---assoc 'x [1])      :type 'wrong-type-argument)
-    (should-error (asoc---assoc 'x '(x . y)) :type 'wrong-type-argument)
+    (should-error (asoc-assoc 2 'x)        :type 'wrong-type-argument)
+    (should-error (asoc-assoc 'x "1")      :type 'wrong-type-argument)
+    (should-error (asoc-assoc 'x [1])      :type 'wrong-type-argument)
+    (should-error (asoc-assoc 'x '(x . y)) :type 'wrong-type-argument)
     ;; ignore atomic elements (as for `assoc', etc)
-    (should-equal (asoc---assoc 'x '(x y))         :result nil)
-    (should-equal (asoc---assoc 'x '(1 2))         :result nil)
-    (should-equal (asoc---assoc 'z '(x y (z . 3))) :result '(z . 3))
+    (should-equal (asoc-assoc 'x '(x y))         :result nil)
+    (should-equal (asoc-assoc 'x '(1 2))         :result nil)
+    (should-equal (asoc-assoc 'z '(x y (z . 3))) :result '(z . 3))
     ;; improper alist: error if end is reached (key is not present of is in last cdr)
-    (should-equal (asoc---assoc 'x '((x . 1) (y . 1) . (z . 1))) :result '(x . 1))
-    (should-error (asoc---assoc 'z '((x . 1) (y . 1) . (z . 1))) :type 'wrong-type-argument)
-    (should-error (asoc---assoc 'a '((x . 1) (y . 1) . (z . 1))) :type 'wrong-type-argument)
+    (should-equal (asoc-assoc 'x '((x . 1) (y . 1) . (z . 1))) :result '(x . 1))
+    (should-error (asoc-assoc 'z '((x . 1) (y . 1) . (z . 1))) :type 'wrong-type-argument)
+    (should-error (asoc-assoc 'a '((x . 1) (y . 1) . (z . 1))) :type 'wrong-type-argument)
     )
 
-  (ert-deftest test-asoc-unit-tests-asoc---assoc/atomic-elements-equalp ()
+  (ert-deftest test-asoc-unit-tests-asoc-assoc/atomic-elements-equalp ()
     ;; ignore atomic elements
     ;; regression test: see commit 7807f49
     (let ((asoc-compare-fn 'cl-equalp))
-      (should-equal (asoc---assoc 'x '(x y))         :result nil)
-      (should-equal (asoc---assoc 'x '(1 2))         :result nil)
-      (should-equal (asoc---assoc 'z '(x y (z . 3))) :result '(z . 3)))
+      (should-equal (asoc-assoc 'x '(x y))         :result nil)
+      (should-equal (asoc-assoc 'x '(1 2))         :result nil)
+      (should-equal (asoc-assoc 'z '(x y (z . 3))) :result '(z . 3)))
     )
 
-  (ert-deftest test-asoc-unit-tests-asoc---assoc/atomic-elements-eql ()
+  (ert-deftest test-asoc-unit-tests-asoc-assoc/atomic-elements-eql ()
     ;; ignore atomic elements
     ;; regression test: see commit 7807f49
     (let ((asoc-compare-fn 'eql))
-      (should-equal (asoc---assoc 'x '(x y))         :result nil)
-      (should-equal (asoc---assoc 'x '(1 2))         :result nil)
-      (should-equal (asoc---assoc 'z '(x y (z . 3))) :result '(z . 3)))
+      (should-equal (asoc-assoc 'x '(x y))         :result nil)
+      (should-equal (asoc-assoc 'x '(1 2))         :result nil)
+      (should-equal (asoc-assoc 'z '(x y (z . 3))) :result '(z . 3)))
     )
 
-  (ert-deftest test-asoc-unit-tests-asoc---assoc/atomic-elements-eq ()
+  (ert-deftest test-asoc-unit-tests-asoc-assoc/atomic-elements-eq ()
     ;; ignore atomic elements
     (let ((asoc-compare-fn 'eq))
-      (should-equal (asoc---assoc 'x '(x y))         :result nil)
-      (should-equal (asoc---assoc 'x '(1 2))         :result nil)
-      (should-equal (asoc---assoc 'z '(x y (z . 3))) :result '(z . 3)))
+      (should-equal (asoc-assoc 'x '(x y))         :result nil)
+      (should-equal (asoc-assoc 'x '(1 2))         :result nil)
+      (should-equal (asoc-assoc 'z '(x y (z . 3))) :result '(z . 3)))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc---uniq ()
@@ -1893,45 +1893,6 @@
                   :result '((a . 1) (b . 2) (c . 3) (d . 4)))
     ;; non-list second argument
     (should-error (asoc--find t 5) :type 'wrong-type-argument)
-    )
-
-  (ert-deftest test-asoc-unit-tests-asoc-find-key ()
-    "Unit tests for `asoc-find-key'."
-    ;; empty list
-    (should-equal (asoc-find-key (lambda (k) t) nil) :result nil)
-    (should-equal (asoc-find-key (lambda (k) nil) nil) :result nil)
-    ;; empty list: no error from predicates with wrong number of arguments
-    (should-equal (asoc-find-key (lambda () t) nil) :result nil)
-    (should-equal (asoc-find-key (lambda (a b c d) t) nil) :result nil)
-    (should-equal
-     (let* (  table
-              ( p  '(1 2) )
-              ( a  `((1   . t) (2.0 . t) ("a" . t) (,p  . t) (nil . t)) )
-               ;;            TEST-ITEM ;;    ALIST-ELEM
-              (test-items `( 1         ;;    1           | 1  int
-                             1.0       ;;    1           | 2  float matches int
-                             2.0       ;;    2.0         | 3  float
-                             2         ;;    2.0         | 4  int matches float
-                             "a"       ;;    "a"         | 5  string
-                             "A"       ;;    "a"         | 6  string, other case
-                             (1 2)     ;;    p = (1 2)   | 7  list, same structure
-                             ,p        ;;    p           | 8  list, same object
-                             nil       ;;    nil         | 9  nil
-                             )))
-       (dolist (eqfn (list #'cl-equalp #'equal #'eql #'eq))
-         (let ( (asoc-compare-fn  eqfn)
-                (result  (list :: eqfn)) )
-           (dolist (test test-items)
-             (push (asoc-find-key test a)
-                   result))
-           (push (reverse result) table)))
-       table)
-     :result
-     ;;  FN            1/1    1.0/1   2.0/2.0    2/2.0    "a"/"a"   "A"/"a"  (1 2)/(1 2) (1 2),same     nil
-     '((eq        :: (1 . t)   nil      nil       nil       nil       nil        nil     ((1 2) . t) (nil . t))
-       (eql       :: (1 . t)   nil   (2.0 . t)    nil       nil       nil        nil     ((1 2) . t) (nil . t))
-       (equal     :: (1 . t)   nil   (2.0 . t)    nil    ("a" . t)    nil    ((1 2) . t) ((1 2) . t) (nil . t))
-       (cl-equalp :: (1 . t) (1 . t) (2.0 . t) (2.0 . t) ("a" . t) ("a" . t) ((1 2) . t) ((1 2) . t) (nil . t))))
     )
 
   (ert-deftest test-asoc-unit-tests-asoc-keys ()

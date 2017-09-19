@@ -5,7 +5,7 @@
 ;; Author: Troy Pracy <troyp7@gmail.com>
 ;; Maintainer: Troy Pracy <troyp7@gmail.com>
 ;; Keywords: alist data-types
-;; Version: 0.6.3
+;; Version: 0.7.0
 ;; URL: https://github.com/troyp/asoc.el
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -57,19 +57,6 @@ This variable may be passed to asoc functions dynamically in a let binding.")
   "Compare X and Y using `asoc-compare-fn'."
   (funcall (or asoc-compare-fn #'equal) x y))
 
-(defun asoc---assoc (key alist)
-  "Return the first association in ALIST matching KEY, or else nil.
-
-The equality test to be used is determined by `asoc-compare-fn'."
-  (cl-case asoc-compare-fn
-    ('eq          (assq  key alist))
-    ((equal nil)  (assoc key alist))
-    (t (progn
-         (while (and alist
-                     (not (funcall asoc-compare-fn (car-safe (car alist)) key)))
-           (setf alist (cdr alist)))
-         (car alist)))))
-
 (defun asoc---uniq (alist)
   "Return a copy of ALIST with duplicate keys removed.
 
@@ -80,7 +67,7 @@ is determined using `asoc-compare-fn'."
     (while rest
       (let* ((pair  (car rest))
              (key   (car pair)))
-        (unless (asoc---assoc key result)
+        (unless (asoc-assoc key result)
           (push pair result)))
       (setq rest (cdr rest)))
     (nreverse result)))
@@ -324,7 +311,7 @@ Example:
 
 (defun asoc-contains-key? (alist key)
   "Return t if ALIST contains an item with key KEY, nil otherwise."
-  (when (asoc---assoc key alist) t))
+  (when (asoc-assoc key alist) t))
 
 (defun asoc-contains-pair? (alist key value)
   "Return t if ALIST contains an item (KEY . VALUE), nil otherwise."
@@ -348,7 +335,7 @@ Example:
 
 (defun asoc-get (alist key &optional default)
   "Return the value associated with KEY in ALIST, or DEFAULT if missing."
-  (or (cdr (asoc---assoc key alist)) default))
+  (or (cdr (asoc-assoc key alist)) default))
 
 (defmacro asoc-put! (alist key value &optional replace)
   "Associate KEY with VALUE in ALIST.
@@ -364,6 +351,19 @@ are removed. Otherwise, the pair is simply consed on the front of the alist."
                      ,alist)))
      (push (cons ,key ,value) ,alist)))
      ;; (setq ,alist (cons (cons ,key ,value) ,alist))))
+
+(defun asoc-assoc (key alist)
+  "Return the first association in ALIST matching KEY, or else nil.
+
+The equality test to be used is determined by `asoc-compare-fn'."
+  (cl-case asoc-compare-fn
+    ('eq          (assq  key alist))
+    ((equal nil)  (assoc key alist))
+    (t (progn
+         (while (and alist
+                     (not (funcall asoc-compare-fn (car-safe (car alist)) key)))
+           (setf alist (cdr alist)))
+         (car alist)))))
 
 (defun asoc-dissoc (alist &rest keys)
   "Return a modified list excluding all pairs with a key in KEYS"
@@ -411,12 +411,6 @@ For all associations satisfying FORM, use `asoc--filter'"
     (declare (debug (form sexp))
              (indent 1))
     `(asoc-find (lambda (key value) ,form) ,alist))
-
-(defun asoc-find-key (key alist)
-    "Return the first association of ALIST with KEY, or nil if none match.
-
-For all associations with KEY, use `asoc-filter-keys'."
-    (asoc---assoc key alist))
 
 (defun asoc-keys (alist)
   "Return a list of unique keys in ALIST.

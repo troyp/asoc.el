@@ -45,11 +45,11 @@ variant), and a special variable for configuring the equality predicate used by
   `(alist key &optional default)`
 * [asoc-put!](#asoc-put-alist-key-value-optional-replace)
   `(alist key value &optional replace)`
+* [asoc-assoc](#asoc-assoc-key-alist) `(key alist)`
 * [asoc-dissoc](#asoc-dissoc-alist-rest-keys) `(alist &rest keys)`
 * [asoc-pop!](#asoc-pop-alist-key) `(alist key)`
 * [asoc-find](#asoc-find-predicate-alist) `(predicate alist)`
 * [asoc--find](#asoc--find-form-alist) `(form alist)`
-* [asoc-find-key](#asoc-find-key-key-alist) `(key alist)`
 * [asoc-keys](#asoc-keys-alist) `(alist)`
 * [asoc-values](#asoc-values-alist-optional-ignore-shadowed)
   `(alist &optional ignore-shadowed)`
@@ -293,6 +293,12 @@ When __key__ already exists, if __replace__ is non-nil, previous entries with
 that __key__ are removed. Otherwise, the pair is simply consed on the front of
 the __alist__. In the latter case, this is equivalent to `acons`.
 
+#### asoc-assoc `(key alist)`
+
+Return the first association in __alist__ matching __key__, or else nil.
+
+The equality test to be used is determined by `asoc-compare-fn`.
+
 #### asoc-dissoc `(alist &rest keys)`
 
 Return a modified list excluding all pairs with a key in __keys__
@@ -318,12 +324,6 @@ Return the first __alist__ association for which __form__ evaluates t.
 The anaphoric variables `key` and `value` are available for use in __form__.
 
 For all associations satisfying __form__, use `asoc--filter`
-
-#### asoc-find-key `(key alist)`
-
-Return the first association of __alist__ with __key__, or nil if none match.
-
-For all associations with __key__, use `asoc-filter-keys`.
 
 #### asoc-keys `(alist)`
 
