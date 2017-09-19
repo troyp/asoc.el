@@ -301,7 +301,7 @@ The equality test to be used is determined by `asoc-compare-fn`.
 
 #### asoc-dissoc `(alist &rest keys)`
 
-Return a modified list excluding all pairs with a key in __keys__
+Return a modified list excluding all pairs with a key in __keys__.
 
 #### asoc-pop! `(alist key)`
 
@@ -323,7 +323,7 @@ Return the first __alist__ association for which __form__ evaluates t.
 
 The anaphoric variables `key` and `value` are available for use in __form__.
 
-For all associations satisfying __form__, use `asoc--filter`
+For all associations satisfying __form__, use `asoc--filter`.
 
 #### asoc-keys `(alist)`
 

@@ -366,7 +366,7 @@ The equality test to be used is determined by `asoc-compare-fn'."
          (car alist)))))
 
 (defun asoc-dissoc (alist &rest keys)
-  "Return a modified list excluding all pairs with a key in KEYS"
+  "Return a modified list excluding all pairs with a key in KEYS."
   (let (result)
     (dolist (assn alist result)
       (unless (asoc---list-member (car assn) keys)
@@ -407,7 +407,7 @@ Return the first ALIST association for which FORM evaluates t.
 
 The anaphoric variables 'key and 'value are available for use in FORM.
 
-For all associations satisfying FORM, use `asoc--filter'"
+For all associations satisfying FORM, use `asoc--filter'."
     (declare (debug (form sexp))
              (indent 1))
     `(asoc-find (lambda (key value) ,form) ,alist))
