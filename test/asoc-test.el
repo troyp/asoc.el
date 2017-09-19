@@ -1700,6 +1700,35 @@
         ((1 2) :: (1 . t) (2.0 . t) ("a" . t)             (nil . t))
         (nil   :: (1 . t) (2.0 . t) ("a" . t) ((1 2) . t))         )))
     )
+
+  (ert-deftest test-asoc-unit-tests-asoc-pop!/wrong-arguments ()
+    "Unit tests for `asoc-pop!' with incorrect arguments."
+    (should-error (macroexpand '(asoc-pop!))                :type 'wrong-number-of-arguments)
+    (should-error (macroexpand '(asoc-pop! a))              :type 'wrong-number-of-arguments)
+    (should-error (macroexpand '(asoc-pop! a 'x nil nil))   :type 'wrong-number-of-arguments)
+    ;; arg1 should be an alist variable
+    (should-error (let ((a 2)) (asoc-pop! a 'x))              :type 'wrong-type-argument)
+    (should-error (let ((a "1")) (asoc-pop! a 'x))            :type 'wrong-type-argument)
+    (should-error (let ((a [1])) (asoc-pop! a 'x))            :type 'wrong-type-argument)
+    (should-error (let ((a '(1 . 2))) (asoc-pop! a 'x))       :type 'wrong-type-argument)
+    (should-error (let ((a '(x y))) (asoc-pop! a 'x))         :type 'wrong-type-argument)
+    (should-error (let ((a '(1 2))) (asoc-pop! a 'x))         :type 'wrong-type-argument)
+    (should-error (let ((a '(x y (z . 3)))) (asoc-pop! a 'z)) :type 'wrong-type-argument)
+    ;; improper alist: only error if end is reached (key is in last association or not found)
+    (should-equal (let ((a '((x . 1) (y . 1) . (z . 1)))) (asoc-pop! a 'x)) :result '(x . 1))
+    (should-error (let ((a '((x . 1) (y . 1) . (z . 1)))) (asoc-pop! a 'z)) :type 'wrong-type-argument)
+    (should-error (let ((a '((x . 1) (y . 1) . (z . 1)))) (asoc-pop! a 'a)) :type 'wrong-type-argument)
+    ;; arg1 should not be a literal
+    (should-error (asoc-pop! '((x . 1) (y . 2) (z . 3)) 'x) :type 'wrong-type-argument)
+    (should-error (asoc-pop! '((x . 1) (y . 2) (z . 3)) 'a) :type 'wrong-type-argument)
+    (should-error (asoc-pop! 2 'x)                          :type 'wrong-type-argument)
+    (should-error (asoc-pop! "1" 'x)                        :type 'wrong-type-argument)
+    (should-error (asoc-pop! [1] 'x)                        :type 'wrong-type-argument)
+    (should-error (asoc-pop! '(1 . 2) 'x)                   :type 'wrong-type-argument)
+    (should-error (asoc-pop! '(x y) 'x)                     :type 'wrong-type-argument)
+    (should-error (asoc-pop! '(1 2) 'x)                     :type 'wrong-type-argument)
+    (should-error (asoc-pop! '(x y (z . 3)) 'z)             :type 'wrong-type-argument)
+    )
 
   (ert-deftest test-asoc-unit-tests-asoc-dissoc ()
     "Unit tests for `asoc-dissoc'."
