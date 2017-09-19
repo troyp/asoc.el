@@ -289,9 +289,8 @@ missing.
 
 Associate __key__ with __value__ in __alist__.
 
-When __key__ already exists, if __replace__ is non-nil, previous entries with
-that __key__ are removed. Otherwise, the pair is simply consed on the front of
-the __alist__. In the latter case, this is equivalent to `acons`.
+When __key__ already exists, if __replace__ is non-nil, previous entries with that key
+are removed. Otherwise, the pair is simply consed on the front of the alist.
 
 #### asoc-assoc `(key alist)`
 
