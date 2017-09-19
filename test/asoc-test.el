@@ -3,7 +3,7 @@
 (require 'asoc)
 (require 'ert)
 
-(defconst asoc---test-dir (file-name-directory load-file-name))
+(defconst asoc---test-dir (file-name-directory (or load-file-name buffer-file-name)))
 
 (cl-macrolet
     ((should-equal            (expr &key result)
